@@ -3,51 +3,104 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#1c2b40">
+<meta name="theme-color" content="#2a1a0e">
 <title>Obrona Jasnej Góry 1655</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preload" href="fonts/baloo2.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <div id="app">
   <div id="hud">
-    <div class="pill"><span class="ic">💰</span><b id="gold">0</b></div>
-    <div class="pill"><span class="ic">❤️</span><b id="lives">20</b></div>
-    <div class="pill"><span class="ic">⚔️</span><b id="wave">Fala 0/10</b></div>
+    <div class="pill"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="8" ry="4" fill="#c98a12"/><ellipse cx="12" cy="13" rx="8" ry="4" fill="#ffcc33" stroke="#8a5a00" stroke-width="1.5"/><ellipse cx="12" cy="9" rx="8" ry="4" fill="#ffe066" stroke="#8a5a00" stroke-width="1.5"/></svg><b id="gold">0</b></div>
+    <div class="pill"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z" fill="#ff4d5e" stroke="#7a1020" stroke-width="1.5"/><ellipse cx="8.5" cy="9" rx="1.6" ry="1" fill="#fff" opacity=".7"/></svg><b id="lives">20</b></div>
+    <div class="pill"><svg viewBox="0 0 24 24"><path d="M5 3l11 11M3 5l2-2M19 3L8 14M21 5l-2-2" stroke="#e8e8f0" stroke-width="2.4" stroke-linecap="round"/><path d="M13 16l3 3 2-2-3-3M11 16l-3 3-2-2 3-3" fill="#8a5a2b" stroke="#3a2010" stroke-width="1.2"/></svg><span class="lbl">Fala</span><b id="wave">0/10</b></div>
+    <button id="btnPause" class="pbtn" aria-label="Pauza"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="#fff"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="#fff"/></svg></button>
   </div>
   <div id="stage">
     <canvas id="cv"></canvas>
     <div id="menu" class="hidden"></div>
-    <div id="start" class="overlay">
-      <div class="card">
-        <div class="title">Obrona<br>Jasnej Góry</div>
-        <div class="year">Częstochowa · 1655</div>
-        <p>Szwedzi generała Müllera oblegają klasztor. Postaw wieże przy drodze i nie wpuść wroga za mury!</p>
-        <ul>
-          <li>Dotknij <b>kamienne pole</b>, by postawić wieżę</li>
-          <li>Dotknij <b>wieżę</b>, by ją ulepszyć lub sprzedać</li>
-          <li><b>Husaria</b> szarżuje po całej drodze</li>
-          <li>Wcześniejsza fala = <b>bonus złota</b></li>
-        </ul>
-        <div id="best" class="best"></div>
-        <button id="btnPlay" class="big">GRAJ</button>
-      </div>
-    </div>
-    <div id="end" class="overlay hidden">
-      <div class="card">
-        <div id="endTitle" class="title">ZWYCIĘSTWO!</div>
-        <div id="stars" class="stars"></div>
-        <p id="endText"></p>
-        <button id="btnAgain" class="big">ZAGRAJ JESZCZE RAZ</button>
-      </div>
-    </div>
   </div>
   <div id="bar">
-    <button id="btnWave" class="btn green"><span id="waveLbl">▶ Start</span><small id="waveSub"></small></button>
-    <button id="btnHus" class="btn red"><span class="fill" id="husFill"></span><span class="lbl">🪽 Husaria</span><small id="husSub">gotowa!</small></button>
+    <button id="btnWave" class="btn green"><span id="waveLbl">▶ Fala 1</span><small id="waveSub"></small></button>
+    <button id="btnHus" class="btn red"><span class="fill" id="husFill"></span><span class="lbl">Husaria</span><small id="husSub">gotowa!</small><span class="cnt" id="husCnt">3/3</span></button>
     <button id="btnSpeed" class="btn sq">x1</button>
-    <button id="btnMute" class="btn sq">🔊</button>
   </div>
+
+  <!-- EKRAN TYTUŁOWY -->
+  <div id="title" class="screen hidden">
+    <div class="tbg"></div>
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="rays"></div>
+    <div class="tcontent">
+      <div class="logo"><span class="l1">Obrona</span><span class="l2">Jasnej Góry</span><span class="l3">— 1655 —</span></div>
+      <div class="tbtns">
+        <button class="mbtn play" data-act="play">Graj</button>
+        <button class="mbtn" data-act="settings">Ustawienia</button>
+        <button class="mbtn" data-act="records">Rekordy</button>
+        <button class="mbtn" data-act="how">Jak grać</button>
+      </div>
+      <div id="bestLine" class="bestline"></div>
+    </div>
+  </div>
+
+  <!-- USTAWIENIA -->
+  <div id="pSettings" class="panel hidden"><div class="card">
+    <h2>Ustawienia</h2>
+    <button class="tog" id="setMusic" data-act="music"><span>🎵 Muzyka</span><b>WŁ.</b></button>
+    <button class="tog" id="setSfx" data-act="sfx"><span>🔊 Dźwięki</span><b>WŁ.</b></button>
+    <button class="tog" id="setSpeed" data-act="speed"><span>⏩ Prędkość gry</span><b>x1</b></button>
+    <div class="credits">Muzyka: autorski polonez generowany na żywo (WebAudio).<br>Czcionki: Baloo 2 i Cinzel Decorative (licencja SIL OFL 1.1).</div>
+    <button class="mbtn small" data-act="back">Wróć</button>
+  </div></div>
+
+  <!-- REKORDY -->
+  <div id="pRecords" class="panel hidden"><div class="card">
+    <h2>Rekordy</h2>
+    <div class="stars big" id="recStars"></div>
+    <div class="rec"><span>Najlepsza fala</span><b id="recWave">0 / 10</b></div>
+    <div class="rec"><span>Zwycięstwa</span><b id="recWins">0</b></div>
+    <div class="rec"><span>Rozegrane bitwy</span><b id="recGames">0</b></div>
+    <button class="mbtn small" data-act="back">Wróć</button>
+  </div></div>
+
+  <!-- JAK GRAĆ -->
+  <div id="pHow" class="panel hidden"><div class="card how">
+    <h2>Jak grać</h2>
+    <p>Szwedzi generała Müllera idą drogą na klasztor. Nie wpuść ich za mury!</p>
+    <div class="tw"><img src="img/t_mus0.webp?v=2" alt=""><div><b>Muszkieterzy</b> – szybki ogień w jednego wroga.</div></div>
+    <div class="tw"><img src="img/t_arm0.webp?v=2" alt=""><div><b>Armata</b> – wolna, ale rani wielu naraz.</div></div>
+    <div class="tw"><img src="img/t_smo0.webp?v=2" alt=""><div><b>Kocioł smoły</b> – spowalnia i parzy wszystkich wokół.</div></div>
+    <div class="tw"><img src="img/t_rus0.webp?v=2" alt=""><div><b>Rusznica wałowa</b> – daleki strzał w najsilniejszego; przebija zbroje.</div></div>
+    <ul>
+      <li>Dotknij <b>kamienne pole</b>, by postawić wieżę; dotknij wieży, by ją ulepszyć.</li>
+      <li><b>Pancerni</b> mają zbroję – na nich armata i rusznica.</li>
+      <li><b>Husaria</b> szarżuje przez całą drogę – tylko <b>3 razy</b> na bitwę!</li>
+      <li>Wcześniejsze wezwanie fali = <b>bonus złota</b>.</li>
+    </ul>
+    <button class="mbtn small" data-act="back">Wróć</button>
+  </div></div>
+
+  <!-- PAUZA -->
+  <div id="pause" class="screen dim hidden"><div class="card">
+    <h2>Pauza</h2>
+    <button class="mbtn play" data-act="resume">Wznów</button>
+    <div class="prow">
+      <button class="ico" id="pmMusic" data-act="music">🎵<small>Muzyka</small></button>
+      <button class="ico" id="pmSfx" data-act="sfx">🔊<small>Dźwięki</small></button>
+      <button class="ico" data-act="how">❓<small>Jak grać</small></button>
+    </div>
+    <button class="mbtn small red" data-act="menu">Menu główne</button>
+  </div></div>
+
+  <!-- KONIEC -->
+  <div id="end" class="screen dim hidden"><div class="card">
+    <h2 id="endTitle">ZWYCIĘSTWO!</h2>
+    <div id="stars" class="stars"></div>
+    <p id="endText"></p>
+    <button class="mbtn play" data-act="again">Zagraj ponownie</button>
+    <button class="mbtn small" data-act="menu">Menu główne</button>
+  </div></div>
 </div>
-<script src="game.js"></script>
+<script src="game.js?v=2"></script>
 </body>
 </html>
