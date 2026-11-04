@@ -1,0 +1,50 @@
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#1c2b40;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:520px;margin:0 auto}
+#hud{display:flex;gap:6px;padding:8px 8px 6px;padding-top:max(8px,env(safe-area-inset-top));justify-content:space-between}
+.pill{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:linear-gradient(#3b5378,#2a3d5c);border:2px solid #6d8bb8;border-radius:14px;padding:5px 6px;font-size:16px;box-shadow:0 2px 0 #0e1726}
+.pill b{font-weight:800;white-space:nowrap}
+.pill.bump{animation:bump .3s}
+@keyframes bump{50%{transform:scale(1.15)}}
+#stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#cv{display:block;border-radius:12px;box-shadow:0 0 0 3px #0e1726,0 6px 18px rgba(0,0,0,.5);touch-action:none}
+#bar{display:flex;gap:6px;padding:6px 8px 8px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.btn{position:relative;overflow:hidden;border:none;border-radius:14px;color:#fff;font-weight:800;font-size:16px;padding:8px 6px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.35);font-family:inherit;cursor:pointer}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn small{font-size:11px;font-weight:600;opacity:.9;position:relative}
+.btn.green{flex:1.4;background:linear-gradient(#5fd35a,#2f9c33)}
+.btn.red{flex:1.2;background:linear-gradient(#ef5050,#b82020)}
+.btn.sq{width:52px;background:linear-gradient(#5b7299,#3a4f72);font-size:18px}
+.btn:disabled{filter:grayscale(.8) brightness(.75)}
+.btn.pulse{animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 4px 0 rgba(0,0,0,.35),0 0 0 5px rgba(255,240,120,.7)}}
+.btn .lbl{position:relative}
+.fill{position:absolute;left:0;bottom:0;width:100%;height:0;background:rgba(0,0,0,.45)}
+#menu{position:absolute;z-index:5;background:#fff8e6;color:#3a2a14;border:3px solid #3a2a14;border-radius:16px;padding:8px;box-shadow:0 6px 16px rgba(0,0,0,.45);width:250px}
+#menu.hidden,.hidden{display:none!important}
+#menu .opts{display:flex;gap:6px}
+#menu .opt{flex:1;background:#ffe9b0;border:2px solid #b8873a;border-radius:12px;padding:4px 2px;text-align:center;font-size:11px;font-weight:700;color:#3a2a14;font-family:inherit}
+#menu .opt img{width:48px;height:48px;display:block;margin:0 auto}
+#menu .opt .c{display:block;font-size:13px;color:#8a5a00;margin-top:2px}
+#menu .opt.no{opacity:.45}
+#menu h3{font-size:15px;margin-bottom:2px}
+#menu .desc{font-size:12px;margin-bottom:6px;opacity:.85}
+#menu .row{display:flex;gap:6px}
+#menu .act{flex:1;border:none;border-radius:10px;padding:10px 4px;font-weight:800;font-size:14px;color:#fff;font-family:inherit}
+#menu .up{background:#2f9c33}#menu .sell{background:#c0392b}
+#menu .act.no{opacity:.45}
+.overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(10,18,30,.6);padding:14px}
+.card{background:linear-gradient(#fff8e6,#f3dfb2);color:#3a2a14;border:4px solid #3a2a14;border-radius:22px;padding:18px 16px;text-align:center;max-width:340px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:pop .35s}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.title{font-size:34px;font-weight:900;line-height:1.05;color:#c0262d;text-shadow:2px 2px 0 #fff,4px 4px 0 rgba(0,0,0,.15);letter-spacing:.5px}
+.year{font-weight:800;margin:4px 0 10px;color:#7a5520}
+.card p{font-size:14px;margin-bottom:8px}
+.card ul{text-align:left;font-size:13px;margin:0 0 10px 18px}
+.card li{margin:3px 0}
+.big{background:linear-gradient(#5fd35a,#2f9c33);color:#fff;border:3px solid #1e5e20;border-radius:16px;font-size:22px;font-weight:900;padding:12px 26px;margin-top:6px;box-shadow:0 5px 0 #1e5e20;font-family:inherit}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #1e5e20}
+.best{font-size:13px;font-weight:700;color:#7a5520;min-height:16px}
+.stars{font-size:52px;margin:6px 0;letter-spacing:4px}
+.stars span{display:inline-block;color:#cbbd9a;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.stars span.on{color:#ffc600;text-shadow:0 0 12px #ffe680,0 2px 0 #b07800;animation:star .5s backwards}
+@keyframes star{from{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.4)}}

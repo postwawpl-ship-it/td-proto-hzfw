@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1c2b40">
+<title>Obrona Jasnej Góry 1655</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="hud">
+    <div class="pill"><span class="ic">💰</span><b id="gold">0</b></div>
+    <div class="pill"><span class="ic">❤️</span><b id="lives">20</b></div>
+    <div class="pill"><span class="ic">⚔️</span><b id="wave">Fala 0/10</b></div>
+  </div>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="menu" class="hidden"></div>
+    <div id="start" class="overlay">
+      <div class="card">
+        <div class="title">Obrona<br>Jasnej Góry</div>
+        <div class="year">Częstochowa · 1655</div>
+        <p>Szwedzi generała Müllera oblegają klasztor. Postaw wieże przy drodze i nie wpuść wroga za mury!</p>
+        <ul>
+          <li>Dotknij <b>kamienne pole</b>, by postawić wieżę</li>
+          <li>Dotknij <b>wieżę</b>, by ją ulepszyć lub sprzedać</li>
+          <li><b>Husaria</b> szarżuje po całej drodze</li>
+          <li>Wcześniejsza fala = <b>bonus złota</b></li>
+        </ul>
+        <div id="best" class="best"></div>
+        <button id="btnPlay" class="big">GRAJ</button>
+      </div>
+    </div>
+    <div id="end" class="overlay hidden">
+      <div class="card">
+        <div id="endTitle" class="title">ZWYCIĘSTWO!</div>
+        <div id="stars" class="stars"></div>
+        <p id="endText"></p>
+        <button id="btnAgain" class="big">ZAGRAJ JESZCZE RAZ</button>
+      </div>
+    </div>
+  </div>
+  <div id="bar">
+    <button id="btnWave" class="btn green"><span id="waveLbl">▶ Start</span><small id="waveSub"></small></button>
+    <button id="btnHus" class="btn red"><span class="fill" id="husFill"></span><span class="lbl">🪽 Husaria</span><small id="husSub">gotowa!</small></button>
+    <button id="btnSpeed" class="btn sq">x1</button>
+    <button id="btnMute" class="btn sq">🔊</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
