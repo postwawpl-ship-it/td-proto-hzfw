@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#2a1a0e">
-<title>Obrona Jasnej Góry 1655</title>
-<link rel="preload" href="fonts/baloo2.woff2?v=2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=2">
+<title>Obrona Jasnej Góry – Kampania</title>
+<link rel="preload" href="fonts/baloo2.woff2?v=3" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <div id="app">
@@ -22,7 +22,8 @@
   </div>
   <div id="bar">
     <button id="btnWave" class="btn green"><span id="waveLbl">▶ Fala 1</span><small id="waveSub"></small></button>
-    <button id="btnHus" class="btn red"><span class="fill" id="husFill"></span><span class="lbl">Husaria</span><small id="husSub">gotowa!</small><span class="cnt" id="husCnt">3/3</span></button>
+    <button id="btnSpec" class="btn red"><span class="fill" id="specFill"></span><span class="lbl" id="specLbl">Husaria</span><small id="specSub">gotowa!</small><span class="cnt" id="specCnt">3/3</span></button>
+    <button id="btnHero" class="btn hero"><img id="heroImg" alt=""><span class="fill" id="heroFill"></span><small id="heroSub">Modlitwa</small></button>
     <button id="btnSpeed" class="btn sq">x1</button>
   </div>
 
@@ -32,7 +33,7 @@
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     <div class="rays"></div>
     <div class="tcontent">
-      <div class="logo"><span class="l1">Obrona</span><span class="l2">Jasnej Góry</span><span class="l3">— 1655 —</span></div>
+      <div class="logo"><span class="l1">Obrona</span><span class="l2">Jasnej Góry</span><span class="l3">— kampania —</span></div>
       <div class="tbtns">
         <button class="mbtn play" data-act="play">Graj</button>
         <button class="mbtn" data-act="settings">Ustawienia</button>
@@ -49,15 +50,15 @@
     <button class="tog" id="setMusic" data-act="music"><span>🎵 Muzyka</span><b>WŁ.</b></button>
     <button class="tog" id="setSfx" data-act="sfx"><span>🔊 Dźwięki</span><b>WŁ.</b></button>
     <button class="tog" id="setSpeed" data-act="speed"><span>⏩ Prędkość gry</span><b>x1</b></button>
-    <div class="credits">Muzyka: autorski polonez generowany na żywo (WebAudio).<br>Czcionki: Baloo 2 i Cinzel Decorative (licencja SIL OFL 1.1).</div>
+    <button class="tog danger" id="setReset" data-act="reset"><span>🗑️ Reset postępu</span><b>USUŃ</b></button>
+    <div class="credits">Muzyka: autorskie melodie generowane na żywo (WebAudio) – inna na każdą bitwę.<br>Czcionki: Baloo 2 i Cinzel Decorative (licencja SIL OFL 1.1).</div>
     <button class="mbtn small" data-act="back">Wróć</button>
   </div></div>
 
   <!-- REKORDY -->
   <div id="pRecords" class="panel hidden"><div class="card">
     <h2>Rekordy</h2>
-    <div class="stars big" id="recStars"></div>
-    <div class="rec"><span>Najlepsza fala</span><b id="recWave">0 / 10</b></div>
+    <div id="recMaps"></div>
     <div class="rec"><span>Zwycięstwa</span><b id="recWins">0</b></div>
     <div class="rec"><span>Rozegrane bitwy</span><b id="recGames">0</b></div>
     <button class="mbtn small" data-act="back">Wróć</button>
@@ -66,15 +67,18 @@
   <!-- JAK GRAĆ -->
   <div id="pHow" class="panel hidden"><div class="card how">
     <h2>Jak grać</h2>
-    <p>Szwedzi generała Müllera idą drogą na klasztor. Nie wpuść ich za mury!</p>
-    <div class="tw"><img src="img/t_mus0.webp?v=2" alt=""><div><b>Muszkieterzy</b> – szybki ogień w jednego wroga.</div></div>
-    <div class="tw"><img src="img/t_arm0.webp?v=2" alt=""><div><b>Armata</b> – wolna, ale rani wielu naraz.</div></div>
-    <div class="tw"><img src="img/t_smo0.webp?v=2" alt=""><div><b>Kocioł smoły</b> – spowalnia i parzy wszystkich wokół.</div></div>
-    <div class="tw"><img src="img/t_rus0.webp?v=2" alt=""><div><b>Rusznica wałowa</b> – daleki strzał w najsilniejszego; przebija zbroje.</div></div>
+    <p>Broń polskich twierdz w czterech słynnych bitwach. Nie wpuść wrogów za mury!</p>
+    <div class="tw"><img src="img/t_mus0.webp?v=3" alt=""><div><b>Muszkieterzy</b> – szybki ogień w jednego wroga.</div></div>
+    <div class="tw"><img src="img/t_arm0.webp?v=3" alt=""><div><b>Armata</b> – wolna, ale rani wielu naraz.</div></div>
+    <div class="tw"><img src="img/t_smo0.webp?v=3" alt=""><div><b>Kocioł smoły</b> – spowalnia i parzy wszystkich wokół.</div></div>
+    <div class="tw"><img src="img/t_rus0.webp?v=3" alt=""><div><b>Rusznica wałowa</b> – daleki strzał w najsilniejszego.</div></div>
+    <div class="tw"><img src="img/t_kus0.webp?v=3" alt=""><div><b>Kusznicy</b> – tani i szybcy, bełty przebijają część zbroi.</div></div>
+    <div class="tw"><img src="img/t_moz0.webp?v=3" alt=""><div><b>Moździerz</b> – bomba z bardzo daleka na całe grupy.</div></div>
     <ul>
       <li>Dotknij <b>kamienne pole</b>, by postawić wieżę; dotknij wieży, by ją ulepszyć.</li>
-      <li><b>Pancerni</b> mają zbroję – na nich armata i rusznica.</li>
-      <li><b>Husaria</b> szarżuje przez całą drogę – tylko <b>3 razy</b> na bitwę!</li>
+      <li><b>Bohater</b>: dotknij go, a potem miejsce na mapie – pobiegnie tam i zatrzyma wrogów. Przycisk z jego twarzą to <b>moc specjalna</b>.</li>
+      <li>Bohater zdobywa <b>doświadczenie</b>. Nowe poziomy = punkty do wydania i nowa zbroja na poz. 4, 7 i 10!</li>
+      <li>Przed bitwą wybierasz <b>atak specjalny</b> – działa 3 razy na bitwę.</li>
       <li>Wcześniejsze wezwanie fali = <b>bonus złota</b>.</li>
     </ul>
     <button class="mbtn small" data-act="back">Wróć</button>
@@ -89,7 +93,7 @@
       <button class="ico" id="pmSfx" data-act="sfx">🔊<small>Dźwięki</small></button>
       <button class="ico" data-act="how">❓<small>Jak grać</small></button>
     </div>
-    <button class="mbtn small red" data-act="menu">Menu główne</button>
+    <button class="mbtn small red" data-act="leave">Opuść bitwę</button>
   </div></div>
 
   <!-- KONIEC -->
@@ -97,10 +101,66 @@
     <h2 id="endTitle">ZWYCIĘSTWO!</h2>
     <div id="stars" class="stars"></div>
     <p id="endText"></p>
-    <button class="mbtn play" data-act="again">Zagraj ponownie</button>
-    <button class="mbtn small" data-act="menu">Menu główne</button>
+    <div id="endXp" class="xpline"></div>
+    <button class="mbtn play" id="endNext" data-act="next">Dalej</button>
+    <button class="mbtn small" data-act="again">Zagraj ponownie</button>
+    <button class="mbtn small" data-act="camp">Mapa kampanii</button>
+  </div></div>
+
+  <!-- MAPA KAMPANII -->
+  <div id="camp" class="screen hidden">
+    <div class="chead"><button class="pbtn" data-act="menu" aria-label="Menu">◀</button><h2>Kampania</h2><div class="cstars" id="campStars">★ 0/12</div></div>
+    <div class="cmapwrap"><div class="cmap" id="cmap">
+      <svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="routePath" d=""/></svg>
+      <div id="nodes"></div>
+    </div></div>
+    <div class="cfoot"><button class="mbtn small" data-act="heroes">⚔️ Bohaterowie</button><button class="mbtn small" data-act="chron">📜 Kronika</button></div>
+  </div>
+
+  <!-- PRZED BITWĄ -->
+  <div id="prep" class="panel hidden"><div class="card prep">
+    <h2 id="prepTitle">Jasna Góra</h2>
+    <div class="year" id="prepYear">1655</div>
+    <p id="prepIntro"></p>
+    <h4>Bohater</h4><div class="picks" id="pickHero"></div>
+    <h4>Atak specjalny</h4><div class="picks" id="pickSpec"></div>
+    <div class="phint" id="prepHint"></div>
+    <button class="mbtn play" data-act="fight">Do boju!</button>
+    <button class="mbtn small" data-act="back">Wróć</button>
+  </div></div>
+
+  <!-- BOHATEROWIE -->
+  <div id="pHeroes" class="panel hidden"><div class="card heroes">
+    <h2>Bohaterowie</h2>
+    <div class="htabs" id="hTabs"></div>
+    <div id="hBody"></div>
+    <button class="mbtn small" data-act="back">Wróć</button>
+  </div></div>
+
+  <!-- ODBLOKOWANO -->
+  <div id="unlock" class="panel hidden"><div class="card">
+    <h2>Odblokowano!</h2>
+    <div id="unlockList"></div>
+    <button class="mbtn play" data-act="unext">Dalej</button>
+  </div></div>
+
+  <!-- HISTORIA -->
+  <div id="hist" class="panel hidden"><div class="card histc">
+    <img id="histImg" alt="">
+    <h2 id="histTitle"></h2>
+    <div id="histText"></div>
+    <div class="fun"><b>Ciekawostka</b><span id="histFun"></span></div>
+    <button class="mbtn play" data-act="hnext" id="histBtn">Dalej</button>
+  </div></div>
+
+  <!-- KRONIKA -->
+  <div id="pChron" class="panel hidden"><div class="card">
+    <h2>Kronika</h2>
+    <p>Historie bitew, które już wygrałeś.</p>
+    <div id="chronList"></div>
+    <button class="mbtn small" data-act="back">Wróć</button>
   </div></div>
 </div>
-<script src="game.js?v=2"></script>
+<script src="game.js?v=3"></script>
 </body>
 </html>
