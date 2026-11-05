@@ -135,12 +135,13 @@ body.loading #app:after{content:'Ładowanie…';position:absolute;inset:0;displa
 .chead h2{flex:1;font-family:Cinzel,Georgia,serif;font-size:24px;color:#ffd86a;text-shadow:0 2px 0 #3a1a08}
 .chead .pbtn{color:#fff;font-size:16px}
 .cstars{font-weight:800;font-size:16px;background:rgba(0,0,0,.35);border:2px solid #c99a52;border-radius:12px;padding:2px 10px;color:#ffd23a}
-.cmapwrap{flex:1;min-height:0;width:100%;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 4px;touch-action:pan-x pan-y}
-.cmap{position:relative;height:100%;width:auto;min-height:100%;max-width:none;aspect-ratio:0.9906;background:url('img/campmap.webp?v=4.3') center/100% 100% no-repeat;border:3px solid #c99a52;border-radius:14px;box-shadow:0 0 0 3px #3a2312,0 8px 20px rgba(0,0,0,.6);flex-shrink:0}
+.cmapwrap{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;padding:2px 8px;overflow:hidden}
+.cmap{position:relative;height:100%;max-width:100%;aspect-ratio:9/16;background:url('img/campmap.webp?v=4.6') center/100% 100% no-repeat;border:3px solid #c99a52;border-radius:14px;box-shadow:0 0 0 3px #3a2312,0 8px 20px rgba(0,0,0,.6)}
 .route{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.route path.roadsh{fill:none;stroke:rgba(40,25,10,.28);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.route path.road{fill:none;stroke:#6b4420;stroke-width:2.4;stroke-dasharray:7 5;stroke-linecap:round;stroke-linejoin:round;opacity:.9;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0.5px 0 #c9a06a)}
-.route path.road.draw{stroke-dasharray:280;stroke-dashoffset:280;animation:roadDraw 1.5s ease forwards}
+.route path.roadsh{display:none}
+.route path.road{fill:none;stroke:#7a1a10;stroke-width:1.05;stroke-dasharray:2.4 1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.95}
+.route path.road.draw{opacity:1;animation:roadPulse 1.6s ease-in-out infinite}
+.route path.road.dim{opacity:.4;stroke:#7a1a10}
 .node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;border:0;background:none;color:#fff;font-weight:800;z-index:2;padding:0}
 .node .ring{position:relative;width:34px;height:34px;border-radius:50%;border:2.5px solid #3a1a08;background:radial-gradient(circle at 40% 35%,#ffe680,#d99a1a 70%);display:flex;align-items:center;justify-content:center;font-family:Cinzel,Georgia,serif;font-size:12px;font-weight:800;color:#3a1a08;box-shadow:0 3px 0 #3a1a08,0 4px 8px rgba(0,0,0,.45)}
 .node.big .ring{width:42px;height:42px;font-size:13px;border-width:3px;border-color:#c9a24a;box-shadow:0 0 0 2px #f0d78a,0 3px 0 #3a1a08,0 4px 10px rgba(0,0,0,.5)}.node.big .st{font-size:9px}
@@ -153,7 +154,7 @@ body.loading #app:after{content:'Ładowanie…';position:absolute;inset:0;displa
 .node .nm.faint{opacity:.55;border-style:dashed;font-size:10px}
 .node .st{font-size:8px;letter-spacing:-1px;color:#cbbd9a;text-shadow:0 1px 1px #3a1a08;line-height:1;margin:0;position:absolute;left:50%;bottom:-2px;transform:translate(-50%,50%);pointer-events:none;white-space:nowrap;z-index:2}
 .node .st .on{color:#ffd23a}
-.node .lead{position:absolute;left:50%;top:50%;width:1.5px;height:var(--llen,18px);background:rgba(90,58,24,.55);transform-origin:top center;transform:translate(-50%,0) rotate(var(--lang,0deg));opacity:.7;pointer-events:none;z-index:1}
+.node .lead{position:absolute;left:50%;top:50%;width:1.5px;height:var(--llen,18px);background:rgba(90,58,24,.45);transform-origin:top center;transform:translate(-50%,0) rotate(var(--lang,0deg));opacity:.55;pointer-events:none;z-index:1;display:none}.node .lead.on{display:block}
 .cfoot{display:flex;gap:8px;width:100%;padding:4px 10px 10px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
 .cfoot .mbtn{margin-top:0;font-size:16px}
 /* przed bitwą */
@@ -222,3 +223,57 @@ body.loading #app:after{content:'Ładowanie…';position:absolute;inset:0;displa
 .brow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .mbtn.gold{background:linear-gradient(180deg,#ffe9a0,#c9922a);color:#2a1808;border-color:#8a5a10}
 #prepEndless.sel{background:linear-gradient(180deg,#ffe9a0,#c9922a);color:#2a1808}
+
+/* ---- chapter parchment panel ---- */
+.card.chapter{position:relative;max-width:360px;width:min(92vw,360px);max-height:86vh;overflow:auto;
+  background:linear-gradient(165deg,#e8c878 0%,#d4a84e 45%,#c4923a 100%);
+  border:3px solid #5a3a14;box-shadow:0 12px 40px rgba(0,0,0,.55),inset 0 0 40px rgba(90,50,10,.18);
+  color:#2a1808;padding:18px 16px 16px}
+.card.chapter h2{font-family:Cinzel,Georgia,serif;color:#3a1a08;margin:4px 28px 2px 0;font-size:1.35rem;text-align:center}
+.card.chapter .year{text-align:center;color:#6b4420;font-weight:800;letter-spacing:.08em;margin-bottom:6px}
+.card.chapter .chIntro{font-size:.88rem;line-height:1.35;text-align:center;margin:0 4px 10px;color:#3a2410}
+.card.chapter .chProg{text-align:center;font-weight:800;margin-bottom:12px;color:#3a1a08}
+.card.chapter .chProg .st{color:#8a5a10;letter-spacing:1px}
+.card.chapter .ch-close{position:absolute;left:10px;top:10px}
+.chPath{display:flex;flex-direction:column;align-items:stretch;gap:0;margin:0 4px 14px}
+.chNode{display:flex;align-items:center;gap:10px;border:2px solid #5a3a14;border-radius:12px;
+  background:rgba(255,236,190,.92);padding:8px 10px;text-align:left;color:#2a1808;font-weight:800;
+  box-shadow:0 2px 0 #5a3a14}
+.chNode .cring{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:2.5px solid #3a1a08;
+  display:flex;align-items:center;justify-content:center;font-family:Cinzel,Georgia,serif;font-size:13px;
+  background:radial-gradient(circle at 40% 35%,#ffe680,#d99a1a 70%);color:#3a1a08;position:relative}
+.chNode.boss .cring{width:48px;height:48px;flex-basis:48px;background:radial-gradient(circle at 40% 35%,#ffe9a0,#e0a020 55%,#b8860b);
+  box-shadow:0 0 0 3px rgba(255,200,60,.35),0 3px 0 #3a1a08}
+.chNode .cinfo{flex:1;min-width:0}
+.chNode .cinfo b{display:block;font-size:.95rem}
+.chNode .cinfo small{display:block;font-weight:700;opacity:.75}
+.chNode .cst{font-size:11px;letter-spacing:-1px;color:#a09070}
+.chNode .cst .on{color:#c8871a}
+.chNode.lock{opacity:.55;filter:grayscale(.35)}
+.chNode.lock .cring{background:#9a9a9a;color:#3a1a08}
+.chNode.open:not(.lock){cursor:pointer}
+.chNode.won .cring{background:radial-gradient(circle at 40% 35%,#b6f08a,#5aaa2a 70%)}
+.chNode.boss.won .cring{background:radial-gradient(circle at 40% 35%,#ffe9a0,#6bbb2e 70%)}
+.chRoad{width:3px;height:14px;margin:0 auto;background:repeating-linear-gradient(#6b4420 0 5px,transparent 5px 9px);
+  border-radius:2px;opacity:.85}
+/* main map chapter nodes — larger */
+.node.chapter .ring{width:52px;height:52px;font-size:15px}
+.node.chapter.big .ring{width:58px;height:58px;font-size:16px}
+.node.chapter .nm b{font-size:11px}
+.node.chapter .prog{position:absolute;left:50%;top:calc(50% + 34px);transform:translateX(-50%);
+  font-size:10px;font-weight:800;white-space:nowrap;background:rgba(40,20,8,.88);border:1px solid #c99a52;
+  border-radius:6px;padding:1px 6px;color:#f5e6c8;pointer-events:none;z-index:3}
+.node.chapter .prog .st{color:#ffd23a;letter-spacing:0}
+
+.node .nm small.chp{display:block;font-size:9px;font-weight:800;color:#ffd23a;letter-spacing:.02em;margin-top:1px}
+
+.node.chapter.lock{filter:grayscale(.7) brightness(.85);opacity:.78}
+.node.chapter.lock .ring{background:#8a8a8a;color:#2a1a0a;border-color:#5a5a5a;box-shadow:0 0 0 2px #b0b0b0,0 3px 0 #2a1a08}
+.node.chapter.lock .swords{opacity:.25;filter:grayscale(1)}
+.node.chapter .nm.faint{opacity:.7}
+.card.chapter{background:linear-gradient(180deg,#f3e2b8 0%,#e8d09a 55%,#d9bc78 100%);border:3px solid #6b4420;box-shadow:inset 0 0 0 2px #f7ebc8,0 12px 28px rgba(0,0,0,.45);max-width:340px}
+#pChapter .card.chapter h2{color:#3a1a08;text-shadow:0 1px 0 #f7ebc8}
+#chYear{display:inline-block;background:#6b4420;color:#f7e4b0;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:800;margin-bottom:6px}
+#chIntro{font-size:.85rem;color:#4a3010;margin:0 4px 8px;line-height:1.35}
+#chProg{font-size:.82rem;color:#3a1a08;margin:0 4px 10px}
+

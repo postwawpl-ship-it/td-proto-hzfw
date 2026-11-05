@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.3';
+const V = '4.6';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -127,10 +127,18 @@ const SPECS = {
 const SKEYS = ['ryc','tat','hus','ost'];
 
 // ====== MAPY (16) + teksty ======
-const NODE_POS = {"glo": [12.5, 47.0], "leg": [16.5, 60.5], "byc": [22.0, 53.5], "jg": [36.0, 64.0], "plo": [30.5, 47.5], "kor": [18.5, 35.0], "gru": [42.0, 33.5], "gni": [26.0, 24.0], "trz": [34.5, 35.5], "kir": [58.0, 8.0], "klu": [94.5, 16.5], "ors": [92.0, 29.5], "obe": [62.0, 76.0], "cec": [80.0, 88.5], "cho": [71.0, 77.5], "och": [91.5, 71.0]};
+const NODE_POS = {"glo": [11.14, 51.35], "leg": [11.64, 56.36], "plo": [22.11, 43.36], "gru": [29.18, 37.28], "kor": [19.49, 38.66], "ors": [75.0, 28.93], "obe": [51.69, 76.02], "byc": [20.52, 56.39], "kir": [48.0, 9.88], "klu": [92.03, 20.42], "cec": [61.88, 85.18], "cho": [57.52, 77.56], "gni": [23.01, 32.82], "trz": [24.24, 37.68], "och": [74.06, 73.43], "jg": [24.82, 59.02]};
+const CHAPTERS = [
+  {id:'ch_gru', boss:'gru', name:'Grunwald', year:1410, maps:['glo','leg','plo','gru']},
+  {id:'ch_kir', boss:'kir', name:'Kircholm', year:1605, maps:['kor','ors','obe','byc','kir']},
+  {id:'ch_cho', boss:'cho', name:'Chocim', year:1621, maps:['klu','cec','cho']},
+  {id:'ch_jg', boss:'jg', name:'Jasna Góra', year:1655, maps:['gni','trz','och','jg']},
+];
+const CHAPTER_POS = {"gru": [42, 22], "kir": [78, 14], "cho": [70, 76], "jg": [48, 50]};
+
 const NODE_LBL = {};
 const CAMP_ROADS = [{"a":"glo","b":"leg","pts":[[16.59,49.82],[16.46,50.34],[16.4,50.87],[16.4,51.41],[16.46,51.95],[16.56,52.5],[16.69,53.05],[16.84,53.61],[17.0,54.17],[17.16,54.72],[17.3,55.27],[17.43,55.82],[17.52,56.36],[17.57,56.89],[17.56,57.42],[17.48,57.93]]},{"a":"leg","b":"plo","pts":[[17.48,57.93],[17.95,56.82],[18.57,55.8],[19.32,54.85],[20.17,53.95],[21.1,53.11],[22.09,52.29],[23.12,51.5],[24.17,50.73],[25.22,49.95],[26.24,49.17],[27.22,48.36],[28.12,47.52],[28.94,46.63],[29.64,45.69],[30.21,44.68]]},{"a":"plo","b":"gru","pts":[[30.21,44.68],[31.08,44.45],[31.9,44.11],[32.68,43.67],[33.43,43.15],[34.15,42.56],[34.86,41.93],[35.55,41.26],[36.23,40.58],[36.91,39.9],[37.6,39.24],[38.3,38.62],[39.01,38.05],[39.75,37.55],[40.52,37.14],[41.33,36.83]]},{"a":"gru","b":"kor","pts":[[41.33,36.83],[40.29,37.3],[39.2,37.62],[38.06,37.81],[36.89,37.9],[35.7,37.9],[34.48,37.83],[33.25,37.72],[32.02,37.6],[30.79,37.47],[29.57,37.37],[28.37,37.32],[27.2,37.33],[26.06,37.43],[24.96,37.64],[23.91,37.98]]},{"a":"kor","b":"ors","pts":[[23.91,37.98],[28.24,37.8],[32.7,37.42],[37.26,36.85],[41.92,36.13],[46.65,35.3],[51.43,34.38],[56.24,33.41],[61.05,32.41],[65.86,31.42],[70.63,30.46],[75.35,29.58],[80.0,28.8],[84.56,28.15],[89.0,27.67],[93.31,27.38]]},{"a":"ors","b":"obe","pts":[[93.31,27.38],[91.95,30.67],[90.36,33.98],[88.57,37.31],[86.62,40.66],[84.54,44.01],[82.36,47.36],[80.13,50.72],[77.87,54.08],[75.62,57.43],[73.42,60.77],[71.29,64.1],[69.28,67.41],[67.42,70.7],[65.74,73.96],[64.28,77.19]]},{"a":"obe","b":"byc","pts":[[64.28,77.19],[62.21,75.46],[59.95,73.85],[57.54,72.33],[55.0,70.89],[52.36,69.52],[49.65,68.2],[46.89,66.91],[44.12,65.63],[41.35,64.36],[38.62,63.06],[35.96,61.74],[33.39,60.36],[30.93,58.91],[28.63,57.38],[26.49,55.75]]},{"a":"byc","b":"kir","pts":[[26.49,55.75],[28.2,52.5],[30.15,49.24],[32.3,45.98],[34.62,42.71],[37.07,39.45],[39.61,36.19],[42.21,32.93],[44.83,29.68],[47.45,26.43],[50.02,23.19],[52.5,19.95],[54.87,16.73],[57.09,13.51],[59.12,10.31],[60.93,7.12]]},{"a":"kir","b":"klu","pts":[[60.93,7.12],[62.91,8.27],[65.02,9.26],[67.25,10.11],[69.57,10.86],[71.98,11.52],[74.43,12.12],[76.93,12.68],[79.43,13.22],[81.93,13.76],[84.4,14.32],[86.82,14.94],[89.16,15.62],[91.42,16.4],[93.56,17.29],[95.57,18.33]]},{"a":"klu","b":"cec","pts":[[95.57,18.33],[94.94,22.67],[94.09,27.13],[93.04,31.69],[91.83,36.32],[90.5,41.01],[89.08,45.75],[87.59,50.51],[86.09,55.27],[84.59,60.02],[83.13,64.75],[81.75,69.43],[80.48,74.04],[79.35,78.58],[78.4,83.01],[77.65,87.33]]},{"a":"cec","b":"cho","pts":[[77.65,87.33],[77.58,86.74],[77.42,86.16],[77.2,85.59],[76.91,85.04],[76.58,84.51],[76.21,83.98],[75.82,83.46],[75.42,82.94],[75.02,82.42],[74.64,81.9],[74.28,81.38],[73.96,80.85],[73.69,80.31],[73.48,79.75],[73.35,79.19]]},{"a":"cho","b":"gni","pts":[[73.35,79.19],[70.37,76.4],[67.45,73.37],[64.57,70.14],[61.72,66.75],[58.91,63.22],[56.11,59.6],[53.34,55.92],[50.57,52.22],[47.81,48.53],[45.04,44.89],[42.26,41.33],[39.47,37.89],[36.65,34.61],[33.81,31.52],[30.93,28.66]]},{"a":"gni","b":"trz","pts":[[30.93,28.66],[30.81,29.18],[30.76,29.71],[30.78,30.25],[30.85,30.79],[30.96,31.33],[31.11,31.88],[31.28,32.44],[31.45,32.99],[31.63,33.54],[31.79,34.09],[31.93,34.63],[32.04,35.17],[32.1,35.7],[32.1,36.22],[32.04,36.73]]},{"a":"trz","b":"och","pts":[[32.04,36.73],[35.99,38.65],[39.97,40.82],[43.99,43.2],[48.02,45.75],[52.08,48.44],[56.14,51.23],[60.21,54.08],[64.28,56.95],[68.34,59.82],[72.38,62.63],[76.41,65.36],[80.41,67.97],[84.38,70.42],[88.31,72.67],[92.19,74.69]]},{"a":"och","b":"jg","pts":[[92.19,74.69],[88.78,73.33],[85.19,72.13],[81.45,71.05],[77.59,70.08],[73.62,69.2],[69.59,68.37],[65.51,67.59],[61.42,66.83],[57.34,66.06],[53.29,65.27],[49.32,64.44],[45.44,63.53],[41.68,62.53],[38.06,61.43],[34.63,60.18]]}];
-const CAMP_ASPECT = 1.0095;
+const CAMP_ASPECT = 9/16; // width/height of v3 painted map
 const FAC_LINES = {"ger": ["Für den Kaiser!", "Los, vorwärts!", "Polnische Burg? Ha!", "Wo ist das Bier?"], "mon": ["Hurraaa!", "Koń i szabla!", "Step woła!", "Batu! Batu!"], "teu": ["Gott mit uns!", "Zwei Schwerter!", "Für den Orden!", "Nein, nicht schon wieder!"], "mos": ["Za cara!", "Moskwa nie zginie!", "Bojar idzie!", "Ura!"], "mol": ["Moldova!", "Do boju!", "Hospodar kazał!"], "max": ["Maximilian!", "Za arcyksięcia!", "Byczyna czeka?"], "swe": ["För Sverige!", "Kungens män!", "Atak!", "Zimno tu!"], "ott": ["Allah!", "Janczarzy!", "Eyvah!", "Do szturmu!"], "tat": ["Haik!", "Ałła!", "Stepowy wiatr!", "Szybko i znikać!"]};
 const PL = {
   wave:['Do broni!','Szykować się!','Idą!','Za Polskę!','Trzymać szyk!','Proch suchy?'],
@@ -352,7 +360,43 @@ const DBG_XP = Q.has('xp') ? +Q.get('xp') : null;
 function persist() { if (SIM) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e) {} }
 const mapRec = id => save.maps[id] || {stars:0, best:0, wins:0, endless:0};
 const won = id => DEBUG || mapRec(id).stars > 0;
-const mapOpen = i => DEBUG || i === 0 || won(MAPS[i-1].id);
+function chapterOf(id) { return CHAPTERS.find(c => c.maps.includes(id)); }
+function chapterIndex(id) { return CHAPTERS.findIndex(c => c.maps.includes(id)); }
+function mapOpen(i) {
+  if (DEBUG) return true;
+  const m = MAPS[i];
+  const ch = chapterOf(m.id);
+  if (!ch) return i === 0;
+  const idx = ch.maps.indexOf(m.id);
+  if (idx === 0) {
+    const ci = CHAPTERS.indexOf(ch);
+    return ci === 0 || won(CHAPTERS[ci - 1].boss);
+  }
+  return won(ch.maps[idx - 1]);
+}
+function chapterOpen(ci) {
+  if (DEBUG || ci <= 0) return true;
+  return won(CHAPTERS[ci - 1].boss);
+}
+function chapterProgress(ci) {
+  const ch = CHAPTERS[ci];
+  let done = 0, stars = 0;
+  for (const id of ch.maps) {
+    const r = mapRec(id);
+    if (r.stars > 0) done++;
+    stars += r.stars|0;
+  }
+  return {done, total: ch.maps.length, stars, maxStars: ch.maps.length * 3};
+}
+function nextUnlockAfter(id) {
+  const ch = chapterOf(id);
+  if (!ch) return null;
+  const idx = ch.maps.indexOf(id);
+  if (idx < ch.maps.length - 1) return ch.maps[idx + 1];
+  const ci = CHAPTERS.indexOf(ch);
+  if (ci < CHAPTERS.length - 1) return CHAPTERS[ci + 1].maps[0];
+  return null;
+}
 const HERO_FROM = {zaw:null, zol:'kir', cho:'klu', kon:'cho', cza:'trz', kor:'och'};
 const HERO_START = {zaw:0, zol:200, cho:350, kon:500, cza:700, kor:900};
 const TOWER_FROM = {luc:null, smo:null, kus:'glo', wil:'leg', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu'};
@@ -1804,7 +1848,7 @@ $('btnPause').addEventListener('click', () => { audioInit(); sfx('click'); setPa
 
 // ---- ekrany ----
 const BASES = ['title', 'camp', 'pause', 'end'];
-const PANELS = ['pSettings', 'pRecords', 'pHow', 'prep', 'pHeroes', 'unlock', 'hist', 'pChron'];
+const PANELS = ['pSettings', 'pRecords', 'pHow', 'prep', 'pHeroes', 'unlock', 'hist', 'pChron', 'pChapter'];
 function show(id) { for (const s of BASES.concat(PANELS)) $(s).classList.toggle('hidden', s !== id); }
 function openPanel(id) { audioInit(); sfx('click');
   if (id === 'pRecords') renderRecords();
@@ -1812,7 +1856,7 @@ function openPanel(id) { audioInit(); sfx('click');
   if (id === 'pChron') renderChron();
   syncSettings(); $(id).classList.remove('hidden');
 }
-function closePanel(id) { sfx('click'); $(id).classList.add('hidden'); if (id === 'pHeroes' || id === 'pChron') renderCamp(); }
+function closePanel(id) { sfx('click'); $(id).classList.add('hidden'); if (id === 'pHeroes' || id === 'pChron' || id === 'pChapter') renderCamp(); }
 function setPause(p) {
   if (!S.running || S.over) return;
   S.paused = p; closeMenu();
@@ -1821,7 +1865,7 @@ function setPause(p) {
 }
 function stopBattle() { if (S) { S.running = false; S.paused = false; } closeMenu(); }
 function goTitle() { sfx('click'); stopBattle(); show('title'); document.body.classList.add('onTitle'); renderBestLine(); setSong('jg'); }
-function goCamp() { stopBattle(); show('camp'); document.body.classList.add('onTitle'); renderCamp(); setSong('jg'); }
+function goCamp() { stopBattle(); show('camp'); const pc=$('pChapter'); if(pc) pc.classList.add('hidden'); document.body.classList.add('onTitle'); renderCamp(); setSong('jg'); }
 function startBattle(id) {
   audioInit(); sfx('up');
   loadMap(MAPS[MAPI[id]] || MAPS[0]);
@@ -1865,14 +1909,33 @@ function renderBestLine() {
 // ---- mapa kampanii ----
 function sizeCampMap() {
   const wrap = $('cmapwrap'), cmap = $('cmap');
-  if (!wrap || !cmap) return {w: 360, h: 360};
-  const h = Math.max(240, wrap.clientHeight - 6);
-  const w = Math.max(280, Math.round(h / CAMP_ASPECT));
-  cmap.style.height = h + 'px';
+  if (!wrap || !cmap) return {w: 360, h: 640};
+  // v3 painted map is portrait 9:16 — fit height, keep aspect, no pan needed
+  const h = Math.max(240, wrap.clientHeight - 4);
+  const w = Math.min(wrap.clientWidth - 16, Math.round(h * CAMP_ASPECT));
+  const hh = Math.round(w / CAMP_ASPECT);
+  cmap.style.height = hh + 'px';
   cmap.style.width = w + 'px';
-  cmap.style.minWidth = w + 'px';
-  cmap.style.aspectRatio = 'auto';
-  return {w, h};
+  cmap.style.minWidth = '';
+  cmap.style.aspectRatio = '9 / 16';
+  return {w, h: hh};
+}
+function roadCurvePct(a, b, side) {
+  // cubic bow in percent-space (SVG viewBox 0 0 100 100)
+  const ax = a[0], ay = a[1], bx = b[0], by = b[1];
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.hypot(dx, dy) || 1;
+  const bow = (side % 2 === 0 ? 1 : -1) * Math.max(6, len * 0.22);
+  const px = -dy / len, py = dx / len;
+  const c1x = ax + dx * 0.35 + px * bow;
+  const c1y = ay + dy * 0.35 + py * bow;
+  const c2x = ax + dx * 0.65 + px * bow * 0.85;
+  const c2y = ay + dy * 0.65 + py * bow * 0.85;
+  // pull ends slightly off the ring (~3.5% ≈ half of 58px ring on ~540px width)
+  const pull = 3.2;
+  const sx = ax + dx / len * pull, sy = ay + dy / len * pull;
+  const ex = bx - dx / len * pull, ey = by - dy / len * pull;
+  return `M${sx.toFixed(2)} ${sy.toFixed(2)} C${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${ex.toFixed(2)} ${ey.toFixed(2)}`;
 }
 function roadCurve(a, b, side) {
   // cubic bezier: perpendicular bow ~18–25% of length (min ~4.5 map units) + wobble
@@ -1893,197 +1956,300 @@ function roadCurve(a, b, side) {
   return 'M' + a[0] + ' ' + a[1] + ' C' + cl(c1x) + ' ' + cl(c1y) + ' ' + cl(c2x) + ' ' + cl(c2y) + ' ' + b[0] + ' ' + b[1];
 }
 function separateCampNodes(pos, mapW, mapH) {
-  // pos: {id:[x%,y%]} — push rings (+stars footprint) apart; min 8px gap
-  const ids = MAPS.map(m => m.id);
-  const gap = 8;
-  for (let iter = 0; iter < 60; iter++) {
-    let moved = false;
-    for (let i = 0; i < ids.length; i++) {
-      for (let j = i + 1; j < ids.length; j++) {
-        const a = MAPS[i], b = MAPS[j];
-        const ra = (a.big ? 21 : 17);
-        const rb = (b.big ? 21 : 17);
-        const ax = pos[a.id][0] / 100 * mapW, ay = pos[a.id][1] / 100 * mapH;
-        const bx = pos[b.id][0] / 100 * mapW, by = pos[b.id][1] / 100 * mapH;
-        const need = ra + rb + gap;
-        const dx = bx - ax, dy = by - ay;
-        const d = Math.hypot(dx, dy) || 0.01;
-        if (d < need) {
-          const push = (need - d) / 2;
-          const ux = dx / d, uy = dy / d;
-          pos[a.id][0] = (ax - ux * push) / mapW * 100;
-          pos[a.id][1] = (ay - uy * push) / mapH * 100;
-          pos[b.id][0] = (bx + ux * push) / mapW * 100;
-          pos[b.id][1] = (by + uy * push) / mapH * 100;
-          moved = true;
-        }
-      }
-    }
-    // clamp
-    for (const id of ids) {
-      pos[id][0] = Math.max(4, Math.min(96, pos[id][0]));
-      pos[id][1] = Math.max(4, Math.min(96, pos[id][1]));
-    }
-    if (!moved) break;
-  }
+  // v4.5: keep geographic positions exact — do not nudge nodes
   return pos;
 }
 function placeCampLabels(items, mapW, mapH, nodePos) {
+  // Glue every label to its own node: gap 2–6px from ring edge.
+  // Prefer below → right → left → above; shrink text before drifting.
   const placed = [];
   const out = {};
-  const pad = 3;
-  const gap = 8;
-  const ringR = (it) => (it.big ? 22 : 18);
-  const dirs = [[0,-1],[0.7,-0.7],[1,0],[0.7,0.7],[0,1],[-0.7,0.7],[-1,0],[-0.7,-0.7]];
-  const radii = [28, 36, 46, 58, 72, 90, 110, 130];
-  const overlaps = (a, b) => !(a.r + gap < b.l || a.l - gap > b.r || a.b + gap < b.t || a.t - gap > b.b);
-  const order = items.slice().sort((a, b) => {
-    const da = items.reduce((n, o) => n + (Math.hypot(a.x - o.x, a.y - o.y) < 14 ? 1 : 0), 0);
-    const db = items.reduce((n, o) => n + (Math.hypot(b.x - o.x, b.y - o.y) < 14 ? 1 : 0), 0);
-    return da - db;
-  });
-  // reserve ring+stars boxes so labels never cover them
-  const reserved = items.map(it => {
-    const cx = (nodePos[it.id][0] / 100) * mapW, cy = (nodePos[it.id][1] / 100) * mapH;
+  const pad = 2;
+  const labelGap = 3;
+  const ringR = (it) => (it.big ? 21 : 17);
+  const dirs = [[0, 1], [1, 0], [-1, 0], [0, -1], [0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7]];
+  const overlaps = (a, b, g) => !(a.r + g < b.l || a.l - g > b.r || a.b + g < b.t || a.t - g > b.b);
+  const rings = {};
+  for (const it of items) {
+    const cx = nodePos[it.id][0] / 100 * mapW, cy = nodePos[it.id][1] / 100 * mapH;
     const rr = ringR(it);
-    return {l: cx - rr - 2, r: cx + rr + 2, t: cy - rr - (it.big ? 12 : 2), b: cy + rr + 4};
+    rings[it.id] = {l: cx - rr, r: cx + rr, t: cy - rr - (it.big ? 10 : 0), b: cy + rr + 2, cx, cy, rr};
+  }
+  const order = items.slice().sort((a, b) => {
+    const dens = (it) => items.reduce((n, o) => n + (Math.hypot(it.x - o.x, it.y - o.y) < 12 ? 1 : 0), 0);
+    return dens(b) - dens(a);
   });
   for (const it of order) {
-    const cx = (nodePos[it.id][0] / 100) * mapW, cy = (nodePos[it.id][1] / 100) * mapH;
-    const hw = it.w / 2, hh = it.h / 2;
-    let best = null, bestScore = 1e9;
-    for (const rad of radii) {
-      for (const [dxn, dyn] of dirs) {
-        let lx = cx + dxn * rad, ly = cy + dyn * rad;
-        lx = Math.max(hw + pad, Math.min(mapW - hw - pad, lx));
-        ly = Math.max(hh + pad, Math.min(mapH - hh - pad, ly));
-        const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
-        let hit = false;
-        for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
-        if (hit) continue;
-        for (const rb of reserved) { if (overlaps(box, rb)) { hit = true; break; } }
-        if (hit) continue;
-        const score = Math.hypot(lx - cx, ly - cy) + (rad > 90 ? 12 : 0);
-        if (score < bestScore) { bestScore = score; best = {dx: lx - cx, dy: ly - cy, box, rad}; }
+    const ring = rings[it.id];
+    const cx = ring.cx, cy = ring.cy, rr = ring.rr;
+    let best = null;
+    const sizes = [
+      {w: it.w, h: it.h, scale: 1},
+      {w: Math.max(28, it.w * 0.85), h: Math.max(12, it.h * 0.9), scale: 0.85},
+      {w: Math.max(22, it.w * 0.7), h: Math.max(11, it.h * 0.82), scale: 0.7},
+    ];
+    for (const sz of sizes) {
+      const hw = sz.w / 2, hh = sz.h / 2;
+      for (const gapEdge of [3, 4, 5, 6, 8, 10, 12, 16, 20]) {
+        for (const [dxn, dyn] of dirs) {
+          const len = Math.hypot(dxn, dyn) || 1;
+          const ux = dxn / len, uy = dyn / len;
+          // place label so its near edge sits gapEdge past the ring
+          const along = Math.abs(ux) * hw + Math.abs(uy) * hh;
+          const dist = rr + gapEdge + along;
+          let lx = cx + ux * dist, ly = cy + uy * dist;
+          // soft clamp — reject if clamp would pull label onto the ring
+          const clx = Math.max(hw + pad, Math.min(mapW - hw - pad, lx));
+          const cly = Math.max(hh + pad, Math.min(mapH - hh - pad, ly));
+          if (Math.hypot(clx - lx, cly - ly) > 8) continue; // would be yanked too far
+          lx = clx; ly = cly;
+          const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
+          // must clear OWN ring by ≥2px (no covering the circle)
+          if (overlaps(box, {l: cx - rr, r: cx + rr, t: cy - rr, b: cy + rr}, 2)) continue;
+          let hit = false;
+          for (const o of items) {
+            if (o.id === it.id) continue;
+            if (overlaps(box, rings[o.id], 2)) { hit = true; break; }
+          }
+          if (hit) continue;
+          for (const p of placed) { if (overlaps(box, p.box, labelGap)) { hit = true; break; } }
+          if (hit) continue;
+          // ownership: own must be nearest by ≥3px margin
+          const ownDist = Math.hypot(lx - cx, ly - cy);
+          let nextD = 1e9;
+          for (const o of items) {
+            if (o.id === it.id) continue;
+            const d = Math.hypot(lx - rings[o.id].cx, ly - rings[o.id].cy);
+            if (d < nextD) nextD = d;
+          }
+          if (ownDist + 4 > nextD) continue;
+          if (ownDist > rr + Math.max(hw, hh) + 24) continue; // too far
+          // prefer below; push away from nearest other node
+          let away = 0;
+          for (const o of items) {
+            if (o.id === it.id) continue;
+            const ox = rings[o.id].cx - cx, oy = rings[o.id].cy - cy;
+            const ol = Math.hypot(ox, oy) || 1;
+            // reward placing opposite to neighbor
+            away += (ux * ox + uy * oy) / ol * (120 / ol);
+          }
+          const score = ownDist + (uy > 0.5 ? 0 : 12) + (sz.scale < 1 ? 4 : 0) + Math.max(0, gapEdge - 6) * 0.4 + away * 18;
+          if (!best || score < best.score) {
+            best = {dx: lx - cx, dy: ly - cy, box, score, scale: sz.scale};
+          }
+        }
+        if (best && best.score < rr + 18) break;
       }
-      if (best && best.rad <= 58) break;
+      if (best && best.score < rr + 20) break;
     }
     if (!best) {
-      const targets = [[hw+pad, cy],[mapW-hw-pad, cy],[cx, hh+pad],[cx, mapH-hh-pad],
-        [hw+pad, hh+pad],[mapW-hw-pad, hh+pad],[hw+pad, mapH-hh-pad],[mapW-hw-pad, mapH-hh-pad]];
-      for (const [lx0, ly0] of targets) {
-        const box = {l: lx0 - hw, r: lx0 + hw, t: ly0 - hh, b: ly0 + hh};
-        let hit = false;
-        for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
-        for (const rb of reserved) { if (!hit && overlaps(box, rb)) hit = true; }
-        if (!hit) { best = {dx: lx0 - cx, dy: ly0 - cy, box, rad: 999}; break; }
+      // last resort: try dirs, prefer away from nearest other node; keep ownership
+      const hw = Math.max(22, it.w * 0.7) / 2, hh = Math.max(11, it.h * 0.82) / 2;
+      let nearO = null, nearOD = 1e9;
+      for (const o of items) {
+        if (o.id === it.id) continue;
+        const d = Math.hypot(cx - rings[o.id].cx, cy - rings[o.id].cy);
+        if (d < nearOD) { nearOD = d; nearO = rings[o.id]; }
       }
+      const candidates = [
+        [0, 1], [1, 0], [-1, 0], [0, -1], [0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7],
+      ];
+      let pick = null;
+      for (const gapEdge of [4, 6, 8, 12, 16, 22]) {
+        for (const [dxn, dyn] of candidates) {
+          const len = Math.hypot(dxn, dyn) || 1;
+          const ux = dxn / len, uy = dyn / len;
+          const along = Math.abs(ux) * hw + Math.abs(uy) * hh;
+          const dist = rr + gapEdge + along;
+          let lx = Math.max(hw + pad, Math.min(mapW - hw - pad, cx + ux * dist));
+          let ly = Math.max(hh + pad, Math.min(mapH - hh - pad, cy + uy * dist));
+          const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
+          if (overlaps(box, {l: cx - rr, r: cx + rr, t: cy - rr, b: cy + rr}, 1)) continue;
+          const ownDist = Math.hypot(lx - cx, ly - cy);
+          let nextD = 1e9;
+          for (const o of items) {
+            if (o.id === it.id) continue;
+            nextD = Math.min(nextD, Math.hypot(lx - rings[o.id].cx, ly - rings[o.id].cy));
+          }
+          if (ownDist + 2 > nextD) continue;
+          // prefer pointing away from nearest neighbor
+          let away = 0;
+          if (nearO) {
+            const vx = cx - nearO.cx, vy = cy - nearO.cy;
+            away = -(ux * vx + uy * vy); // more positive = more away
+          }
+          const score = ownDist + (uy > 0.5 ? 0 : 8) + gapEdge * 0.2 + away * 0.05;
+          if (!pick || score < pick.score) pick = {dx: lx - cx, dy: ly - cy, box, score, scale: 0.7};
+        }
+        if (pick) break;
+      }
+      best = pick || {dx: 0, dy: rr + 6 + hh, box: {l:0,r:0,t:0,b:0}, score: 999, scale: 0.7};
     }
-    if (!best) {
-      const lx = Math.max(hw + pad, Math.min(mapW - hw - pad, cx));
-      const ly = Math.max(hh + pad, Math.min(mapH - hh - pad, cy + ringR(it) + hh + 16));
-      best = {dx: lx - cx, dy: ly - cy, box: {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh}, rad: 0};
-    }
-    placed.push({box: best.box});
-    out[it.id] = [Math.round(best.dx), Math.round(best.dy)];
+    placed.push({id: it.id, box: best.box});
+    out[it.id] = [Math.round(best.dx), Math.round(best.dy), best.scale || 1];
   }
   return out;
 }
 function assertCampNoOverlap(mapW, mapH, nodePos, LBL) {
-  // node rings (+stars band) and labels; min 8px gap; returns overlap count
   const boxes = [];
   MAPS.forEach((m, i) => {
     const [x, y] = nodePos[m.id];
     const cx = x / 100 * mapW, cy = y / 100 * mapH;
     const rr = m.big ? 21 : 17;
     boxes.push({kind: 'ring', id: m.id, l: cx - rr, r: cx + rr, t: cy - rr - (m.big ? 10 : 0), b: cy + rr + 2});
-    const [ldx, ldy] = LBL[m.id] || [0, 26];
+    const L = LBL[m.id] || [0, 26, 1];
+    const scale = L[2] || 1;
     const op = mapOpen(i);
     const text = op ? m.name : String(m.year);
-    const w = Math.min(110, 12 + text.length * 6.6), h = op ? 18 : 15;
-    const lx = cx + ldx, ly = cy + ldy;
+    const w = Math.min(110, 12 + text.length * 6.6) * scale, h = (op ? 18 : 15) * scale;
+    const lx = cx + L[0], ly = cy + L[1];
     boxes.push({kind: 'lbl', id: m.id, l: lx - w/2, r: lx + w/2, t: ly - h/2, b: ly + h/2});
   });
   let n = 0;
-  const gap = 8;
-  const hit = (a, b) => !(a.r + gap < b.l || a.l - gap > b.r || a.b + gap < b.t || a.t - gap > b.b);
+  const hit = (a, b, g) => !(a.r + g < b.l || a.l - g > b.r || a.b + g < b.t || a.t - g > b.b);
   for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
     const a = boxes[i], b = boxes[j];
-    // own label may sit near own ring via leader — require gap still
-    if (a.id === b.id && a.kind !== b.kind) {
-      // allow if label is outside ring by lead (still check gap)
-      if (hit(a, b)) n++;
-      continue;
-    }
     if (a.id === b.id) continue;
-    if (hit(a, b)) n++;
+    const g = (a.kind === 'lbl' && b.kind === 'lbl') ? 3 : 4;
+    if (hit(a, b, g)) n++;
   }
   return n;
+}
+function assertLabelOwnership(mapW, mapH, nodePos, LBL) {
+  const centers = MAPS.map(m => {
+    const [x, y] = nodePos[m.id];
+    return {id: m.id, cx: x / 100 * mapW, cy: y / 100 * mapH, rr: m.big ? 21 : 17};
+  });
+  let bad = 0;
+  const details = [];
+  for (const m of MAPS) {
+    const L = LBL[m.id] || [0, 26];
+    const me = centers.find(c => c.id === m.id);
+    const lx = me.cx + L[0], ly = me.cy + L[1];
+    let nearest = null, nearestD = 1e9;
+    for (const c of centers) {
+      const d = Math.hypot(lx - c.cx, ly - c.cy);
+      if (d < nearestD) { nearestD = d; nearest = c; }
+    }
+    const maxDist = me.rr + 32;
+    if (nearest.id !== m.id || nearestD > maxDist) {
+      bad++;
+      details.push({id: m.id, nearest: nearest.id, d: +nearestD.toFixed(1), max: maxDist});
+    }
+  }
+  return {bad, details};
+}
+function truncRoadEnds(aPct, bPct, raPx, rbPx, mapW, mapH) {
+  // shorten in pixel space so stroke stops at ring edges (no stubs through circles)
+  const ax = aPct[0] / 100 * mapW, ay = aPct[1] / 100 * mapH;
+  const bx = bPct[0] / 100 * mapW, by = bPct[1] / 100 * mapH;
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  const ra = Math.min(raPx + 3, len * 0.42), rb = Math.min(rbPx + 3, len * 0.42);
+  const a2 = [(ax + ux * ra) / mapW * 100, (ay + uy * ra) / mapH * 100];
+  const b2 = [(bx - ux * rb) / mapW * 100, (by - uy * rb) / mapH * 100];
+  return [a2, b2];
 }
 function renderCamp() {
   $('campStars').textContent = '★ ' + totalStars() + '/' + TOTAL_STARS;
   const {w: mapW, h: mapH} = sizeCampMap();
-  // working copy of node positions (percent), separated for this pixel size
-  const nodePos = {};
-  for (const m of MAPS) nodePos[m.id] = NODE_POS[m.id].slice();
-  separateCampNodes(nodePos, mapW, mapH);
-
   const svg = $('routeSvg');
-  let lastOpen = 0;
-  for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) lastOpen = i;
-  let shadows = '', roads = '';
-  for (let idx = 0; idx < MAPS.length - 1; idx++) {
-    if (idx >= lastOpen) break;
-    const a = MAPS[idx], b = MAPS[idx + 1];
-    const d = roadCurve(nodePos[a.id], nodePos[b.id], idx);
-    const fresh = idx === lastOpen - 1;
-    shadows += `<path class="roadsh" d="${d}" />`;
-    roads += `<path class="road${fresh ? ' draw' : ''}" d="${d}" />`;
+  // v3-style dashed red roads between the 4 big battles (viewBox 0..100)
+  let frontier = 0;
+  for (let ci = 0; ci < CHAPTERS.length; ci++) {
+    if (chapterOpen(ci)) frontier = ci;
+    if (won(CHAPTERS[ci].boss)) frontier = Math.min(CHAPTERS.length - 1, ci + 1);
   }
-  if (svg) svg.innerHTML = shadows + roads;
+  let roads = '';
+  for (let ci = 0; ci < CHAPTERS.length - 1; ci++) {
+    const a = CHAPTER_POS[CHAPTERS[ci].boss], b = CHAPTER_POS[CHAPTERS[ci + 1].boss];
+    const d = roadCurvePct(a, b, ci);
+    const done = won(CHAPTERS[ci].boss);
+    const dim = ci >= frontier && !done;
+    const fresh = !dim && (ci === frontier - 1 || ci === frontier);
+    roads += `<path class="road${fresh ? ' draw' : ''}${dim ? ' dim' : ''}" d="${d}" />`;
+  }
+  if (svg) svg.innerHTML = roads;
 
-  const labelItems = MAPS.map((m, i) => {
-    const op = mapOpen(i);
-    const text = op ? m.name : String(m.year);
-    const tw = Math.min(110, 12 + text.length * 6.6);
-    const th = op ? 18 : 15;
-    return {id: m.id, x: nodePos[m.id][0], y: nodePos[m.id][1], big: !!m.big, w: tw, h: th, text, op};
-  });
-  const LBL = placeCampLabels(labelItems, mapW, mapH, nodePos);
-  const ov = assertCampNoOverlap(mapW, mapH, nodePos, LBL);
-  if (ov > 0) console.warn('camp overlaps', ov);
-  window.__campOverlap = ov;
-  window.__campNodePos = nodePos;
-
-  $('nodes').innerHTML = MAPS.map((m, i) => {
-    const op = mapOpen(i), r = mapRec(m.id), wonB = r.stars > 0;
-    const [x, y] = nodePos[m.id];
-    const [ldx, ldy] = LBL[m.id] || [0, 26];
-    const end = (r.endless|0) > 0 ? `<div class="endb">Bastion ${r.endless}</div>` : '';
-    const num = String(i + 1);
-    const ring = op ? num : '🔒';
-    const swords = m.big ? `<span class="swords" aria-hidden="true">⚔</span>` : '';
-    const lead = (Math.abs(ldx) > 24 || Math.abs(ldy) > 24);
-    const ang = Math.atan2(ldy, ldx) * 180 / Math.PI;
-    const llen = Math.hypot(ldx, ldy) - 12;
-    const nm = op ? `<div class="nm" style="--ldx:${ldx}px;--ldy:${ldy}px"><b>${m.name}</b></div>`
-                  : `<div class="nm faint" style="--ldx:${ldx}px;--ldy:${ldy}px"><small>${m.year}</small></div>`;
-    const leadHtml = lead ? `<i class="lead" style="--llen:${Math.max(8,llen)}px;--lang:${ang}deg"></i>` : '';
-    return `<button class="node ${m.big?'big':''} ${wonB?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${leadHtml}${swords}<div class="ring">${ring}${op?`<span class="st">${starsHtml(r.stars)}</span>`:''}</div>${nm}${end}</button>`;
+  $('nodes').innerHTML = CHAPTERS.map((ch, ci) => {
+    const [x, y] = CHAPTER_POS[ch.boss];
+    const open = chapterOpen(ci);
+    const prog = chapterProgress(ci);
+    const bossWon = won(ch.boss);
+    const active = open && prog.done < prog.total;
+    const cls = ['node', 'chapter', 'big',
+      bossWon ? 'won' : open ? 'open' : 'lock'].join(' ');
+    const ring = open ? (bossWon ? '⚔' : String(ci + 1)) : '🔒';
+    const label = open
+      ? `<div class="nm" style="--ldx:0px;--ldy:48px"><b>${ch.name}</b><small class="chp">${prog.done}/${prog.total} · ★${prog.stars}</small></div>`
+      : `<div class="nm faint" style="--ldx:0px;--ldy:48px"><small>${ch.year}</small></div>`;
+    const swords = `<span class="swords" aria-hidden="true">⚔</span>`;
+    return `<button class="${cls}" data-ci="${ci}" style="left:${x}%;top:${y}%">${swords}<div class="ring">${ring}${bossWon?`<span class="st">${starsHtml(mapRec(ch.boss).stars)}</span>`:''}</div>${label}</button>`;
   }).join('');
-  $('nodes').querySelectorAll('.node').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); audioInit(); const i = +b.dataset.i;
-    if (mapOpen(i)) openPrep(i); else { sfx('click'); b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300}); } }));
+
+  $('nodes').querySelectorAll('.node.chapter').forEach(b => b.addEventListener('click', ev => {
+    ev.stopPropagation(); audioInit();
+    const ci = +b.dataset.ci;
+    if (chapterOpen(ci)) openChapter(ci);
+    else {
+      sfx('click');
+      b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300});
+    }
+  }));
+
   requestAnimationFrame(() => {
     const wrap = $('cmapwrap'); if (!wrap) return;
-    let focus = 0;
-    for (let i = 0; i < MAPS.length; i++) { if (mapOpen(i) && !won(MAPS[i].id)) { focus = i; break; } if (won(MAPS[i].id)) focus = i; }
-    const [x, y] = nodePos[MAPS[focus].id];
-    const tw = wrap.clientWidth, th = wrap.clientHeight;
-    const cw = mapW, ch = mapH;
-    wrap.scrollTo({ left: Math.max(0, Math.min(cw - tw, (x/100)*cw - tw/2)), top: Math.max(0, Math.min(ch - th, (y/100)*ch - th/2)), behavior: 'smooth' });
+    wrap.scrollTo({left: 0, top: 0});
   });
 }
-let prepI = 0, prepEndless = false;
+let chapterI = 0;
+function openChapter(ci) {
+  audioInit(); sfx('click');
+  chapterI = ci;
+  const ch = CHAPTERS[ci];
+  const prog = chapterProgress(ci);
+  $('chTitle').textContent = ch.name;
+  $('chYear').textContent = String(ch.year);
+  $('chIntro').textContent = ci === 0
+    ? 'Potyczki wiodące do wielkiej bitwy pod Grunwaldem.'
+    : ci === 1 ? 'Szlak ku Kircholmowi — triumf husarii.'
+    : ci === 2 ? 'Wojny na wschodzie i południu, aż po Chocim.'
+    : 'Potop szwedzki i obrona Jasnej Góry.';
+  $('chProg').innerHTML = `Postęp: <b>${prog.done}/${prog.total}</b> · ★${prog.stars}/${prog.maxStars}`;
+
+  const parts = [];
+  ch.maps.forEach((id, j) => {
+    const m = MAPS[MAPI[id]];
+    const i = MAPI[id];
+    const op = mapOpen(i);
+    const r = mapRec(id);
+    const isBoss = id === ch.boss;
+    const wonB = r.stars > 0;
+    const cls = ['chNode', isBoss ? 'boss' : '', wonB ? 'won' : op ? 'open' : 'lock'].filter(Boolean).join(' ');
+    const ring = op ? (isBoss ? '⚔' : String(j + 1)) : (isBoss ? '⚔' : '🔒');
+    const st = op ? `<span class="cst">${starsHtml(r.stars)}</span>` : '';
+    const sub = isBoss ? 'Wielka bitwa' : 'Potyczka';
+    const title = op ? m.name : (isBoss ? ch.name : '???');
+    const meta = op ? `${m.year} · ${sub}` : (isBoss ? `🔒 ${ch.year} · ${sub}` : 'Zablokowane');
+    parts.push(`<button class="${cls}" data-i="${i}" ${op?'':'disabled'}><span class="cring">${ring}</span><span class="cinfo"><b>${title}</b><small>${meta}</small></span>${st}</button>`);
+    if (j < ch.maps.length - 1) parts.push('<div class="chRoad" aria-hidden="true"></div>');
+  });
+  $('chPath').innerHTML = parts.join('');
+  $('chPath').querySelectorAll('.chNode.open').forEach(b => b.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const i = +b.dataset.i;
+    if (mapOpen(i)) { $('pChapter').classList.add('hidden'); openPrep(i); }
+  }));
+  // keep camp visible underneath
+  $('camp').classList.remove('hidden');
+  $('pChapter').classList.remove('hidden');
+}
+function closeChapter() {
+  sfx('click');
+  $('pChapter').classList.add('hidden');
+  renderCamp();
+}
 function openPrep(i, endless) {
   prepI = i; prepEndless = !!endless; const m = MAPS[i];
   const last = save.last || {};
@@ -2158,7 +2324,16 @@ function renderUnlock(m) {
   if (u.hero) it.push(`<div class="ul"><img src="${himg(u.hero,0)}" alt=""><div><b>Nowy bohater: ${HEROES[u.hero].name}</b><small>${HEROES[u.hero].desc}</small></div></div>`);
   if (u.tower) it.push(`<div class="ul"><img src="${timg(u.tower,0)}" alt=""><div><b>Nowa wieża: ${TT[u.tower].name}</b><small>${TT[u.tower].desc}</small></div></div>`);
   if (u.spec) it.push(`<div class="ul"><img src="${iimg(SPECS[u.spec].img)}" alt=""><div><b>Nowy atak: ${SPECS[u.spec].name}</b><small>${SPECS[u.spec].desc}</small></div></div>`);
-  if (MAPS[i+1]) it.push(`<div class="ul"><span class="ic">🗺️</span><div><b>Nowa bitwa: ${MAPS[i+1].name} ${MAPS[i+1].year}</b><small>Czeka na mapie kampanii.</small></div></div>`);
+  const nxt = nextUnlockAfter(m.id);
+  if (nxt) {
+    const nm = MAPS[MAPI[nxt]];
+    const ch = chapterOf(nxt);
+    const isBoss = ch && ch.boss === nxt;
+    const isNewCh = ch && ch.maps[0] === nxt && ch.boss !== m.id;
+    const label = isNewCh ? `Nowy rozdział: ${ch.name}` : (isBoss ? `Wielka bitwa: ${nm.name} ${nm.year}` : `Nowa potyczka: ${nm.name} ${nm.year}`);
+    const hint = isNewCh ? 'Odblokowany na mapie kampanii.' : (isBoss ? 'Czeka na końcu rozdziału.' : 'Czeka w oknie rozdziału.');
+    it.push(`<div class="ul"><span class="ic">🗺️</span><div><b>${label}</b><small>${hint}</small></div></div>`);
+  }
   if (u.final) it.push(`<div class="ul"><span class="ic">🏆</span><div><b>Kampania ukończona!</b><small>Obroniłeś Polskę! Zbierz gwiazdki – ${totalStars()}/${TOTAL_STARS}. Spróbuj Ostatniego bastionu!</small></div></div>`);
   $('unlockList').innerHTML = it.map((s, k) => s.replace('class="ul"', `class="ul" style="animation-delay:${k*.15}s"`)).join('');
   $('unlock').querySelector('h2').textContent = u.final ? 'Zwycięstwo!' : 'Odblokowano!';
@@ -2194,12 +2369,13 @@ document.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click',
   else if (a === 'how') openPanel('pHow');
   else if (a === 'heroes') { heroTab = heroOpen(heroTab) ? heroTab : 'zaw'; openPanel('pHeroes'); }
   else if (a === 'chron') openPanel('pChron');
-  else if (a === 'back') closePanel(b.closest('.panel').id);
+  else if (a === 'back') { const pid = b.closest('.panel').id; closePanel(pid); if (pid === 'prep') openChapter(chapterI); }
   else if (a === 'resume') { audioInit(); sfx('click'); setPause(false); }
   else if (a === 'menu') goTitle();
   else if (a === 'leave' || a === 'camp') { sfx('click'); goCamp(); }
   else if (a === 'again') startBattle(M.id);
   else if (a === 'fight') { ENDLESS = prepEndless; save.last = {hero: PICK.hero, spec: PICK.spec, towers: PICK.towers.slice(0,4)}; persist(); startBattle(MAPS[prepI].id); }
+  else if (a === 'closeChapter') { closeChapter(); }
   else if (a === 'endless') { prepEndless = !prepEndless; openPrep(prepI, prepEndless); }
   else if (a === 'bastion') { sfx('click'); ENDLESS = true; $('hist').classList.add('hidden'); openPrep(MAPI[LAST.map], true); }
   else if (a === 'next') { sfx('click'); afterWin(); }
@@ -2358,7 +2534,7 @@ window.TD = {
   giveXp: (id, n) => { heroData(id).xp += n; persist(); },
   hero: () => S.hero, moveHero: (x, y) => heroMove(x, y), ability: () => heroAbility(), tap: (x, y) => tapAt(x, y),
   toScreen: (x, y) => { const r = cv.getBoundingClientRect(); return [r.left + x/W*r.width, r.top + (y + OFF)/VH*r.height]; },
-  camp: goCamp, prep: i => openPrep(i), heroes: id => { heroTab = id || 'zaw'; openPanel('pHeroes'); }, hist: id => showHist(id, true), chron: () => openPanel('pChron'),
+  camp: goCamp, prep: i => openPrep(i), chapter: ci => openChapter(ci), heroes: id => { heroTab = id || 'zaw'; openPanel('pHeroes'); }, hist: id => showHist(id, true), chron: () => openPanel('pChron'),
   cov: i => { const [sx, sy] = SPOTS[i]; let c = 0; for (let d = 0; d < PLEN; d += 8) { const q = posAt(d); if (Math.hypot(q.x - sx, q.y - sy) < 85) c++; } return c; },
   open: k => towerOpen(k),
   setSpeed: n => { S.speed = n; }, openTower: i => openTower(S.towers.find(t => t.spot === i)), openBuild, pause: setPause, goTitle,
