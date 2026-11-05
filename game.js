@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.7';
+const V = '4.8';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -16,7 +16,7 @@ const rnd = (a,b) => a + Math.random()*(b-a);
 // ====== WIEŻE (12) ======
 // road:true = Wilcze doły – stawia się na drodze
 const TT = {
-  luc: {name:'Łucznicy', desc:'Tanie, szybkie strzały w jeden cel', cost:[55,50,90], dmg:[10,16,24], rate:[.55,.48,.4], range:[88,96,104]},
+  luc: {name:'Łucznicy', desc:'Tanie strzały w jeden cel', cost:[55,50,90], dmg:[12,19,29], rate:[.66,.58,.48], range:[88,96,104]},
   smo: {name:'Kocioł smoły', desc:'Spowalnia i parzy wszystkich w pobliżu', cost:[85,75,120], dmg:[5,9,14], rate:[.95,.88,.8], range:[66,74,82], slow:[.3,.4,.5]},
   kus: {name:'Kusznicy', desc:'Bełty przebijają kolczugi (zbroja −50%)', cost:[80,70,115], dmg:[18,28,42], rate:[.85,.74,.6], range:[100,110,120]},
   wil: {name:'Wilcze doły', desc:'Stawia się NA DRODZE. Rani i spowalnia przechodzących', cost:[70,65,110], dmg:[8,14,22], rate:[0,0,0], range:[18,20,22], slow:[.25,.35,.45], road:true, hp:[80,130,200]},
@@ -30,8 +30,8 @@ const TT = {
   woz: {name:'Wóz bojowy', desc:'Tabor: wytrzymały bloker ze strzelcami', cost:[160,140,210], dmg:[18,28,42], rate:[.8,.7,.58], range:[85,92,100], block:true, hp:[200,340,520]},
 };
 const TKEYS = ['luc','smo','kus','wil','bal','mus','arm','rus','haj','kar','moz','woz'];
-const TW = {luc:[40,42,44], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[44,46,50], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
-const TOPF = {luc:[.35,.35,.35], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.3,.28,.25], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
+const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[44,46,50], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
+const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.3,.28,.25], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
 
 // ====== WROGOWIE ======
 const ET = {
@@ -1071,14 +1071,19 @@ function update(dt) {
         t.cd = towerStat(t, 'rate'); t.anim = 1;
         const mx = t.x + Math.cos(t.ang)*16, my = t.gy + Math.sin(t.ang)*16;
         if (t.type === 'mus') {
-          S.tracers.push({x1:mx, y1:my, x2:best.x, y2:best.y-10, life:.08, max:.08, w:2, col:'255,240,160'});
+          S.tracers.push({x1:mx, y1:my, x2:mx+Math.cos(t.ang)*14, y2:my+Math.sin(t.ang)*14, life:.06, max:.06, w:2.2, col:'255,240,160'});
           damage(best, towerStat(t,'dmg'), 'mus'); burst(best.x, best.y-10, '#fff1a8', 3, 60, 2, .2); sfx('shot');
           smoke(mx, my, 1, 5);
         } else if (t.type === 'luc' || t.type === 'kus' || t.type === 'bal') {
           const kx = t.x + Math.cos(t.ang)*10, ky = t.gy + Math.sin(t.ang)*10;
-          const col = t.type==='bal' ? '60,40,20' : '90,60,30';
-          S.tracers.push({x1:kx, y1:ky, x2:best.x, y2:best.y-12, life: t.type==='bal'?.16:.12, max:.16, w: t.type==='bal'?2.4:1.6, col});
-          damage(best, towerStat(t,'dmg'), t.type==='luc'?'mus':'kus'); burst(best.x, best.y-12, '#d9c29a', 3, 50, 2, .2); sfx(t.type==='luc'?'arrow':'twang');
+          const dist = Math.hypot(best.x - kx, best.y - 12 - ky);
+          const spd = t.type === 'bal' ? 320 : t.type === 'kus' ? 380 : 340;
+          const dur = Math.max(.18, Math.min(.55, dist / spd));
+          const lead = best.blockBy || best.stunT > 0 ? 0 : ET[best.type].spd * (best.slowT > 0 ? 1 - best.slowA : 1);
+          const aim = lead ? posAt(best.d + lead * dur) : {x: best.x, y: best.y};
+          S.proj.push({sx:kx, sy:ky, tx:aim.x, ty:aim.y - 12, t:0, dur, dmg:towerStat(t,'dmg'), splash: t.type==='bal'?10:6,
+            src: t.type==='bal'?'bal':t.type==='kus'?'kus':'luc', kind: t.type==='luc'?'arrow':'bolt', hi:false});
+          sfx(t.type==='luc'?'arrow':'twang');
         } else if (t.type === 'kar') {
           const dmg = towerStat(t,'dmg'), splash = towerStat(t,'splash');
           S.tracers.push({x1:mx, y1:my, x2:best.x, y2:best.y-10, life:.1, max:.1, w:4, col:'255,200,100'});
@@ -1086,7 +1091,7 @@ function update(dt) {
           burst(best.x, best.y-10, '#ff9a1a', 12, 100, 3, .35); smoke(mx, my, 3, 6); sfx('boom'); S.shake = Math.max(S.shake, 1.5);
         } else if (t.type === 'rus') {
           const rx = t.x + Math.cos(t.ang)*22, ry = t.gy + Math.sin(t.ang)*22;
-          S.tracers.push({x1:rx, y1:ry, x2:best.x, y2:best.y-12, life:.16, max:.16, w:3, col:'255,200,120'});
+          S.tracers.push({x1:rx, y1:ry, x2:rx+Math.cos(t.ang)*18, y2:ry+Math.sin(t.ang)*18, life:.07, max:.07, w:3, col:'255,200,120'});
           damage(best, towerStat(t,'dmg'), 'rus');
           { const dx = best.x - t.x, dy = best.y - t.gy, l = Math.hypot(dx, dy) || 1, ux = dx/l, uy = dy/l; let nx = null, nd = 1e9;
             for (const e of S.enemies) { if (e.dead || e === best) continue; const ex = e.x - best.x, ey = e.y - best.y, along = ex*ux + ey*uy, perp = Math.abs(ex*uy - ey*ux);
@@ -1112,15 +1117,23 @@ function update(dt) {
     if (Math.random() < .5 && S.parts.length < 330) { const q = projPos(p); S.parts.push({x:q.x, y:q.y, vx:0, vy:-6, life:.35, max:.35, color: p.fall ? '#b8b0a4' : '#cfcac2', size:3, grav:0, kind:'smoke'}); }
     if (p.t >= p.dur) {
       p.done = true;
-      for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-p.tx, e.y-p.ty) <= p.splash) damage(e, p.dmg, p.src);
-      const big = p.src === 'moz' || p.fall;
-      burst(p.tx, p.ty, '#ff9a1a', big ? 20 : 14, 120, 4, .45); burst(p.tx, p.ty, '#ffe14d', 8, 70, 3, .35); smoke(p.tx, p.ty, big ? 9 : 6, 10, '#bdb6aa');
-      burst(p.tx, p.ty, '#7a5a3a', 6, 90, 2.5, .5, 220);
-      S.parts.push({x:p.tx, y:p.ty, vx:0, vy:0, life:.3, max:.3, color:'#fff2b0', size:p.splash, grav:0, kind:'ring'});
-      if (S.decals.length > 14) S.decals.shift();
-      S.decals.push({x:p.tx, y:p.ty, r:p.splash*.45, life:5, max:5});
-      S.shake = Math.max(S.shake, big ? 4 : 3);
-      if (p.fall) sfx('boom');
+      if (p.kind === 'arrow' || p.kind === 'bolt') {
+        let hit = null, hd = p.splash + 14;
+        for (const e of S.enemies) if (!e.dead) { const dd = Math.hypot(e.x - p.tx, e.y - 12 - p.ty); if (dd < hd) { hd = dd; hit = e; } }
+        if (hit) damage(hit, p.dmg, p.src);
+        else for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-p.tx, e.y-p.ty) <= p.splash + 8) { damage(e, p.dmg, p.src); break; }
+        burst(p.tx, p.ty, '#d9c29a', 4, 55, 2, .22);
+      } else {
+        for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-p.tx, e.y-p.ty) <= p.splash) damage(e, p.dmg, p.src);
+        const big = p.src === 'moz' || p.fall;
+        burst(p.tx, p.ty, '#ff9a1a', big ? 20 : 14, 120, 4, .45); burst(p.tx, p.ty, '#ffe14d', 8, 70, 3, .35); smoke(p.tx, p.ty, big ? 9 : 6, 10, '#bdb6aa');
+        burst(p.tx, p.ty, '#7a5a3a', 6, 90, 2.5, .5, 220);
+        S.parts.push({x:p.tx, y:p.ty, vx:0, vy:0, life:.3, max:.3, color:'#fff2b0', size:p.splash, grav:0, kind:'ring'});
+        if (S.decals.length > 14) S.decals.shift();
+        S.decals.push({x:p.tx, y:p.ty, r:p.splash*.45, life:5, max:5});
+        S.shake = Math.max(S.shake, big ? 4 : 3);
+        if (p.fall) sfx('boom');
+      }
     }
   }
   S.proj = S.proj.filter(p => !p.done);
@@ -1186,7 +1199,8 @@ function update(dt) {
 function projPos(p) {
   const k = Math.max(0, Math.min(1, p.t / p.dur));
   if (p.fall) return {x: p.sx + (p.tx - p.sx)*k, y: p.sy + (p.ty - p.sy)*k*k, gx: p.tx, gy: p.ty};
-  const hgt = Math.sin(k*Math.PI) * (p.hi ? 70 + p.dur*30 : 20 + p.dur*30);
+  const arc = p.kind === 'arrow' ? 28 + p.dur*36 : p.kind === 'bolt' ? 18 + p.dur*28 : (p.hi ? 70 + p.dur*30 : 20 + p.dur*30);
+  const hgt = Math.sin(k*Math.PI) * arc;
   return {x: p.sx + (p.tx - p.sx)*k, y: p.sy + (p.ty - p.sy)*k - hgt, gx: p.sx + (p.tx - p.sx)*k, gy: p.sy + (p.ty - p.sy)*k + 12*(1-k)};
 }
 function updateFx(dt) {
@@ -1449,7 +1463,25 @@ function drawTower(c, t, time) {
   if (sq) { c.translate(x, by); c.scale(1 + sq, 1 - sq); c.translate(-x, -by); }
   drawSpr(c, 't_'+type+lvl, x, by, w);
   const gy = t.gy;
-  if (type === 'mus') {
+  if (type === 'luc') {
+    // łucznicy upieczeni na spricie (platforma v3 kus + zielone płaszcze);
+    // przy strzale – naciąg łuku / błysk nad galerią
+    if (anim > .2) {
+      const pos = [[[0,0]], [[-7,1],[7,-1]], [[-8,2],[8,1],[0,-4]]][lvl];
+      for (const [px, py] of pos) {
+        c.save(); c.translate(x + px, gy + py); c.rotate(t.ang);
+        const pull = anim * 3.2;
+        c.strokeStyle = '#5a3417'; c.lineWidth = 2.2;
+        c.beginPath(); c.moveTo(4, -8); c.quadraticCurveTo(13 + (1-anim), 0, 4, 9); c.stroke();
+        c.strokeStyle = '#e8e0cc'; c.lineWidth = 1;
+        c.beginPath(); c.moveTo(4, -8); c.lineTo(1 - pull, 0); c.lineTo(4, 9); c.stroke();
+        c.strokeStyle = '#3a2a14'; c.lineWidth = 1.5;
+        c.beginPath(); c.moveTo(1 - pull, 0); c.lineTo(12 - pull*.2, 0); c.stroke();
+        if (anim > .55) { circ(c, 13, 0, 3.5 + (anim-.55)*6, '#fff3a0', null); }
+        c.restore();
+      }
+    }
+  } else if (type === 'mus') {
     const pos = [[[0,0]], [[-7,1],[7,-1]], [[-8,2],[8,1],[0,-4]]][lvl];
     for (const [px, py] of pos) soldier(c, x + px, gy + py, t.ang, anim, .78, lvl == 2 ? '#c41e3a' : '#d93636', 17, lvl == 2 ? '#ffcc33' : '#e02b2b');
   } else if (type === 'arm') {
@@ -1507,7 +1539,7 @@ function drawTower(c, t, time) {
   if (t.pray) { c.globalAlpha = .5 + Math.sin(time*6)*.2; star(c, x + w*.4, by - t.h + 4, 3, '#fff3a0'); c.globalAlpha = 1; }
   // proporczyk na wieży
   if (type !== 'smo' && type !== 'moz' && type !== 'wil') {
-    const fx = x - w*.42, fy = by - t.h*(type === 'rus' ? .97 : type === 'arm' ? .62 : type === 'kus' ? .95 : .9);
+    const fx = x - w*.42, fy = by - t.h*(type === 'rus' ? .97 : type === 'arm' ? .62 : (type === 'kus' || type === 'luc') ? .95 : .9);
     flag(c, fx, fy, 10 + lvl*2, 6 + lvl, time + t.seed, ['#ffffff', '#e02b2b']);
   }
   // gwiazdki poziomu
@@ -1693,13 +1725,30 @@ function render() {
   // złote promienie przeora
   for (const b of S.beams) { const a = b.life/b.max; c.strokeStyle = 'rgba(255,230,120,' + a + ')'; c.lineWidth = 4*a + 1; c.beginPath(); c.moveTo(b.x1, b.y1); c.lineTo(b.x2, b.y2); c.stroke();
     c.strokeStyle = 'rgba(255,255,255,' + a + ')'; c.lineWidth = 1.4; c.stroke(); }
-  // kule armatnie i bomby (łuk)
+  // pociski: strzały / bełty / kule / bomby
   for (const p of S.proj) {
     if (p.t < 0) continue;
-    const q = projPos(p), r = p.hi ? 5.5 : 4.5;
-    c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(q.gx, q.gy + 3, r, r*.45, 0, 0, 7); c.fill();
-    circ(c, q.x, q.y, r, '#1e1e1e', '#000', 1); circ(c, q.x-1.5, q.y - 1.5, 1.4, 'rgba(255,255,255,.6)', null);
-    if (p.hi) { c.fillStyle = (Math.floor(at*20) % 2) ? '#ffd23a' : '#ff6a00'; c.beginPath(); c.arc(q.x + 3, q.y - 5, 1.8, 0, 7); c.fill(); }
+    const q = projPos(p);
+    if (p.kind === 'arrow' || p.kind === 'bolt') {
+      const k = Math.max(0.001, Math.min(1, p.t / p.dur));
+      const q2 = projPos(Object.assign({}, p, {t: p.t - 0.016}));
+      const ang = Math.atan2(q.y - q2.y, q.x - q2.x);
+      const len = p.kind === 'bolt' ? 14 : 11;
+      c.save(); c.translate(q.x, q.y); c.rotate(ang);
+      c.strokeStyle = p.kind === 'bolt' ? '#3a2a14' : '#5a3417'; c.lineWidth = p.kind === 'bolt' ? 2.4 : 1.8;
+      c.beginPath(); c.moveTo(-len*.45, 0); c.lineTo(len*.55, 0); c.stroke();
+      c.fillStyle = p.kind === 'bolt' ? '#6a4a28' : '#c41e3a';
+      c.beginPath(); c.moveTo(len*.55, 0); c.lineTo(len*.2, -2.4); c.lineTo(len*.2, 2.4); c.fill();
+      c.strokeStyle = '#e8e0cc'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(-len*.45, 0); c.lineTo(-len*.2, -2); c.moveTo(-len*.45, 0); c.lineTo(-len*.2, 2); c.stroke();
+      c.restore();
+      c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(q.gx, q.gy + 2, 3, 1.4, 0, 0, 7); c.fill();
+    } else {
+      const r = p.hi ? 5.5 : 4.5;
+      c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(q.gx, q.gy + 3, r, r*.45, 0, 0, 7); c.fill();
+      circ(c, q.x, q.y, r, '#1e1e1e', '#000', 1); circ(c, q.x-1.5, q.y - 1.5, 1.4, 'rgba(255,255,255,.6)', null);
+      if (p.hi) { c.fillStyle = (Math.floor(at*20) % 2) ? '#ffd23a' : '#ff6a00'; c.beginPath(); c.arc(q.x + 3, q.y - 5, 1.8, 0, 7); c.fill(); }
+    }
   }
   // celownik ostrzału
   if (S.aiming) { const k = (at*1.5) % 1; c.strokeStyle = 'rgba(255,80,40,' + (1-k) + ')'; c.lineWidth = 3; c.beginPath(); c.arc(180, 250, 30 + k*40, 0, 7); c.stroke();
@@ -2551,8 +2600,11 @@ document.body.classList.add('loading', 'onTitle');
 
 // API do testów
 window.TD = {
-  get S() { return S; }, get SPOTS() { return SPOTS; }, get WAVES() { return WAVES; }, get M() { return M; }, get save() { return save; }, get LAST() { return LAST; }, MAPS, HEROES,
-  build: (i, k) => build(i, k), upgrade: i => upgrade(S.towers.find(t => t.spot === i)), next: () => startWave(true),
+  get S() { return S; }, get SPOTS() { return SPOTS; }, get WAVES() { return WAVES; }, get M() { return M; }, get save() { return save; }, get LAST() { return LAST; }, get PICK() { return PICK; }, MAPS, HEROES, TKEYS, TT,
+  build: (i, k, onRoad) => build(i, k, onRoad), upgrade: i => upgrade(S.towers.find(t => t.spot === i)), next: () => startWave(true),
+  tick: (n=1) => { for (let i=0;i<n;i++) update(1/60); },
+  spawn: (type,d) => { spawn(type||'pie',0,1); const e=S.enemies[S.enemies.length-1]; if(d!=null && e){e.d=d; const q=posAt(d); e.x=q.x;e.y=q.y;} return e; },
+  setPick: (o) => { Object.assign(PICK,o); renderPrep(); },
   spec: (x, y) => { if (S.spec === 'ost') { if (!S.aiming) useSpec(); return fireSpec(x ?? 180, y ?? 250); } return useSpec(); },
   husaria: () => useSpec(),
   start: (id, hero, spec) => { if (hero) PICK.hero = hero; if (spec) PICK.spec = spec; ENDLESS=false; startBattle(id || 'glo'); },

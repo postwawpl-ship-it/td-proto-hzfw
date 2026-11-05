@@ -41,7 +41,7 @@ button{font-family:inherit;cursor:pointer}
 #menu.tower{width:auto;max-width:calc(100% - 16px)}
 #menu .opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
 #menu .opt{background:linear-gradient(#ffeec2,#f3d58c);border:2px solid #b8873a;border-radius:12px;padding:3px 1px 4px;text-align:center;font-size:11px;font-weight:700;color:#3a2a14;line-height:1.05;display:flex;flex-direction:column;align-items:center}
-#menu .opt img{height:46px;width:auto;max-width:56px;object-fit:contain;display:block;margin:1px auto 2px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.3))}
+#menu .opt img{height:58px;width:auto;max-width:72px;object-fit:contain;display:block;margin:1px auto 2px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.3))}
 #menu .opt .n{min-height:23px;display:flex;align-items:center}
 #menu .opt .c{display:block;font-size:13px;font-weight:800;color:#8a5a00;margin-top:1px}
 #menu .opt.no{opacity:.45}
@@ -305,4 +305,12 @@ body.loading #app:after{content:'Ładowanie…';position:absolute;inset:0;displa
 @media (max-width:380px){
   #pickHero .pk img{height:34px}
   #pickHero .pk small{font-size:8px}
+}
+
+#pickTowers{gap:6px}
+#pickTowers .pk{padding:6px 3px 5px}
+#pickTowers .pk img{height:64px;width:auto;max-width:100%;object-fit:contain;display:block;margin:0 auto 3px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.28))}
+@media (max-width:380px){
+  #pickTowers .pk img{height:54px}
+  #menu .opt img{height:50px;max-width:64px}
 }
