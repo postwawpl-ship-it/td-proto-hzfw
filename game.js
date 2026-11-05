@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.11';
+const V = '4.12';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -744,7 +744,7 @@ function addCorpse(e, src) {
 // ====== WIEŻE ======
 function towerGeom(t) {
   const w = TW[t.type][t.lvl], img = IMG['t_'+t.type+t.lvl], h = img && img.width ? w*img.height/img.width : w*1.2;
-  t.w = w; t.h = h; t.by = t.y + 13; t.gy = t.by - h*(1 - TOPF[t.type][t.lvl]);
+  t.w = w; t.h = h; t.by = t.y + (t.type === 'pik' ? 2 : 13); t.gy = t.by - h*(1 - TOPF[t.type][t.lvl]);
 }
 function build(i, type, onRoad) {
   if (S.over || !TT[type] || !towerOpen(type)) return false;
@@ -1511,7 +1511,11 @@ function drawTower(c, t, time) {
   const {x, by, w, lvl, type} = t, anim = Math.max(0, t.anim);
   if (!TT[type]) return;
   const pop = t.pop > 0 ? 1 + Math.sin(t.pop*Math.PI)*.12 : 1;
-  c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(x + 2, by - 3, w*.5, w*.2, 0, 0, 7); c.fill();
+  if (type === 'pik') {
+    c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(x + 1, by + 1, w * .35, w * .13, 0, 0, 7); c.fill();
+  } else {
+    c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(x + 2, by - 3, w*.5, w*.2, 0, 0, 7); c.fill();
+  }
   c.save(); c.translate(x, by); c.scale(2 - pop, pop); c.translate(-x, -by);
   // odrzut armaty/rusznicy – lekki przysiad
   const sq = (type === 'arm' || type === 'rus') ? anim*.03 : 0;
