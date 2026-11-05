@@ -2304,7 +2304,7 @@ function toggleTowerPick(k) {
 }
 function renderPrep(hint) {
   $('pickHero').innerHTML = HKEYS.map(k => { const op = heroOpen(k);
-    return `<button class="pk ${op ? '' : 'lock'} ${PICK.hero === k ? 'sel' : ''}" data-h="${k}"><img src="${himg(k, op ? heroTier(k) : 0)}" alt="">${op ? '' : '<span class="lk">🔒</span>'}${HEROES[k].short}<small>${op ? 'poz. ' + heroLvl(k) : '&nbsp;'}</small></button>`; }).join('');
+    return `<button class="pk ${op ? '' : 'lock'} ${PICK.hero === k ? 'sel' : ''}" data-h="${k}" aria-label="${HEROES[k].name}" title="${HEROES[k].name}"><img src="${himg(k, op ? heroTier(k) : 0)}" alt="${HEROES[k].name}">${op ? '' : '<span class="lk">🔒</span>'}${op ? `<small>poz. ${heroLvl(k)}</small>` : ''}</button>`; }).join('');
   $('pickSpec').innerHTML = SKEYS.map(k => { const op = specOpen(k); const neu = save.seen && save.seen['s_'+k] === false;
     return `<button class="pk ${op ? '' : 'lock'} ${PICK.spec === k ? 'sel' : ''} ${neu?'new':''}" data-s="${k}"><img src="${iimg(SPECS[k].img)}" alt="">${op ? '' : '<span class="lk">🔒</span>'}${SPECS[k].name}<small>${SPECS[k].uses}×</small></button>`; }).join('');
   const pt = $('pickTowers');
@@ -2315,6 +2315,7 @@ function renderPrep(hint) {
   }
   $('prepHint').textContent = hint || `${HEROES[PICK.hero].short} · ${SPECS[PICK.spec].name} · bronie: ${PICK.towers.map(k=>TT[k].name).join(', ')} (${PICK.towers.length}/4)`;
   $('pickHero').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); const k = b.dataset.h;
+    toast(HEROES[k].name);
     if (!heroOpen(k)) return renderPrep(`🔒 ${HEROES[k].name} – odblokujesz, wygrywając bitwę: ${mapName(HERO_FROM[k])}.`);
     PICK.hero = k; renderPrep(); }));
   $('pickSpec').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); const k = b.dataset.s;
