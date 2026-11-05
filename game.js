@@ -1,7 +1,9 @@
 'use strict';
 (() => {
+'use strict';
+(() => {
 // ====== KONFIGURACJA ======
-const V = '4.1';
+const V = '4.2';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -123,11 +125,12 @@ const SPECS = {
   ost: {name:'Ostrzał z armat', desc:'Dotknij planszę – spadnie grad kul.', uses:3, cd:28, img:'d_ocan'},
 };
 const SKEYS = ['ryc','tat','hus','ost'];
+
 // ====== MAPY (16) + teksty ======
-const NODE_POS = {"glo": [14.5, 49.5], "leg": [18.5, 59.0], "plo": [24.0, 48.5], "gru": [38.5, 37.5], "kor": [20.5, 41.0], "ors": [79.98, 30.01], "obe": [56.9, 76.91], "byc": [28.0, 54.0], "kir": [53.3, 11.01], "klu": [95.58, 20.63], "cec": [68.39, 89.38], "cho": [62.71, 78.34], "gni": [26.5, 34.5], "trz": [36.5, 28.0], "och": [80.9, 73.03], "jg": [32.0, 62.5]};
-const NODE_LBL = {"glo": [-8, -28], "leg": [18, 26], "plo": [-28, -12], "gru": [26, -8], "kor": [-26, 22], "ors": [0, -18], "obe": [16, 10], "byc": [20, 8], "kir": [0, 20], "klu": [-12, 14], "cec": [10, 24], "cho": [-22, -18], "gni": [-24, -14], "trz": [24, 16], "och": [0, 20], "jg": [0, 28]};
-const CAMP_ROADS = [{"a":"glo","b":"leg","pts":[[14.5,49.5],[14.04,49.82],[13.71,50.31],[13.54,50.94],[13.55,51.65],[13.73,52.42],[14.06,53.22],[14.51,54.05],[15.03,54.87],[15.58,55.68],[16.11,56.47],[16.59,57.21],[17.02,57.88],[17.38,58.44],[17.68,58.87],[17.94,59.11],[18.16,59.14]]},{"a":"leg","b":"plo","pts":[[18.5,59.0],[18.08,58.63],[17.81,58.07],[17.73,57.36],[17.84,56.57],[18.14,55.71],[18.6,54.82],[19.18,53.91],[19.84,53.01],[20.52,52.12],[21.18,51.26],[21.78,50.44],[22.32,49.71],[22.77,49.09],[23.14,48.62],[23.44,48.36],[23.68,48.33]]},{"a":"plo","b":"gru","pts":[[24.0,48.5],[24.56,48.91],[25.39,49.03],[26.39,48.88],[27.52,48.43],[28.72,47.73],[29.95,46.81],[31.19,45.72],[32.42,44.54],[33.63,43.33],[34.81,42.16],[35.92,41.08],[36.92,40.12],[37.76,39.31],[38.4,38.66],[38.75,38.17],[38.77,37.85]]},{"a":"gru","b":"kor","pts":[[38.5,37.5],[38.43,38.2],[37.97,38.9],[37.17,39.55],[36.09,40.1],[34.76,40.53],[33.24,40.83],[31.59,41.03],[29.87,41.16],[28.15,41.26],[26.48,41.36],[24.92,41.46],[23.53,41.57],[22.35,41.66],[21.44,41.7],[20.83,41.64],[20.58,41.44]]},{"a":"kor","b":"ors","pts":[[20.5,41.0],[21.5,42.67],[23.69,43.94],[26.86,44.7],[30.83,44.89],[35.41,44.5],[40.44,43.59],[45.76,42.29],[51.21,40.74],[56.64,39.09],[61.9,37.49],[66.83,36.04],[71.25,34.78],[74.99,33.71],[77.85,32.8],[79.65,31.98],[80.2,31.2]]},{"a":"ors","b":"obe","pts":[[79.98,30.01],[81.36,31.34],[82.11,33.56],[82.16,36.46],[81.49,39.86],[80.14,43.6],[78.21,47.57],[75.85,51.67],[73.21,55.81],[70.49,59.9],[67.86,63.87],[65.43,67.59],[63.29,70.95],[61.48,73.79],[60.0,75.93],[58.84,77.21],[57.99,77.45]]},{"a":"obe","b":"byc","pts":[[56.9,76.91],[57.41,75.6],[57.25,73.92],[56.43,72.02],[55.0,70.04],[53.01,68.04],[50.58,66.09],[47.83,64.21],[44.89,62.38],[41.9,60.61],[39.01,58.9],[36.32,57.27],[33.94,55.79],[31.92,54.53],[30.32,53.62],[29.18,53.17],[28.56,53.3]]},{"a":"byc","b":"kir","pts":[[28.0,54.0],[26.71,52.59],[26.1,50.39],[26.21,47.6],[27.05,44.4],[28.58,40.92],[30.7,37.28],[33.26,33.55],[36.08,29.81],[38.98,26.12],[41.79,22.55],[44.39,19.19],[46.68,16.16],[48.62,13.59],[50.19,11.67],[51.4,10.54],[52.26,10.4]]},{"a":"kir","b":"klu","pts":[[53.3,11.01],[53.42,12.66],[54.45,14.36],[56.28,15.96],[58.81,17.33],[61.92,18.44],[65.49,19.27],[69.37,19.87],[73.42,20.32],[77.48,20.68],[81.42,21.03],[85.09,21.39],[88.38,21.75],[91.15,22.05],[93.31,22.21],[94.74,22.11],[95.35,21.66]]},{"a":"klu","b":"cec","pts":[[95.58,20.63],[96.97,22.07],[97.64,24.86],[97.53,28.74],[96.63,33.47],[94.99,38.84],[92.72,44.65],[89.97,50.75],[86.93,56.96],[83.81,63.14],[80.78,69.12],[77.99,74.74],[75.52,79.78],[73.44,84.04],[71.75,87.29],[70.44,89.3],[69.52,89.83]]},{"a":"cec","b":"cho","pts":[[68.39,89.38],[68.81,89.01],[69.07,88.43],[69.15,87.7],[69.02,86.87],[68.71,85.98],[68.24,85.04],[67.64,84.09],[66.97,83.13],[66.27,82.19],[65.59,81.27],[64.97,80.42],[64.43,79.64],[63.96,78.98],[63.58,78.49],[63.27,78.21],[63.03,78.17]]},{"a":"cho","b":"gni","pts":[[62.71,78.34],[60.9,79.01],[58.48,78.67],[55.67,77.35],[52.66,75.12],[49.57,72.09],[46.49,68.4],[43.47,64.24],[40.5,59.81],[37.61,55.32],[34.82,50.96],[32.17,46.92],[29.77,43.33],[27.74,40.29],[26.24,37.88],[25.46,36.19],[25.56,35.27]]},{"a":"gni","b":"trz","pts":[[26.5,34.5],[26.91,34.89],[27.5,35.09],[28.21,35.11],[28.99,34.92],[29.82,34.54],[30.67,34.0],[31.52,33.33],[32.37,32.59],[33.2,31.82],[34.0,31.08],[34.76,30.4],[35.44,29.8],[36.02,29.29],[36.46,28.87],[36.69,28.55],[36.7,28.31]]},{"a":"trz","b":"och","pts":[[36.5,28.0],[38.3,27.22],[40.88,27.5],[44.01,28.79],[47.5,31.03],[51.18,34.13],[54.94,37.91],[58.73,42.2],[62.49,46.78],[66.18,51.42],[69.75,55.92],[73.12,60.1],[76.17,63.82],[78.75,66.96],[80.67,69.44],[81.74,71.21],[81.76,72.18]]},{"a":"och","b":"jg","pts":[[80.9,73.03],[80.74,71.13],[79.53,69.18],[77.4,67.37],[74.46,65.81],[70.85,64.58],[66.73,63.67],[62.24,63.02],[57.57,62.57],[52.88,62.2],[48.33,61.85],[44.09,61.48],[40.29,61.11],[37.09,60.8],[34.6,60.65],[32.94,60.78],[32.26,61.31]]}];
-const CAMP_ASPECT = 1.1272;
+const NODE_POS = {"glo": [16.59, 49.82], "leg": [17.48, 57.93], "plo": [30.21, 44.68], "gru": [41.33, 36.83], "kor": [23.91, 37.98], "ors": [93.31, 27.38], "obe": [64.28, 77.19], "byc": [26.49, 55.75], "kir": [60.93, 7.12], "klu": [95.57, 18.33], "cec": [77.65, 87.33], "cho": [73.35, 79.19], "gni": [30.93, 28.66], "trz": [32.04, 36.73], "och": [92.19, 74.69], "jg": [34.63, 60.18]};
+const NODE_LBL = {};
+const CAMP_ROADS = [{"a":"glo","b":"leg","pts":[[16.59,49.82],[16.46,50.34],[16.4,50.87],[16.4,51.41],[16.46,51.95],[16.56,52.5],[16.69,53.05],[16.84,53.61],[17.0,54.17],[17.16,54.72],[17.3,55.27],[17.43,55.82],[17.52,56.36],[17.57,56.89],[17.56,57.42],[17.48,57.93]]},{"a":"leg","b":"plo","pts":[[17.48,57.93],[17.95,56.82],[18.57,55.8],[19.32,54.85],[20.17,53.95],[21.1,53.11],[22.09,52.29],[23.12,51.5],[24.17,50.73],[25.22,49.95],[26.24,49.17],[27.22,48.36],[28.12,47.52],[28.94,46.63],[29.64,45.69],[30.21,44.68]]},{"a":"plo","b":"gru","pts":[[30.21,44.68],[31.08,44.45],[31.9,44.11],[32.68,43.67],[33.43,43.15],[34.15,42.56],[34.86,41.93],[35.55,41.26],[36.23,40.58],[36.91,39.9],[37.6,39.24],[38.3,38.62],[39.01,38.05],[39.75,37.55],[40.52,37.14],[41.33,36.83]]},{"a":"gru","b":"kor","pts":[[41.33,36.83],[40.29,37.3],[39.2,37.62],[38.06,37.81],[36.89,37.9],[35.7,37.9],[34.48,37.83],[33.25,37.72],[32.02,37.6],[30.79,37.47],[29.57,37.37],[28.37,37.32],[27.2,37.33],[26.06,37.43],[24.96,37.64],[23.91,37.98]]},{"a":"kor","b":"ors","pts":[[23.91,37.98],[28.24,37.8],[32.7,37.42],[37.26,36.85],[41.92,36.13],[46.65,35.3],[51.43,34.38],[56.24,33.41],[61.05,32.41],[65.86,31.42],[70.63,30.46],[75.35,29.58],[80.0,28.8],[84.56,28.15],[89.0,27.67],[93.31,27.38]]},{"a":"ors","b":"obe","pts":[[93.31,27.38],[91.95,30.67],[90.36,33.98],[88.57,37.31],[86.62,40.66],[84.54,44.01],[82.36,47.36],[80.13,50.72],[77.87,54.08],[75.62,57.43],[73.42,60.77],[71.29,64.1],[69.28,67.41],[67.42,70.7],[65.74,73.96],[64.28,77.19]]},{"a":"obe","b":"byc","pts":[[64.28,77.19],[62.21,75.46],[59.95,73.85],[57.54,72.33],[55.0,70.89],[52.36,69.52],[49.65,68.2],[46.89,66.91],[44.12,65.63],[41.35,64.36],[38.62,63.06],[35.96,61.74],[33.39,60.36],[30.93,58.91],[28.63,57.38],[26.49,55.75]]},{"a":"byc","b":"kir","pts":[[26.49,55.75],[28.2,52.5],[30.15,49.24],[32.3,45.98],[34.62,42.71],[37.07,39.45],[39.61,36.19],[42.21,32.93],[44.83,29.68],[47.45,26.43],[50.02,23.19],[52.5,19.95],[54.87,16.73],[57.09,13.51],[59.12,10.31],[60.93,7.12]]},{"a":"kir","b":"klu","pts":[[60.93,7.12],[62.91,8.27],[65.02,9.26],[67.25,10.11],[69.57,10.86],[71.98,11.52],[74.43,12.12],[76.93,12.68],[79.43,13.22],[81.93,13.76],[84.4,14.32],[86.82,14.94],[89.16,15.62],[91.42,16.4],[93.56,17.29],[95.57,18.33]]},{"a":"klu","b":"cec","pts":[[95.57,18.33],[94.94,22.67],[94.09,27.13],[93.04,31.69],[91.83,36.32],[90.5,41.01],[89.08,45.75],[87.59,50.51],[86.09,55.27],[84.59,60.02],[83.13,64.75],[81.75,69.43],[80.48,74.04],[79.35,78.58],[78.4,83.01],[77.65,87.33]]},{"a":"cec","b":"cho","pts":[[77.65,87.33],[77.58,86.74],[77.42,86.16],[77.2,85.59],[76.91,85.04],[76.58,84.51],[76.21,83.98],[75.82,83.46],[75.42,82.94],[75.02,82.42],[74.64,81.9],[74.28,81.38],[73.96,80.85],[73.69,80.31],[73.48,79.75],[73.35,79.19]]},{"a":"cho","b":"gni","pts":[[73.35,79.19],[70.37,76.4],[67.45,73.37],[64.57,70.14],[61.72,66.75],[58.91,63.22],[56.11,59.6],[53.34,55.92],[50.57,52.22],[47.81,48.53],[45.04,44.89],[42.26,41.33],[39.47,37.89],[36.65,34.61],[33.81,31.52],[30.93,28.66]]},{"a":"gni","b":"trz","pts":[[30.93,28.66],[30.81,29.18],[30.76,29.71],[30.78,30.25],[30.85,30.79],[30.96,31.33],[31.11,31.88],[31.28,32.44],[31.45,32.99],[31.63,33.54],[31.79,34.09],[31.93,34.63],[32.04,35.17],[32.1,35.7],[32.1,36.22],[32.04,36.73]]},{"a":"trz","b":"och","pts":[[32.04,36.73],[35.99,38.65],[39.97,40.82],[43.99,43.2],[48.02,45.75],[52.08,48.44],[56.14,51.23],[60.21,54.08],[64.28,56.95],[68.34,59.82],[72.38,62.63],[76.41,65.36],[80.41,67.97],[84.38,70.42],[88.31,72.67],[92.19,74.69]]},{"a":"och","b":"jg","pts":[[92.19,74.69],[88.78,73.33],[85.19,72.13],[81.45,71.05],[77.59,70.08],[73.62,69.2],[69.59,68.37],[65.51,67.59],[61.42,66.83],[57.34,66.06],[53.29,65.27],[49.32,64.44],[45.44,63.53],[41.68,62.53],[38.06,61.43],[34.63,60.18]]}];
+const CAMP_ASPECT = 1.0095;
 const FAC_LINES = {"ger": ["Für den Kaiser!", "Los, vorwärts!", "Polnische Burg? Ha!", "Wo ist das Bier?"], "mon": ["Hurraaa!", "Koń i szabla!", "Step woła!", "Batu! Batu!"], "teu": ["Gott mit uns!", "Zwei Schwerter!", "Für den Orden!", "Nein, nicht schon wieder!"], "mos": ["Za cara!", "Moskwa nie zginie!", "Bojar idzie!", "Ura!"], "mol": ["Moldova!", "Do boju!", "Hospodar kazał!"], "max": ["Maximilian!", "Za arcyksięcia!", "Byczyna czeka?"], "swe": ["För Sverige!", "Kungens män!", "Atak!", "Zimno tu!"], "ott": ["Allah!", "Janczarzy!", "Eyvah!", "Do szturmu!"], "tat": ["Haik!", "Ałła!", "Stepowy wiatr!", "Szybko i znikać!"]};
 const PL = {
   wave:['Do broni!','Szykować się!','Idą!','Za Polskę!','Trzymać szyk!','Proch suchy?'],
@@ -163,7 +166,7 @@ const FACT = {
 const MAPS = [
  { id:"glo", name:"Głogów", year:1109, big:false, fac:"ger", grass:"grass", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
+   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[128, 33], [232, 59], [90, 55], [51, 68], [115, 157], [148, 182], [205, 191], [265, 201], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
    gold:200, hk:0.92, boss:null, roster:["ger", "gkn"], music:"jg", sky:"#d9e6f0",
    intro:"Rok 1109. Cesarz Henryk V oblega Głogów. Obrońcy nie oddadzą grodu!",
    unlock:{"tower": "kus"},
@@ -173,7 +176,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"leg", name:"Legnica", year:1241, big:false, fac:"mon", grass:"grass", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179]], roads:[[70, 95], [290, 95], [290, 200]],
+   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[122, 41], [165, 43], [206, 43], [246, 43], [237, 147], [196, 148], [235, 252], [154, 148], [114, 148]], roads:[[70, 95], [290, 95], [290, 200]],
    gold:210, hk:0.95, boss:null, roster:["mon", "mkn"], music:"jg", sky:"#e8e0c8",
    intro:"1241. Mongołowie Batu-chana. Henryk Pobożny staje do heroicznej obrony!",
    unlock:{"tower": "wil"},
@@ -183,7 +186,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"plo", name:"Płowce", year:1331, big:false, fac:"teu", grass:"grass_gr", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
+   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[48, 43], [177, 20], [185, 127], [226, 134], [332, 140], [149, 145], [108, 151], [68, 156], [116, 255]], roads:[[100, 60], [280, 90], [280, 180]],
    gold:220, hk:0.98, boss:null, roster:["kne", "teu"], music:"gr", sky:"#d5e8d5",
    intro:"1331. Władysław Łokietek ściera się z Krzyżakami pod Płowcami.",
    unlock:{"tower": "bal"},
@@ -193,7 +196,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"gru", name:"Grunwald", year:1410, big:true, fac:"teu", grass:"grass", fort:"fort_tabor", fortW:170, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230], [126, 266], [124, 296]], roads:[[40, 100], [320, 100], [320, 200], [80, 200]],
+   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[92, 44], [60, 152], [194, 48], [264, 48], [266, 252], [225, 252], [183, 252], [133, 252], [27, 230], [28, 271], [124, 372]], roads:[[40, 100], [320, 100], [320, 200], [80, 200]],
    gold:260, hk:1.0, boss:"ulr", roster:["kne", "teu", "bra"], music:"gr", sky:"#d9ecf6",
    intro:"15 lipca 1410. Jagiełło i Witold przeciw Krzyżakom. Dwa miecze? Dzięki, nie trzeba!",
    unlock:{"tower": "mus", "spec": "tat", "chest": true},
@@ -203,7 +206,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"kor", name:"Koronowo", year:1410, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:0.8136,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
+   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [144, 34], [105, 47], [66, 60], [133, 147], [172, 167], [106, 259], [163, 272], [204, 281]], roads:[[200, 70], [80, 110], [80, 200]],
    gold:230, hk:1.02, boss:null, roster:["kne", "teu", "bra"], music:"gr", sky:"#d8ecd8",
    intro:"Październik 1410. Po Grunwaldzie – jeszcze Koronowo.",
    unlock:{"tower": "arm"},
@@ -213,7 +216,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"ors", name:"Orsza", year:1514, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:1.1364,
    flags:'pl', river:true, camp:'v2', deco:'v2',
-   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[179, 20], [268, 106], [139, 30], [153, 133], [30, 108], [189, 151], [228, 158], [271, 166], [307, 212]], roads:[[300, 45], [90, 95], [60, 180]],
    gold:240, hk:1.04, boss:null, roster:["str", "boj"], music:"ch", sky:"#e8dcc0",
    intro:"1514. Ostrogski i Daszkiewicz biją Moskwę pod Orszą.",
    unlock:{"tower": "rus"},
@@ -223,7 +226,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"obe", name:"Obertyn", year:1531, big:false, fac:"mol", grass:"grass", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
+   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [134, 62], [175, 74], [214, 63], [235, 167], [253, 51], [295, 37], [195, 180], [296, 256]], roads:[[50, 90], [180, 130], [300, 90]],
    gold:240, hk:1.05, boss:null, roster:["mol", "aza"], music:"ch", sky:"#e6d8b8",
    intro:"1531. Hetman Tarnowski rozbija Mołdawian pod Obertynem. Tabor rządzi!",
    unlock:{"tower": "haj"},
@@ -233,7 +236,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"byc", name:"Byczyna", year:1588, big:false, fac:"max", grass:"grass", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
+   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[128, 33], [232, 59], [90, 55], [51, 68], [115, 157], [148, 182], [205, 191], [265, 201], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
    gold:250, hk:1.06, boss:null, roster:["max", "gkn"], music:"jg", sky:"#e0e4f0",
    intro:"1588. Zamoyski bierze do niewoli Maksymiliana pod Byczyną.",
    unlock:{"tower": "kar"},
@@ -243,7 +246,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"kir", name:"Kircholm", year:1605, big:true, fac:"swe", grass:"grass", fort:"fort_tabor", fortW:170, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[30, -25], [30, 140], [150, 140], [150, 40], [300, 40], [300, 250], [60, 250], [60, 340], [250, 340], [250, 405], [180, 420], [180, 478]], spots:[[75, 107], [60, 160], [96, 154], [126, 153], [200, 85], [106, 60], [270, 31], [258, 92], [258, 156], [252, 208], [168, 270]], roads:[[30, 140], [150, 140], [300, 250], [60, 250]],
+   path:[[30, -25], [30, 140], [150, 140], [150, 40], [300, 40], [300, 250], [60, 250], [60, 340], [250, 340], [250, 405], [180, 420], [180, 478]], spots:[[85, 88], [60, 192], [101, 192], [141, 192], [205, 92], [98, 50], [245, 92], [248, 132], [248, 176], [212, 198], [198, 160]], roads:[[30, 140], [150, 140], [300, 250], [60, 250]],
    gold:280, hk:1.08, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
    intro:"1605. Chodkiewicz i husaria – mniejszość przeciw Szwedom. Kircholm!",
    unlock:{"tower": "moz", "spec": "hus", "hero": "zol"},
@@ -253,7 +256,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"klu", name:"Kłuszyn", year:1610, big:false, fac:"mos", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230]], roads:[[40, 100], [320, 100], [320, 200]],
+   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[92, 44], [60, 152], [194, 48], [264, 48], [266, 252], [225, 252], [183, 252], [133, 252], [27, 230]], roads:[[40, 100], [320, 100], [320, 200]],
    gold:260, hk:1.1, boss:null, roster:["str", "boj", "pan"], music:"ch", sky:"#e8d8b0",
    intro:"1610. Żółkiewski z husarią rozbija Moskwę pod Kłuszynem.",
    unlock:{"tower": "woz", "hero": "cho"},
@@ -263,7 +266,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"cec", name:"Cecora", year:1620, big:false, fac:"ott", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:true, camp:'v2', deco:'v2',
-   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[179, 20], [268, 106], [139, 30], [153, 133], [30, 108], [189, 151], [228, 158], [271, 166], [307, 212]], roads:[[300, 45], [90, 95], [60, 180]],
    gold:250, hk:1.08, boss:null, roster:["aza", "jan", "sip", "tat"], music:"ch", sky:"#e8e0c8",
    intro:"1620. Odwrót spod Cecory. Przetrwaj napór i ocal tabor!",
    unlock:{"chest": true},
@@ -273,7 +276,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"cho", name:"Chocim", year:1621, big:true, fac:"ott", grass:"grass_ch", fort:"fort_ch", fortW:180, fortAR:1.0250,
    flags:'pl', river:true, camp:'v2', deco:'v2',
-   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229], [237, 261], [253, 320]], roads:[[300, 45], [90, 95], [60, 180], [250, 215]],
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[179, 20], [268, 106], [139, 30], [153, 133], [30, 108], [189, 151], [228, 158], [271, 166], [307, 212], [191, 257], [259, 350]], roads:[[300, 45], [90, 95], [60, 180], [250, 215]],
    gold:300, hk:1.1, boss:"pas", roster:["aza", "jan", "sip"], music:"ch", sky:"#e8e0c8",
    intro:"1621. Hetman Chodkiewicz broni obozu pod Chocimiem nad Dniestrem.",
    unlock:{"spec": "ost", "hero": "kon"},
@@ -283,7 +286,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"gni", name:"Gniew", year:1626, big:false, fac:"swe", grass:"grass_ch", fort:"fort_gr", fortW:160, fortAR:0.8136,
    flags:'pl', river:true, camp:'v2', deco:'v2',
-   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
+   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[48, 43], [177, 20], [185, 127], [226, 134], [298, 230], [149, 145], [108, 151], [68, 156], [116, 255]], roads:[[100, 60], [280, 90], [280, 180]],
    gold:270, hk:1.12, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d0e0f0",
    intro:"1626. Koniecpolski staje Szwedom pod Gniewem nad Wisłą.",
    unlock:{"chest": true},
@@ -293,7 +296,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"trz", name:"Trzciana", year:1629, big:false, fac:"swe", grass:"grass_gr", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
+   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [144, 34], [105, 47], [66, 60], [133, 147], [172, 167], [106, 259], [163, 272], [204, 281]], roads:[[200, 70], [80, 110], [80, 200]],
    gold:280, hk:1.14, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d8ecd0",
    intro:"1629. Koniecpolski bije Szwedów pod Trzcianą.",
    unlock:{"hero": "cza"},
@@ -303,7 +306,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"och", name:"Ochmatów", year:1644, big:false, fac:"tat", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
+   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [134, 62], [175, 74], [214, 63], [235, 167], [253, 51], [295, 37], [195, 180], [296, 256]], roads:[[50, 90], [180, 130], [300, 90]],
    gold:290, hk:1.15, boss:null, roster:["tat", "aza", "sip"], music:"ch", sky:"#ead8a8",
    intro:"1644. Koniecpolski rozbija Tatarów pod Ochmatowem.",
    unlock:{"hero": "kor"},
@@ -313,7 +316,7 @@ const MAPS = [
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
  { id:"jg", name:"Jasna Góra", year:1655, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:0.8341,
    flags:'pl', river:false, camp:'v2', deco:'v2',
-   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179], [111, 258], [125, 316]], roads:[[70, 95], [290, 95], [290, 200], [70, 200]],
+   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[122, 41], [165, 43], [206, 43], [246, 43], [237, 147], [196, 148], [235, 252], [154, 148], [114, 148], [122, 253], [125, 357]], roads:[[70, 95], [290, 95], [290, 200], [70, 200]],
    gold:300, hk:1.12, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
    intro:"1655. Potop. Przeor Kordecki: klasztoru nie oddamy!",
    unlock:{"final": true, "chest": true},
@@ -325,6 +328,7 @@ const MAPS = [
 const MAPI = Object.fromEntries(MAPS.map((m,i) => [m.id,i]));
 const BIG_IDS = MAPS.filter(m => m.big).map(m => m.id);
 const TOTAL_STARS = MAPS.length*3;
+
 // ====== ZAPIS ======
 let save = {music:true, sfx:true, speed:1, maps:{}, heroes:{}, games:0, wins:0,
   last:{hero:'zaw', spec:'ryc', towers:['luc','smo']}, seen:{}, notice:null};
@@ -523,6 +527,7 @@ function musicUpdate() {
     if (MU.timer) { clearInterval(MU.timer); MU.timer = null; }
   }
 }
+
 
 
 // ====== MAPA ======
@@ -1188,6 +1193,7 @@ function endGame(win) {
   if (!SIM) setTimeout(() => showEnd(win, stars), 1100);
 }
 
+
 // ====== GRAFIKA: wczytywanie i skalowanie sprite'ów ======
 const IMG = {};
 const IMG_LIST = [].concat(
@@ -1675,14 +1681,38 @@ function render() {
   if (S.banner) {
     const b = S.banner, k = 1 - b.t / b.max, a = Math.min(1, b.t*3, k*8), sc = k < .12 ? .6 + k/.12*.4 : 1;
     c.save(); c.globalAlpha = a; c.translate(W/2, 230); c.scale(sc, sc);
-    const gr = c.createLinearGradient(0, -30, 0, 32); gr.addColorStop(0, 'rgba(70,35,15,.82)'); gr.addColorStop(1, 'rgba(35,18,8,.82)');
-    c.fillStyle = gr; rr(c, -150, -30, 300, b.sub ? 62 : 46, 14); c.fill();
+    // fit title + wrap subtitle so nothing clips at phone edges (logical W=360)
+    c.font = '800 26px ' + FONT;
+    let title = b.text, tSize = 26;
+    while (tSize > 16 && c.measureText(title).width > 300) { tSize -= 1; c.font = '800 ' + tSize + 'px ' + FONT; }
+    const subLines = [];
+    if (b.sub) {
+      c.font = '700 13px ' + FONT;
+      const words = String(b.sub).split(' ');
+      let line = '';
+      for (const w of words) {
+        const trial = line ? line + ' ' + w : w;
+        if (c.measureText(trial).width > 300) { if (line) subLines.push(line); line = w; }
+        else line = trial;
+      }
+      if (line) subLines.push(line);
+      if (!subLines.length) subLines.push(b.sub);
+    }
+    const boxH = 40 + (subLines.length ? 8 + subLines.length * 16 : 0);
+    const gr = c.createLinearGradient(0, -boxH/2, 0, boxH/2); gr.addColorStop(0, 'rgba(70,35,15,.82)'); gr.addColorStop(1, 'rgba(35,18,8,.82)');
+    c.fillStyle = gr; rr(c, -160, -boxH/2, 320, boxH, 14); c.fill();
     c.strokeStyle = 'rgba(255,210,100,.8)'; c.lineWidth = 2; c.stroke();
-    c.font = '800 26px ' + FONT; c.strokeStyle = INK; c.lineWidth = 5; c.strokeText(b.text, 0, -7); c.fillStyle = '#ffe14d'; c.fillText(b.text, 0, -7);
-    if (b.sub) { c.font = '700 13px ' + FONT; c.fillStyle = '#fff'; c.fillText(b.sub, 0, 18); }
+    c.font = '800 ' + tSize + 'px ' + FONT; c.strokeStyle = INK; c.lineWidth = 5;
+    const titleY = subLines.length ? -boxH/2 + 22 : 0;
+    c.strokeText(title, 0, titleY); c.fillStyle = '#ffe14d'; c.fillText(title, 0, titleY);
+    if (subLines.length) {
+      c.font = '700 13px ' + FONT; c.fillStyle = '#fff';
+      subLines.forEach((ln, i) => c.fillText(ln, 0, titleY + 22 + i * 16));
+    }
     c.restore();
   }
 }
+
 
 // ====== UI ======
 const $ = id => document.getElementById(id);
@@ -1797,7 +1827,7 @@ function startBattle(id) {
   loadMap(MAPS[MAPI[id]] || MAPS[0]);
   newGame(); fit(); show(null); document.body.classList.remove('onTitle');
   S.running = true;
-  banner(M.name + ' ' + M.year, 'Dotknij kamienne pole przy drodze', 2.6);
+  banner(M.name + ' ' + M.year, 'Dotknij pole przy drodze', 2.6);
   if ((save.games|0) < 3) { const s0 = S; setTimeout(() => { if (S === s0 && S.running && !S.over) heroSay('Dotknij mnie, a potem drogę!', true); }, SIM ? 0 : 3200); }
 }
 function syncSettings() {
@@ -1835,6 +1865,7 @@ function renderBestLine() {
 // ---- mapa kampanii ----
 function roadD(pts) {
   if (!pts || pts.length < 2) return '';
+  // thin ink trail: smooth mid-point quadratic through polyline samples
   let d = 'M' + pts[0][0] + ' ' + pts[0][1];
   for (let i = 1; i < pts.length - 1; i++) {
     const xc = (pts[i][0] + pts[i+1][0]) / 2, yc = (pts[i][1] + pts[i+1][1]) / 2;
@@ -1844,11 +1875,82 @@ function roadD(pts) {
   d += ' T' + last[0] + ' ' + last[1];
   return d;
 }
+function placeCampLabels(items, mapW, mapH) {
+  // Place one label per node: try 8 dirs × several radii; keep on-screen; avoid rings & other labels.
+  const placed = [];
+  const out = {};
+  const pad = 3;
+  const ringR = (it) => (it.big ? 20 : 16);
+  const dirs = [
+    [0, -1], [0.7, -0.7], [1, 0], [0.7, 0.7],
+    [0, 1], [-0.7, 0.7], [-1, 0], [-0.7, -0.7],
+  ];
+  const radii = [26, 34, 44, 56, 70, 86, 104];
+  const overlaps = (a, b) => !(a.r + 2 < b.l || a.l - 2 > b.r || a.b + 2 < b.t || a.t - 2 > b.b);
+  // process outer/edge nodes first so dense cluster can claim leftover space
+  const order = items.map((it, i) => {
+    const cx = (it.x / 100) * mapW, cy = (it.y / 100) * mapH;
+    const edge = Math.min(cx, cy, mapW - cx, mapH - cy);
+    return {i, edge, dens: items.reduce((n, o) => n + (Math.hypot(it.x - o.x, it.y - o.y) < 12 ? 1 : 0), 0)};
+  }).sort((a, b) => b.dens - a.dens || a.edge - b.edge); // densest first actually harder — do sparsest first
+  order.sort((a, b) => a.dens - b.dens || a.edge - b.edge);
+
+  for (const {i} of order) {
+    const it = items[i];
+    const cx = (it.x / 100) * mapW, cy = (it.y / 100) * mapH;
+    const hw = it.w / 2, hh = it.h / 2;
+    let best = null, bestScore = 1e9;
+    for (const rad of radii) {
+      for (const [dxn, dyn] of dirs) {
+        let lx = cx + dxn * rad, ly = cy + dyn * rad;
+        lx = Math.max(hw + pad, Math.min(mapW - hw - pad, lx));
+        ly = Math.max(hh + pad, Math.min(mapH - hh - pad, ly));
+        const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
+        let hit = false;
+        for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
+        if (hit) continue;
+        // avoid all rings
+        for (const o of items) {
+          const ox = (o.x / 100) * mapW, oy = (o.y / 100) * mapH;
+          const rr = ringR(o) + 3;
+          if (overlaps(box, {l: ox - rr, r: ox + rr, t: oy - rr, b: oy + rr})) { hit = true; break; }
+        }
+        if (hit) continue;
+        // prefer closer + prefer putting label toward map edge (more empty)
+        const edgePref = Math.min(lx, ly, mapW - lx, mapH - ly);
+        const score = Math.hypot(lx - cx, ly - cy) * 1.0 - edgePref * 0.15 + (rad > 70 ? 8 : 0);
+        if (score < bestScore) { bestScore = score; best = {dx: lx - cx, dy: ly - cy, box, rad}; }
+      }
+      if (best && best.rad <= 56) break; // good enough early
+    }
+    if (!best) {
+      // last resort: park at nearest screen edge from node
+      const targets = [
+        [hw + pad, cy], [mapW - hw - pad, cy], [cx, hh + pad], [cx, mapH - hh - pad],
+        [hw + pad, hh + pad], [mapW - hw - pad, hh + pad], [hw + pad, mapH - hh - pad], [mapW - hw - pad, mapH - hh - pad],
+      ];
+      for (const [lx0, ly0] of targets) {
+        let lx = lx0, ly = ly0;
+        const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
+        let hit = false;
+        for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
+        if (!hit) { best = {dx: lx - cx, dy: ly - cy, box, rad: 999}; break; }
+      }
+    }
+    if (!best) {
+      const lx = Math.max(hw + pad, Math.min(mapW - hw - pad, cx));
+      const ly = Math.max(hh + pad, Math.min(mapH - hh - pad, cy + ringR(it) + hh + 4));
+      best = {dx: lx - cx, dy: ly - cy, box: {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh}, rad: 0};
+    }
+    placed.push({box: best.box});
+    out[it.id] = [Math.round(best.dx), Math.round(best.dy)];
+  }
+  return out;
+}
 function renderCamp() {
   $('campStars').textContent = '★ ' + totalStars() + '/' + TOTAL_STARS;
   const cmap = $('cmap');
   if (cmap) cmap.style.aspectRatio = String(CAMP_ASPECT);
-  // winding roads for unlocked segments
   const svg = $('routeSvg');
   let lastOpen = 0;
   for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) lastOpen = i;
@@ -1862,19 +1964,35 @@ function renderCamp() {
   });
   if (svg) svg.innerHTML = shadows + roads;
 
+  // measure map & place labels with collision avoidance
+  const mapW = (cmap && cmap.clientWidth) || 360;
+  const mapH = (cmap && cmap.clientHeight) || Math.round(mapW * CAMP_ASPECT);
+  const labelItems = MAPS.map((m, i) => {
+    const op = mapOpen(i);
+    const [x, y] = NODE_POS[m.id];
+    // name-only when open (year sits in the ring); locked shows year only
+    const text = op ? m.name : String(m.year);
+    const w = Math.min(110, 12 + text.length * 6.6);
+    const h = op ? 18 : 15;
+    return {id: m.id, x, y, big: !!m.big, w, h, text, op};
+  });
+  const LBL = placeCampLabels(labelItems, mapW, mapH);
+
   $('nodes').innerHTML = MAPS.map((m, i) => {
     const op = mapOpen(i), r = mapRec(m.id), w = r.stars > 0, [x, y] = NODE_POS[m.id];
-    const [ldx, ldy] = NODE_LBL[m.id] || [0, 0];
+    const [ldx, ldy] = LBL[m.id] || [0, 22];
     const end = (r.endless|0) > 0 ? `<div class="endb">Bastion ${r.endless}</div>` : '';
     const ring = op ? String(m.year).slice(2) : '🔒';
-    const nm = op ? `<div class="nm" style="--ldx:${ldx}px;--ldy:${ldy}px"><b>${m.name}</b><small>${m.year}</small></div>`
+    const lead = (Math.abs(ldx) > 22 || Math.abs(ldy) > 22);
+    const ang = Math.atan2(ldy, ldx) * 180 / Math.PI;
+    const llen = Math.hypot(ldx, ldy) - 10;
+    const nm = op ? `<div class="nm" style="--ldx:${ldx}px;--ldy:${ldy}px"><b>${m.name}</b></div>`
                   : `<div class="nm faint" style="--ldx:${ldx}px;--ldy:${ldy}px"><small>${m.year}</small></div>`;
-    const lead = (ldx || ldy) ? `<i class="lead" style="--ldx:${ldx}px;--ldy:${ldy}px"></i>` : '';
-    return `<button class="node ${m.big?'big':''} ${w?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${lead}<div class="ring">${ring}</div>${nm}<div class="st">${op?starsHtml(r.stars):''}</div>${end}</button>`;
+    const leadHtml = lead ? `<i class="lead" style="--llen:${Math.max(8,llen)}px;--lang:${ang}deg"></i>` : '';
+    return `<button class="node ${m.big?'big':''} ${w?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${leadHtml}<div class="ring">${ring}</div>${nm}<div class="st">${op?starsHtml(r.stars):''}</div>${end}</button>`;
   }).join('');
   $('nodes').querySelectorAll('.node').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); audioInit(); const i = +b.dataset.i;
     if (mapOpen(i)) openPrep(i); else { sfx('click'); b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300}); } }));
-  // auto-scroll to current (first open not-won, else last won)
   requestAnimationFrame(() => {
     const wrap = $('cmapwrap'); if (!wrap) return;
     let focus = 0;
@@ -1882,7 +2000,9 @@ function renderCamp() {
     const [x, y] = NODE_POS[MAPS[focus].id];
     const tw = wrap.clientWidth, th = wrap.clientHeight;
     const cw = cmap.clientWidth, ch = cmap.clientHeight;
-    wrap.scrollTo({ left: Math.max(0, (x/100)*cw - tw/2), top: Math.max(0, (y/100)*ch - th/2), behavior: 'smooth' });
+    // mostly vertical pan; only nudge H if focus is near east edge
+    const left = Math.max(0, Math.min(cw - tw, (x/100)*cw - tw/2));
+    wrap.scrollTo({ left: left, top: Math.max(0, (y/100)*ch - th/2), behavior: 'smooth' });
   });
 }
 let prepI = 0, prepEndless = false;
@@ -2165,4 +2285,6 @@ window.TD = {
   setSpeed: n => { S.speed = n; }, openTower: i => openTower(S.towers.find(t => t.spot === i)), openBuild, pause: setPause, goTitle,
   say: (txt, kind) => say(txt, kind || 'pl', FORT_SPOT, 0, true),
 };
+})();
+
 })();
