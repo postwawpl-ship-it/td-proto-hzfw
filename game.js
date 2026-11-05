@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.2';
+const V = '4.3';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -127,7 +127,7 @@ const SPECS = {
 const SKEYS = ['ryc','tat','hus','ost'];
 
 // ====== MAPY (16) + teksty ======
-const NODE_POS = {"glo": [16.59, 49.82], "leg": [17.48, 57.93], "plo": [30.21, 44.68], "gru": [41.33, 36.83], "kor": [23.91, 37.98], "ors": [93.31, 27.38], "obe": [64.28, 77.19], "byc": [26.49, 55.75], "kir": [60.93, 7.12], "klu": [95.57, 18.33], "cec": [77.65, 87.33], "cho": [73.35, 79.19], "gni": [30.93, 28.66], "trz": [32.04, 36.73], "och": [92.19, 74.69], "jg": [34.63, 60.18]};
+const NODE_POS = {"glo": [12.5, 47.0], "leg": [16.5, 60.5], "byc": [22.0, 53.5], "jg": [36.0, 64.0], "plo": [30.5, 47.5], "kor": [18.5, 35.0], "gru": [42.0, 33.5], "gni": [26.0, 24.0], "trz": [34.5, 35.5], "kir": [58.0, 8.0], "klu": [94.5, 16.5], "ors": [92.0, 29.5], "obe": [62.0, 76.0], "cec": [80.0, 88.5], "cho": [71.0, 77.5], "och": [91.5, 71.0]};
 const NODE_LBL = {};
 const CAMP_ROADS = [{"a":"glo","b":"leg","pts":[[16.59,49.82],[16.46,50.34],[16.4,50.87],[16.4,51.41],[16.46,51.95],[16.56,52.5],[16.69,53.05],[16.84,53.61],[17.0,54.17],[17.16,54.72],[17.3,55.27],[17.43,55.82],[17.52,56.36],[17.57,56.89],[17.56,57.42],[17.48,57.93]]},{"a":"leg","b":"plo","pts":[[17.48,57.93],[17.95,56.82],[18.57,55.8],[19.32,54.85],[20.17,53.95],[21.1,53.11],[22.09,52.29],[23.12,51.5],[24.17,50.73],[25.22,49.95],[26.24,49.17],[27.22,48.36],[28.12,47.52],[28.94,46.63],[29.64,45.69],[30.21,44.68]]},{"a":"plo","b":"gru","pts":[[30.21,44.68],[31.08,44.45],[31.9,44.11],[32.68,43.67],[33.43,43.15],[34.15,42.56],[34.86,41.93],[35.55,41.26],[36.23,40.58],[36.91,39.9],[37.6,39.24],[38.3,38.62],[39.01,38.05],[39.75,37.55],[40.52,37.14],[41.33,36.83]]},{"a":"gru","b":"kor","pts":[[41.33,36.83],[40.29,37.3],[39.2,37.62],[38.06,37.81],[36.89,37.9],[35.7,37.9],[34.48,37.83],[33.25,37.72],[32.02,37.6],[30.79,37.47],[29.57,37.37],[28.37,37.32],[27.2,37.33],[26.06,37.43],[24.96,37.64],[23.91,37.98]]},{"a":"kor","b":"ors","pts":[[23.91,37.98],[28.24,37.8],[32.7,37.42],[37.26,36.85],[41.92,36.13],[46.65,35.3],[51.43,34.38],[56.24,33.41],[61.05,32.41],[65.86,31.42],[70.63,30.46],[75.35,29.58],[80.0,28.8],[84.56,28.15],[89.0,27.67],[93.31,27.38]]},{"a":"ors","b":"obe","pts":[[93.31,27.38],[91.95,30.67],[90.36,33.98],[88.57,37.31],[86.62,40.66],[84.54,44.01],[82.36,47.36],[80.13,50.72],[77.87,54.08],[75.62,57.43],[73.42,60.77],[71.29,64.1],[69.28,67.41],[67.42,70.7],[65.74,73.96],[64.28,77.19]]},{"a":"obe","b":"byc","pts":[[64.28,77.19],[62.21,75.46],[59.95,73.85],[57.54,72.33],[55.0,70.89],[52.36,69.52],[49.65,68.2],[46.89,66.91],[44.12,65.63],[41.35,64.36],[38.62,63.06],[35.96,61.74],[33.39,60.36],[30.93,58.91],[28.63,57.38],[26.49,55.75]]},{"a":"byc","b":"kir","pts":[[26.49,55.75],[28.2,52.5],[30.15,49.24],[32.3,45.98],[34.62,42.71],[37.07,39.45],[39.61,36.19],[42.21,32.93],[44.83,29.68],[47.45,26.43],[50.02,23.19],[52.5,19.95],[54.87,16.73],[57.09,13.51],[59.12,10.31],[60.93,7.12]]},{"a":"kir","b":"klu","pts":[[60.93,7.12],[62.91,8.27],[65.02,9.26],[67.25,10.11],[69.57,10.86],[71.98,11.52],[74.43,12.12],[76.93,12.68],[79.43,13.22],[81.93,13.76],[84.4,14.32],[86.82,14.94],[89.16,15.62],[91.42,16.4],[93.56,17.29],[95.57,18.33]]},{"a":"klu","b":"cec","pts":[[95.57,18.33],[94.94,22.67],[94.09,27.13],[93.04,31.69],[91.83,36.32],[90.5,41.01],[89.08,45.75],[87.59,50.51],[86.09,55.27],[84.59,60.02],[83.13,64.75],[81.75,69.43],[80.48,74.04],[79.35,78.58],[78.4,83.01],[77.65,87.33]]},{"a":"cec","b":"cho","pts":[[77.65,87.33],[77.58,86.74],[77.42,86.16],[77.2,85.59],[76.91,85.04],[76.58,84.51],[76.21,83.98],[75.82,83.46],[75.42,82.94],[75.02,82.42],[74.64,81.9],[74.28,81.38],[73.96,80.85],[73.69,80.31],[73.48,79.75],[73.35,79.19]]},{"a":"cho","b":"gni","pts":[[73.35,79.19],[70.37,76.4],[67.45,73.37],[64.57,70.14],[61.72,66.75],[58.91,63.22],[56.11,59.6],[53.34,55.92],[50.57,52.22],[47.81,48.53],[45.04,44.89],[42.26,41.33],[39.47,37.89],[36.65,34.61],[33.81,31.52],[30.93,28.66]]},{"a":"gni","b":"trz","pts":[[30.93,28.66],[30.81,29.18],[30.76,29.71],[30.78,30.25],[30.85,30.79],[30.96,31.33],[31.11,31.88],[31.28,32.44],[31.45,32.99],[31.63,33.54],[31.79,34.09],[31.93,34.63],[32.04,35.17],[32.1,35.7],[32.1,36.22],[32.04,36.73]]},{"a":"trz","b":"och","pts":[[32.04,36.73],[35.99,38.65],[39.97,40.82],[43.99,43.2],[48.02,45.75],[52.08,48.44],[56.14,51.23],[60.21,54.08],[64.28,56.95],[68.34,59.82],[72.38,62.63],[76.41,65.36],[80.41,67.97],[84.38,70.42],[88.31,72.67],[92.19,74.69]]},{"a":"och","b":"jg","pts":[[92.19,74.69],[88.78,73.33],[85.19,72.13],[81.45,71.05],[77.59,70.08],[73.62,69.2],[69.59,68.37],[65.51,67.59],[61.42,66.83],[57.34,66.06],[53.29,65.27],[49.32,64.44],[45.44,63.53],[41.68,62.53],[38.06,61.43],[34.63,60.18]]}];
 const CAMP_ASPECT = 1.0095;
@@ -1863,41 +1863,93 @@ function renderBestLine() {
 }
 
 // ---- mapa kampanii ----
-function roadD(pts) {
-  if (!pts || pts.length < 2) return '';
-  // thin ink trail: smooth mid-point quadratic through polyline samples
-  let d = 'M' + pts[0][0] + ' ' + pts[0][1];
-  for (let i = 1; i < pts.length - 1; i++) {
-    const xc = (pts[i][0] + pts[i+1][0]) / 2, yc = (pts[i][1] + pts[i+1][1]) / 2;
-    d += ' Q' + pts[i][0] + ' ' + pts[i][1] + ' ' + xc + ' ' + yc;
-  }
-  const last = pts[pts.length - 1];
-  d += ' T' + last[0] + ' ' + last[1];
-  return d;
+function sizeCampMap() {
+  const wrap = $('cmapwrap'), cmap = $('cmap');
+  if (!wrap || !cmap) return {w: 360, h: 360};
+  const h = Math.max(240, wrap.clientHeight - 6);
+  const w = Math.max(280, Math.round(h / CAMP_ASPECT));
+  cmap.style.height = h + 'px';
+  cmap.style.width = w + 'px';
+  cmap.style.minWidth = w + 'px';
+  cmap.style.aspectRatio = 'auto';
+  return {w, h};
 }
-function placeCampLabels(items, mapW, mapH) {
-  // Place one label per node: try 8 dirs × several radii; keep on-screen; avoid rings & other labels.
+function roadCurve(a, b, side) {
+  // cubic bezier: perpendicular bow ~18–25% of length (min ~4.5 map units) + wobble
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  const nx = -uy, ny = ux;
+  const s = (side % 2 === 0) ? 1 : -1;
+  const pct = 0.18 + 0.07 * ((side * 37) % 5) / 4; // 18–25%
+  const off = Math.max(len * pct, 4.5);
+  const wob = Math.max(len * 0.06, 1.2);
+  // both controls bowed the same way so midpoint visibly arcs; wobble differs them
+  const c1x = a[0] + ux * len * 0.30 + nx * s * off + ny * wob * 0.55;
+  const c1y = a[1] + uy * len * 0.30 + ny * s * off - nx * wob * 0.55;
+  const c2x = a[0] + ux * len * 0.70 + nx * s * off - ny * wob * 0.45;
+  const c2y = a[1] + uy * len * 0.70 + ny * s * off + nx * wob * 0.45;
+  const cl = (v) => Math.max(1, Math.min(99, v));
+  return 'M' + a[0] + ' ' + a[1] + ' C' + cl(c1x) + ' ' + cl(c1y) + ' ' + cl(c2x) + ' ' + cl(c2y) + ' ' + b[0] + ' ' + b[1];
+}
+function separateCampNodes(pos, mapW, mapH) {
+  // pos: {id:[x%,y%]} — push rings (+stars footprint) apart; min 8px gap
+  const ids = MAPS.map(m => m.id);
+  const gap = 8;
+  for (let iter = 0; iter < 60; iter++) {
+    let moved = false;
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const a = MAPS[i], b = MAPS[j];
+        const ra = (a.big ? 21 : 17);
+        const rb = (b.big ? 21 : 17);
+        const ax = pos[a.id][0] / 100 * mapW, ay = pos[a.id][1] / 100 * mapH;
+        const bx = pos[b.id][0] / 100 * mapW, by = pos[b.id][1] / 100 * mapH;
+        const need = ra + rb + gap;
+        const dx = bx - ax, dy = by - ay;
+        const d = Math.hypot(dx, dy) || 0.01;
+        if (d < need) {
+          const push = (need - d) / 2;
+          const ux = dx / d, uy = dy / d;
+          pos[a.id][0] = (ax - ux * push) / mapW * 100;
+          pos[a.id][1] = (ay - uy * push) / mapH * 100;
+          pos[b.id][0] = (bx + ux * push) / mapW * 100;
+          pos[b.id][1] = (by + uy * push) / mapH * 100;
+          moved = true;
+        }
+      }
+    }
+    // clamp
+    for (const id of ids) {
+      pos[id][0] = Math.max(4, Math.min(96, pos[id][0]));
+      pos[id][1] = Math.max(4, Math.min(96, pos[id][1]));
+    }
+    if (!moved) break;
+  }
+  return pos;
+}
+function placeCampLabels(items, mapW, mapH, nodePos) {
   const placed = [];
   const out = {};
   const pad = 3;
-  const ringR = (it) => (it.big ? 20 : 16);
-  const dirs = [
-    [0, -1], [0.7, -0.7], [1, 0], [0.7, 0.7],
-    [0, 1], [-0.7, 0.7], [-1, 0], [-0.7, -0.7],
-  ];
-  const radii = [26, 34, 44, 56, 70, 86, 104];
-  const overlaps = (a, b) => !(a.r + 2 < b.l || a.l - 2 > b.r || a.b + 2 < b.t || a.t - 2 > b.b);
-  // process outer/edge nodes first so dense cluster can claim leftover space
-  const order = items.map((it, i) => {
-    const cx = (it.x / 100) * mapW, cy = (it.y / 100) * mapH;
-    const edge = Math.min(cx, cy, mapW - cx, mapH - cy);
-    return {i, edge, dens: items.reduce((n, o) => n + (Math.hypot(it.x - o.x, it.y - o.y) < 12 ? 1 : 0), 0)};
-  }).sort((a, b) => b.dens - a.dens || a.edge - b.edge); // densest first actually harder — do sparsest first
-  order.sort((a, b) => a.dens - b.dens || a.edge - b.edge);
-
-  for (const {i} of order) {
-    const it = items[i];
-    const cx = (it.x / 100) * mapW, cy = (it.y / 100) * mapH;
+  const gap = 8;
+  const ringR = (it) => (it.big ? 22 : 18);
+  const dirs = [[0,-1],[0.7,-0.7],[1,0],[0.7,0.7],[0,1],[-0.7,0.7],[-1,0],[-0.7,-0.7]];
+  const radii = [28, 36, 46, 58, 72, 90, 110, 130];
+  const overlaps = (a, b) => !(a.r + gap < b.l || a.l - gap > b.r || a.b + gap < b.t || a.t - gap > b.b);
+  const order = items.slice().sort((a, b) => {
+    const da = items.reduce((n, o) => n + (Math.hypot(a.x - o.x, a.y - o.y) < 14 ? 1 : 0), 0);
+    const db = items.reduce((n, o) => n + (Math.hypot(b.x - o.x, b.y - o.y) < 14 ? 1 : 0), 0);
+    return da - db;
+  });
+  // reserve ring+stars boxes so labels never cover them
+  const reserved = items.map(it => {
+    const cx = (nodePos[it.id][0] / 100) * mapW, cy = (nodePos[it.id][1] / 100) * mapH;
+    const rr = ringR(it);
+    return {l: cx - rr - 2, r: cx + rr + 2, t: cy - rr - (it.big ? 12 : 2), b: cy + rr + 4};
+  });
+  for (const it of order) {
+    const cx = (nodePos[it.id][0] / 100) * mapW, cy = (nodePos[it.id][1] / 100) * mapH;
     const hw = it.w / 2, hh = it.h / 2;
     let best = null, bestScore = 1e9;
     for (const rad of radii) {
@@ -1909,37 +1961,27 @@ function placeCampLabels(items, mapW, mapH) {
         let hit = false;
         for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
         if (hit) continue;
-        // avoid all rings
-        for (const o of items) {
-          const ox = (o.x / 100) * mapW, oy = (o.y / 100) * mapH;
-          const rr = ringR(o) + 3;
-          if (overlaps(box, {l: ox - rr, r: ox + rr, t: oy - rr, b: oy + rr})) { hit = true; break; }
-        }
+        for (const rb of reserved) { if (overlaps(box, rb)) { hit = true; break; } }
         if (hit) continue;
-        // prefer closer + prefer putting label toward map edge (more empty)
-        const edgePref = Math.min(lx, ly, mapW - lx, mapH - ly);
-        const score = Math.hypot(lx - cx, ly - cy) * 1.0 - edgePref * 0.15 + (rad > 70 ? 8 : 0);
+        const score = Math.hypot(lx - cx, ly - cy) + (rad > 90 ? 12 : 0);
         if (score < bestScore) { bestScore = score; best = {dx: lx - cx, dy: ly - cy, box, rad}; }
       }
-      if (best && best.rad <= 56) break; // good enough early
+      if (best && best.rad <= 58) break;
     }
     if (!best) {
-      // last resort: park at nearest screen edge from node
-      const targets = [
-        [hw + pad, cy], [mapW - hw - pad, cy], [cx, hh + pad], [cx, mapH - hh - pad],
-        [hw + pad, hh + pad], [mapW - hw - pad, hh + pad], [hw + pad, mapH - hh - pad], [mapW - hw - pad, mapH - hh - pad],
-      ];
+      const targets = [[hw+pad, cy],[mapW-hw-pad, cy],[cx, hh+pad],[cx, mapH-hh-pad],
+        [hw+pad, hh+pad],[mapW-hw-pad, hh+pad],[hw+pad, mapH-hh-pad],[mapW-hw-pad, mapH-hh-pad]];
       for (const [lx0, ly0] of targets) {
-        let lx = lx0, ly = ly0;
-        const box = {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh};
+        const box = {l: lx0 - hw, r: lx0 + hw, t: ly0 - hh, b: ly0 + hh};
         let hit = false;
         for (const p of placed) { if (overlaps(box, p.box)) { hit = true; break; } }
-        if (!hit) { best = {dx: lx - cx, dy: ly - cy, box, rad: 999}; break; }
+        for (const rb of reserved) { if (!hit && overlaps(box, rb)) hit = true; }
+        if (!hit) { best = {dx: lx0 - cx, dy: ly0 - cy, box, rad: 999}; break; }
       }
     }
     if (!best) {
       const lx = Math.max(hw + pad, Math.min(mapW - hw - pad, cx));
-      const ly = Math.max(hh + pad, Math.min(mapH - hh - pad, cy + ringR(it) + hh + 4));
+      const ly = Math.max(hh + pad, Math.min(mapH - hh - pad, cy + ringR(it) + hh + 16));
       best = {dx: lx - cx, dy: ly - cy, box: {l: lx - hw, r: lx + hw, t: ly - hh, b: ly + hh}, rad: 0};
     }
     placed.push({box: best.box});
@@ -1947,49 +1989,87 @@ function placeCampLabels(items, mapW, mapH) {
   }
   return out;
 }
+function assertCampNoOverlap(mapW, mapH, nodePos, LBL) {
+  // node rings (+stars band) and labels; min 8px gap; returns overlap count
+  const boxes = [];
+  MAPS.forEach((m, i) => {
+    const [x, y] = nodePos[m.id];
+    const cx = x / 100 * mapW, cy = y / 100 * mapH;
+    const rr = m.big ? 21 : 17;
+    boxes.push({kind: 'ring', id: m.id, l: cx - rr, r: cx + rr, t: cy - rr - (m.big ? 10 : 0), b: cy + rr + 2});
+    const [ldx, ldy] = LBL[m.id] || [0, 26];
+    const op = mapOpen(i);
+    const text = op ? m.name : String(m.year);
+    const w = Math.min(110, 12 + text.length * 6.6), h = op ? 18 : 15;
+    const lx = cx + ldx, ly = cy + ldy;
+    boxes.push({kind: 'lbl', id: m.id, l: lx - w/2, r: lx + w/2, t: ly - h/2, b: ly + h/2});
+  });
+  let n = 0;
+  const gap = 8;
+  const hit = (a, b) => !(a.r + gap < b.l || a.l - gap > b.r || a.b + gap < b.t || a.t - gap > b.b);
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const a = boxes[i], b = boxes[j];
+    // own label may sit near own ring via leader — require gap still
+    if (a.id === b.id && a.kind !== b.kind) {
+      // allow if label is outside ring by lead (still check gap)
+      if (hit(a, b)) n++;
+      continue;
+    }
+    if (a.id === b.id) continue;
+    if (hit(a, b)) n++;
+  }
+  return n;
+}
 function renderCamp() {
   $('campStars').textContent = '★ ' + totalStars() + '/' + TOTAL_STARS;
-  const cmap = $('cmap');
-  if (cmap) cmap.style.aspectRatio = String(CAMP_ASPECT);
+  const {w: mapW, h: mapH} = sizeCampMap();
+  // working copy of node positions (percent), separated for this pixel size
+  const nodePos = {};
+  for (const m of MAPS) nodePos[m.id] = NODE_POS[m.id].slice();
+  separateCampNodes(nodePos, mapW, mapH);
+
   const svg = $('routeSvg');
   let lastOpen = 0;
   for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) lastOpen = i;
   let shadows = '', roads = '';
-  CAMP_ROADS.forEach((rd, idx) => {
-    if (idx >= lastOpen) return;
+  for (let idx = 0; idx < MAPS.length - 1; idx++) {
+    if (idx >= lastOpen) break;
+    const a = MAPS[idx], b = MAPS[idx + 1];
+    const d = roadCurve(nodePos[a.id], nodePos[b.id], idx);
     const fresh = idx === lastOpen - 1;
-    const d = roadD(rd.pts);
     shadows += `<path class="roadsh" d="${d}" />`;
     roads += `<path class="road${fresh ? ' draw' : ''}" d="${d}" />`;
-  });
+  }
   if (svg) svg.innerHTML = shadows + roads;
 
-  // measure map & place labels with collision avoidance
-  const mapW = (cmap && cmap.clientWidth) || 360;
-  const mapH = (cmap && cmap.clientHeight) || Math.round(mapW * CAMP_ASPECT);
   const labelItems = MAPS.map((m, i) => {
     const op = mapOpen(i);
-    const [x, y] = NODE_POS[m.id];
-    // name-only when open (year sits in the ring); locked shows year only
     const text = op ? m.name : String(m.year);
-    const w = Math.min(110, 12 + text.length * 6.6);
-    const h = op ? 18 : 15;
-    return {id: m.id, x, y, big: !!m.big, w, h, text, op};
+    const tw = Math.min(110, 12 + text.length * 6.6);
+    const th = op ? 18 : 15;
+    return {id: m.id, x: nodePos[m.id][0], y: nodePos[m.id][1], big: !!m.big, w: tw, h: th, text, op};
   });
-  const LBL = placeCampLabels(labelItems, mapW, mapH);
+  const LBL = placeCampLabels(labelItems, mapW, mapH, nodePos);
+  const ov = assertCampNoOverlap(mapW, mapH, nodePos, LBL);
+  if (ov > 0) console.warn('camp overlaps', ov);
+  window.__campOverlap = ov;
+  window.__campNodePos = nodePos;
 
   $('nodes').innerHTML = MAPS.map((m, i) => {
-    const op = mapOpen(i), r = mapRec(m.id), w = r.stars > 0, [x, y] = NODE_POS[m.id];
-    const [ldx, ldy] = LBL[m.id] || [0, 22];
+    const op = mapOpen(i), r = mapRec(m.id), wonB = r.stars > 0;
+    const [x, y] = nodePos[m.id];
+    const [ldx, ldy] = LBL[m.id] || [0, 26];
     const end = (r.endless|0) > 0 ? `<div class="endb">Bastion ${r.endless}</div>` : '';
-    const ring = op ? String(m.year).slice(2) : '🔒';
-    const lead = (Math.abs(ldx) > 22 || Math.abs(ldy) > 22);
+    const num = String(i + 1);
+    const ring = op ? num : '🔒';
+    const swords = m.big ? `<span class="swords" aria-hidden="true">⚔</span>` : '';
+    const lead = (Math.abs(ldx) > 24 || Math.abs(ldy) > 24);
     const ang = Math.atan2(ldy, ldx) * 180 / Math.PI;
-    const llen = Math.hypot(ldx, ldy) - 10;
+    const llen = Math.hypot(ldx, ldy) - 12;
     const nm = op ? `<div class="nm" style="--ldx:${ldx}px;--ldy:${ldy}px"><b>${m.name}</b></div>`
                   : `<div class="nm faint" style="--ldx:${ldx}px;--ldy:${ldy}px"><small>${m.year}</small></div>`;
     const leadHtml = lead ? `<i class="lead" style="--llen:${Math.max(8,llen)}px;--lang:${ang}deg"></i>` : '';
-    return `<button class="node ${m.big?'big':''} ${w?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${leadHtml}<div class="ring">${ring}</div>${nm}<div class="st">${op?starsHtml(r.stars):''}</div>${end}</button>`;
+    return `<button class="node ${m.big?'big':''} ${wonB?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${leadHtml}${swords}<div class="ring">${ring}${op?`<span class="st">${starsHtml(r.stars)}</span>`:''}</div>${nm}${end}</button>`;
   }).join('');
   $('nodes').querySelectorAll('.node').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); audioInit(); const i = +b.dataset.i;
     if (mapOpen(i)) openPrep(i); else { sfx('click'); b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300}); } }));
@@ -1997,12 +2077,10 @@ function renderCamp() {
     const wrap = $('cmapwrap'); if (!wrap) return;
     let focus = 0;
     for (let i = 0; i < MAPS.length; i++) { if (mapOpen(i) && !won(MAPS[i].id)) { focus = i; break; } if (won(MAPS[i].id)) focus = i; }
-    const [x, y] = NODE_POS[MAPS[focus].id];
+    const [x, y] = nodePos[MAPS[focus].id];
     const tw = wrap.clientWidth, th = wrap.clientHeight;
-    const cw = cmap.clientWidth, ch = cmap.clientHeight;
-    // mostly vertical pan; only nudge H if focus is near east edge
-    const left = Math.max(0, Math.min(cw - tw, (x/100)*cw - tw/2));
-    wrap.scrollTo({ left: left, top: Math.max(0, (y/100)*ch - th/2), behavior: 'smooth' });
+    const cw = mapW, ch = mapH;
+    wrap.scrollTo({ left: Math.max(0, Math.min(cw - tw, (x/100)*cw - tw/2)), top: Math.max(0, Math.min(ch - th, (y/100)*ch - th/2)), behavior: 'smooth' });
   });
 }
 let prepI = 0, prepEndless = false;
@@ -2240,7 +2318,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden' && S && S.running && !S.over && !S.paused) setPause(true);
   musicUpdate();
 });
-window.addEventListener('resize', () => { if (started) { fit(); closeMenu(); } });
+window.addEventListener('resize', () => { if (started) { fit(); closeMenu(); if (!$('camp').classList.contains('hidden')) renderCamp(); } });
 
 function boot() {
   newGame(); fit(); started = true; syncSettings(); renderBestLine(); renderCamp();
@@ -2276,6 +2354,7 @@ window.TD = {
   win: (stars=3) => { S.lives = stars >= 3 ? 20 : stars === 2 ? 12 : 5; S.wave = WAVES.length; endGame(true); },
   lose: () => { S.lives = 0; endGame(false); },
   unlockAll: () => { for (const m of MAPS) save.maps[m.id] = {stars:3, best:WAVES.length, wins:1}; for (const k of HKEYS) heroData(k); persist(); renderCamp(); },
+  freshCamp: () => { save.maps = {}; persist(); renderCamp(); },
   giveXp: (id, n) => { heroData(id).xp += n; persist(); },
   hero: () => S.hero, moveHero: (x, y) => heroMove(x, y), ability: () => heroAbility(), tap: (x, y) => tapAt(x, y),
   toScreen: (x, y) => { const r = cv.getBoundingClientRect(); return [r.left + x/W*r.width, r.top + (y + OFF)/VH*r.height]; },
