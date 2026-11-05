@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.10';
+const V = '4.11';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -27,10 +27,11 @@ const TT = {
   kar: {name:'Działo kartaczowe', desc:'Kartacz – krótki dystans, szeroki snop', cost:[130,110,180], dmg:[28,48,78], rate:[2.0,1.8,1.55], range:[72,78,85], splash:[55,62,70]},
   moz: {name:'Moździerz', desc:'Bomba po łuku – daleko, w całą gromadę', cost:[155,125,195], dmg:[48,80,128], rate:[3.3,3.0,2.7], range:[150,165,182], splash:[50,56,64]},
   woz: {name:'Wóz bojowy', desc:'Tabor: wytrzymały bloker ze strzelcami', cost:[160,140,210], dmg:[18,28,42], rate:[.8,.7,.58], range:[85,92,100], block:true, hp:[200,340,520]},
+  pik: {name:'Pikinierzy', desc:'Krótki zasięg: kłują i na chwilę przytrzymują wroga', cost:[90,80,130], dmg:[22,36,56], rate:[.8,.68,.55], range:[56,64,74], slow:[.5,.6,.7], hold:[.32,.42,.55]},
 };
-const TKEYS = ['luc','smo','kus','bal','mus','arm','rus','haj','kar','moz','woz'];
-const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], bal:[48,50,54], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
-const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], bal:[.38,.36,.34], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
+const TKEYS = ['luc','smo','kus','bal','mus','arm','rus','haj','kar','moz','woz','pik'];
+const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], bal:[48,50,54], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56], pik:[56,62,70]};
+const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], bal:[.38,.36,.34], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4], pik:[.40,.40,.40]};
 
 // ====== WROGOWIE ======
 const ET = {
@@ -156,6 +157,7 @@ const PL = {
     bal:['Balista!','Ciężki bełt!'], mus:['Ognia!','Pif-paf!'],
     arm:['Bum!','Kula w drogę!'], rus:['Z daleka!','Na cel!'], haj:['Hajducy!','Toporki!'],
     kar:['Kartacz!','Snop ognia!'], moz:['Uwaga, leci!','BUM!'], woz:['Tabor stoi!','Z wozu ognia!'],
+    pik:['Nie przejdziesz!','Kłuj!','Piki naprzód!','Stoj!'],
   },
 };
 const FACT = {
@@ -186,7 +188,7 @@ const MAPS = [
    path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[122, 41], [165, 43], [206, 43], [246, 43], [237, 147], [196, 148], [235, 252], [154, 148], [114, 148]], roads:[[70, 95], [290, 95], [290, 200]],
    gold:210, hk:0.95, boss:null, roster:["mon", "mkn"], music:"jg", sky:"#e8e0c8",
    intro:"1241. Mongołowie Batu-chana. Henryk Pobożny staje do heroicznej obrony!",
-   unlock:{"chest": true},
+   unlock:{"tower": "pik"},
    hist:{"title": "LEGNICA 1241", "img": "hist_gr", "text": ["Mongołowie Batu-chana szli przez Europę.", "Pod Legnicą stawił im czoła Henryk Pobożny.", "Bitwa przegrana, Henryk zginął – ale najazd wyhamował.", "Heroiczna obrona kupiła Europie czas."], "fun": "Mongołowie używali dymu i forteli, by mieszać szyki rycerstwa."},
    waves:[[["mon", 4, 1.1, 0]], [["mon", 4, 1.05, 0], ["mkn", 2, 0.96, 3]], [["mon", 5, 1.0, 0], ["mkn", 3, 0.92, 3]], [["mon", 6, 0.95, 0], ["mkn", 4, 0.88, 3]], [["mon", 7, 0.9, 0], ["mkn", 4, 0.84, 3]], [["mon", 8, 0.85, 0], ["mkn", 5, 0.8, 3]], [["mon", 9, 0.8, 0], ["mkn", 6, 0.76, 3]], [["mon", 10, 0.75, 0], ["mkn", 6, 0.72, 3]]],
    bossL:null,
@@ -354,7 +356,7 @@ try {
   }
   if (!save.last) save.last = {hero:'zaw', spec:'ryc', towers:['luc','smo']};
   if (!save.last.towers) save.last.towers = ['luc','smo'];
-  // v4.10: Wilcze doły usunięte — wypadnij z loadoutu / seen, żeby stare save'y nie padały
+  // v4.11: Wilcze doły usunięte — wypadnij z loadoutu / seen, żeby stare save'y nie padały
   {
     const before = (save.last.towers || []).slice();
     save.last.towers = before.filter(k => k !== 'wil' && TT[k]);
@@ -406,7 +408,7 @@ function nextUnlockAfter(id) {
 }
 const HERO_FROM = {zaw:null, zol:'kir', cho:'klu', kon:'cho', cza:'trz', kor:'och'};
 const HERO_START = {zaw:0, zol:200, cho:350, kon:500, cza:700, kor:900};
-const TOWER_FROM = {luc:null, smo:null, kus:'glo', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu'};
+const TOWER_FROM = {luc:null, smo:null, kus:'glo', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu', pik:'leg'};
 const CHEST_GOLD = 100, CHEST_XP = 80;
 const SPEC_FROM = {ryc:null, tat:'gru', hus:'kir', ost:'cho'};
 const heroOpen = h => !HERO_FROM[h] || won(HERO_FROM[h]);
@@ -1037,6 +1039,37 @@ function update(dt) {
       } else t.busy = S.enemies.some(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R);
       continue;
     }
+    if (t.type === 'pik') {
+      if (t.cd <= 0) {
+        let best = null;
+        for (const e of S.enemies) {
+          if (e.dead || e.d < 0) continue;
+          const dd = Math.hypot(e.x - t.x, e.y - t.y);
+          if (dd <= R && (!best || e.d > best.d)) best = e;
+        }
+        if (best) {
+          t.busy = true;
+          t.cd = towerStat(t, 'rate'); t.anim = 1;
+          t.thrustX = best.x; t.thrustY = best.y;
+          t.ang = Math.atan2(best.y - 8 - t.gy, best.x - t.x);
+          damage(best, towerStat(t, 'dmg'), 'pik');
+          best.slowT = Math.max(best.slowT, .75);
+          best.slowA = Math.max(best.slowA, towerStat(t, 'slow'));
+          best.stunT = Math.max(best.stunT, towerStat(t, 'hold'));
+          const ang = t.ang, len = Math.min(R + 14, Math.hypot(best.x - t.x, best.y - 8 - t.gy));
+          S.tracers.push({x1:t.x + Math.cos(ang)*10, y1:t.gy + Math.sin(ang)*5,
+            x2:t.x + Math.cos(ang)*len, y2:t.gy + Math.sin(ang)*len * .55,
+            life:.28, max:.28, w:3.4, col:'230,215,170'});
+          burst(best.x, best.y - 10, '#e8e0c8', 5, 45, 2.2, .28);
+          sfx('slash');
+          if (S.time - (t._lastSay || 0) > 3.2 && Math.random() < .5) {
+            t._lastSay = S.time;
+            say(pick(PL.tower.pik), 'pl', {x:t.x, y:towerHead(t)}, 0, false);
+          }
+        }
+      } else t.busy = S.enemies.some(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R);
+      continue;
+    }
     if (t.type === 'haj') {
       t.eng = (t.eng||[]).filter(e => !e.dead && e.blockBy === t);
       if (t.cd <= 0 && t.eng.length) {
@@ -1553,6 +1586,31 @@ function drawTower(c, t, time) {
     c.strokeStyle = lvl == 2 ? '#c99a2e' : '#3a2a1a'; c.lineWidth = 2; c.beginPath(); c.moveTo(12, -6); c.quadraticCurveTo(16, 1, 12, 8); c.stroke();
     c.strokeStyle = '#e8e0cc'; c.lineWidth = .8; c.beginPath(); c.moveTo(12, -6); c.lineTo(4 - pull, 1); c.lineTo(12, 8); c.stroke();
     c.restore();
+  } else if (type === 'pik') {
+    // wyraźny wypych długich pik — peak w połowie anim (czytelny jab)
+    if (anim > 0 && t.thrustX != null) {
+      const a = Math.atan2(t.thrustY - 8 - gy, t.thrustX - x);
+      const jab = Math.sin(anim * Math.PI); // 0→1→0, max przy anim≈.5
+      const reach = w * (.42 + jab * .95); // jab wyraźnie poza platformę
+      const thick = 3.0 + w * .025;
+      c.save();
+      c.strokeStyle = `rgba(220,200,150,${.55 + .4 * jab})`;
+      c.lineWidth = thick; c.lineCap = 'round';
+      const x0 = x + Math.cos(a) * (w * .1), y0 = gy + Math.sin(a) * (w * .05);
+      const x1 = x + Math.cos(a) * reach, y1 = gy + Math.sin(a) * reach * .55;
+      c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+      c.fillStyle = `rgba(255,255,230,${.55 + .4 * jab})`;
+      c.beginPath(); c.arc(x1, y1, 3.4 + jab * 2, 0, 7); c.fill();
+      // druga równoległa pika – oddział
+      const ox = Math.cos(a + 1.57) * (5 + jab), oy = Math.sin(a + 1.57) * (5 + jab);
+      c.strokeStyle = `rgba(200,180,130,${.35 + .35 * jab})`;
+      c.lineWidth = thick * .85;
+      c.beginPath();
+      c.moveTo(x0 + ox, y0 + oy);
+      c.lineTo(x1 + ox * .55, y1 + oy * .55);
+      c.stroke();
+      c.restore();
+    }
   } else if (type === 'moz') {
     if (anim > .6) { circ(c, x, gy - 10, 7, '#ffb03a', null); circ(c, x, gy - 10, 3.5, '#fff6c0', null); }
   } else if (type === 'rus') {
@@ -1570,7 +1628,7 @@ function drawTower(c, t, time) {
   c.restore();
   if (t.pray) { c.globalAlpha = .5 + Math.sin(time*6)*.2; star(c, x + w*.4, by - t.h + 4, 3, '#fff3a0'); c.globalAlpha = 1; }
   // proporczyk na wieży
-  if (type !== 'smo' && type !== 'moz') {
+  if (type !== 'smo' && type !== 'moz' && type !== 'pik') {
     const fx = x - w*.42, fy = by - t.h*(type === 'rus' ? .97 : type === 'arm' ? .62 : (type === 'kus' || type === 'luc') ? .95 : .9);
     flag(c, fx, fy, 10 + lvl*2, 6 + lvl, time + t.seed, ['#ffffff', '#e02b2b']);
   }
