@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.9';
+const V = '4.10';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -13,13 +13,12 @@ const FONT = 'Baloo2, system-ui, sans-serif';
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const rnd = (a,b) => a + Math.random()*(b-a);
 
-// ====== WIEŻE (12) ======
-// road:true = Wilcze doły – stawia się na drodze
+// ====== WIEŻE (11) ======
+// road:true = broń stawiana na drodze; block:true = bloker (hajducy / wóz)
 const TT = {
   luc: {name:'Łucznicy', desc:'Tanie strzały w jeden cel', cost:[55,50,90], dmg:[12,19,29], rate:[.66,.58,.48], range:[88,96,104]},
   smo: {name:'Kocioł smoły', desc:'Spowalnia i parzy wszystkich w pobliżu', cost:[85,75,120], dmg:[5,9,14], rate:[.95,.88,.8], range:[66,74,82], slow:[.3,.4,.5]},
   kus: {name:'Kusznicy', desc:'Bełty przebijają kolczugi (zbroja −50%)', cost:[80,70,115], dmg:[18,28,42], rate:[.85,.74,.6], range:[100,110,120]},
-  wil: {name:'Wilcze doły', desc:'Stawia się NA DRODZE. Rani i spowalnia przechodzących', cost:[70,65,110], dmg:[8,14,22], rate:[0,0,0], range:[18,20,22], slow:[.25,.35,.45], road:true, hp:[80,130,200]},
   bal: {name:'Balista', desc:'Ciężki bełt, duży dystans, jeden cel', cost:[100,90,145], dmg:[80,130,200], rate:[4.2,3.8,3.3], range:[135,150,165]},
   mus: {name:'Muszkieterzy', desc:'Szybki ogień z muszkietów', cost:[75,65,115], dmg:[14,22,34], rate:[.62,.5,.38], range:[92,100,110]},
   arm: {name:'Armata', desc:'Wolna, rani wielu, przebija zbroje', cost:[125,105,175], dmg:[36,60,98], rate:[2.3,2.05,1.75], range:[105,115,125], splash:[40,46,54]},
@@ -29,9 +28,9 @@ const TT = {
   moz: {name:'Moździerz', desc:'Bomba po łuku – daleko, w całą gromadę', cost:[155,125,195], dmg:[48,80,128], rate:[3.3,3.0,2.7], range:[150,165,182], splash:[50,56,64]},
   woz: {name:'Wóz bojowy', desc:'Tabor: wytrzymały bloker ze strzelcami', cost:[160,140,210], dmg:[18,28,42], rate:[.8,.7,.58], range:[85,92,100], block:true, hp:[200,340,520]},
 };
-const TKEYS = ['luc','smo','kus','wil','bal','mus','arm','rus','haj','kar','moz','woz'];
-const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[48,50,54], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
-const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.38,.36,.34], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
+const TKEYS = ['luc','smo','kus','bal','mus','arm','rus','haj','kar','moz','woz'];
+const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], bal:[48,50,54], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
+const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], bal:[.38,.36,.34], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
 
 // ====== WROGOWIE ======
 const ET = {
@@ -154,7 +153,7 @@ const PL = {
   lose:['Odwrót…','Nie tym razem.','Padliśmy.','Spróbuj ponownie!'],
   tower:{
     luc:['Celuć!','Strzała!','Czuwaj!'], smo:['Gorąca kąpiel!','Smoła!'], kus:['Bełt!','Naciągaj!'],
-    wil:['Wilcze doły!','Uwaga, dół!'], bal:['Balista!','Ciężki bełt!'], mus:['Ognia!','Pif-paf!'],
+    bal:['Balista!','Ciężki bełt!'], mus:['Ognia!','Pif-paf!'],
     arm:['Bum!','Kula w drogę!'], rus:['Z daleka!','Na cel!'], haj:['Hajducy!','Toporki!'],
     kar:['Kartacz!','Snop ognia!'], moz:['Uwaga, leci!','BUM!'], woz:['Tabor stoi!','Z wozu ognia!'],
   },
@@ -187,7 +186,7 @@ const MAPS = [
    path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[122, 41], [165, 43], [206, 43], [246, 43], [237, 147], [196, 148], [235, 252], [154, 148], [114, 148]], roads:[[70, 95], [290, 95], [290, 200]],
    gold:210, hk:0.95, boss:null, roster:["mon", "mkn"], music:"jg", sky:"#e8e0c8",
    intro:"1241. Mongołowie Batu-chana. Henryk Pobożny staje do heroicznej obrony!",
-   unlock:{"tower": "wil"},
+   unlock:{"chest": true},
    hist:{"title": "LEGNICA 1241", "img": "hist_gr", "text": ["Mongołowie Batu-chana szli przez Europę.", "Pod Legnicą stawił im czoła Henryk Pobożny.", "Bitwa przegrana, Henryk zginął – ale najazd wyhamował.", "Heroiczna obrona kupiła Europie czas."], "fun": "Mongołowie używali dymu i forteli, by mieszać szyki rycerstwa."},
    waves:[[["mon", 4, 1.1, 0]], [["mon", 4, 1.05, 0], ["mkn", 2, 0.96, 3]], [["mon", 5, 1.0, 0], ["mkn", 3, 0.92, 3]], [["mon", 6, 0.95, 0], ["mkn", 4, 0.88, 3]], [["mon", 7, 0.9, 0], ["mkn", 4, 0.84, 3]], [["mon", 8, 0.85, 0], ["mkn", 5, 0.8, 3]], [["mon", 9, 0.8, 0], ["mkn", 6, 0.76, 3]], [["mon", 10, 0.75, 0], ["mkn", 6, 0.72, 3]]],
    bossL:null,
@@ -355,6 +354,14 @@ try {
   }
   if (!save.last) save.last = {hero:'zaw', spec:'ryc', towers:['luc','smo']};
   if (!save.last.towers) save.last.towers = ['luc','smo'];
+  // v4.10: Wilcze doły usunięte — wypadnij z loadoutu / seen, żeby stare save'y nie padały
+  {
+    const before = (save.last.towers || []).slice();
+    save.last.towers = before.filter(k => k !== 'wil' && TT[k]);
+    if (!save.last.towers.length) save.last.towers = ['luc', 'smo'];
+    if (save.seen) delete save.seen['t_wil'];
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
+  }
 } catch(e) {}
 const DBG_XP = Q.has('xp') ? +Q.get('xp') : null;
 function persist() { if (SIM) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e) {} }
@@ -399,10 +406,11 @@ function nextUnlockAfter(id) {
 }
 const HERO_FROM = {zaw:null, zol:'kir', cho:'klu', kon:'cho', cza:'trz', kor:'och'};
 const HERO_START = {zaw:0, zol:200, cho:350, kon:500, cza:700, kor:900};
-const TOWER_FROM = {luc:null, smo:null, kus:'glo', wil:'leg', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu'};
+const TOWER_FROM = {luc:null, smo:null, kus:'glo', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu'};
+const CHEST_GOLD = 100, CHEST_XP = 80;
 const SPEC_FROM = {ryc:null, tat:'gru', hus:'kir', ost:'cho'};
 const heroOpen = h => !HERO_FROM[h] || won(HERO_FROM[h]);
-const towerOpen = k => !TOWER_FROM[k] || won(TOWER_FROM[k]);
+const towerOpen = k => !!TT[k] && (!TOWER_FROM[k] || won(TOWER_FROM[k]));
 const specOpen = k => !SPEC_FROM[k] || won(SPEC_FROM[k]);
 function heroData(id) {
   let d = save.heroes[id];
@@ -415,7 +423,7 @@ const heroPts = id => Math.max(0, heroLvl(id) - 1 - heroData(id).st.reduce((a,b)
 const mapName = id => (MAPS[MAPI[id]]||{}).name || id;
 function loadoutTowers() {
   const t = (save.last && save.last.towers) || ['luc','smo'];
-  return t.filter(towerOpen).slice(0,4);
+  return t.filter(k => TT[k] && towerOpen(k)).slice(0,4);
 }
 
 // ====== DŹWIĘK (WebAudio) ======
@@ -605,10 +613,12 @@ let PICK = {hero:'zaw', spec:'ryc', towers:['luc','smo']};
 let ENDLESS = false;
 function newGame() {
   const sp = SPECS[PICK.spec] || SPECS.ryc;
-  const towers = (PICK.towers && PICK.towers.length) ? PICK.towers.slice(0,4) : loadoutTowers();
-  S = {gold: DEBUG ? 5000 : M.gold, lives:START_LIVES, wave:0, time:0, queue:[], enemies:[], towers:[], proj:[], parts:[], floats:[],
+  const towers = ((PICK.towers && PICK.towers.length) ? PICK.towers.slice(0,4) : loadoutTowers()).filter(k => TT[k] && k !== 'wil');
+  const bonus = save.bonusGold|0;
+  if (bonus) { save.bonusGold = 0; persist(); }
+  S = {gold: (DEBUG ? 5000 : M.gold) + bonus, lives:START_LIVES, wave:0, time:0, queue:[], enemies:[], towers:[], proj:[], parts:[], floats:[],
        hussars:[], tatars:[], knights:[], corpses:[], bubbles:[], decals:[], countdown:null, cdArmed:false, paid:true,
-       spec: PICK.spec, specLeft: sp.uses, charge:0, aiming:false, loadout: towers,
+       spec: PICK.spec, specLeft: sp.uses, charge:0, aiming:false, loadout: towers.length ? towers : ['luc','smo'],
        over:false, result:null, shake:0, fortFlash:0, selected:null, banner:null, running:false, paused:false,
        speed:save.speed || 1, kills:0, bossStep:0, tracers:[], beams:[], nextChat:6, lastCry:-9, lastGate:-99, lastFlee:-9, lastSlow:-9,
        xp:0, prayT:0, hero:null, endless:ENDLESS, endlessWave:0};
@@ -735,7 +745,7 @@ function towerGeom(t) {
   t.w = w; t.h = h; t.by = t.y + 13; t.gy = t.by - h*(1 - TOPF[t.type][t.lvl]);
 }
 function build(i, type, onRoad) {
-  if (S.over || !towerOpen(type)) return false;
+  if (S.over || !TT[type] || !towerOpen(type)) return false;
   if (S.loadout && !S.loadout.includes(type)) return false;
   const road = !!TT[type].road;
   if (road !== !!onRoad) return false;
@@ -751,7 +761,7 @@ function build(i, type, onRoad) {
   return true;
 }
 function upgrade(t) {
-  if (!t || t.lvl >= 2) return false;
+  if (!t || !TT[t.type] || t.lvl >= 2) return false;
   const c = TT[t.type].cost[t.lvl+1]; if (S.gold < c) return false;
   S.gold -= c; t.lvl++; t.spent += c; t.pop = 1; towerGeom(t);
   burst(t.x, t.y - 10, '#ffd84a', 18, 110, 3, .6); floatT(t.x, t.gy - 18, 'Poziom '+(t.lvl+1)+'!', '#7dff6a', 14); sfx('up');
@@ -762,7 +772,7 @@ function sell(t) {
   const r = Math.floor(t.spent*.7); S.gold += r; S.towers.splice(S.towers.indexOf(t), 1);
   floatT(t.x, t.y-20, '+'+r, '#ffe14d', 14); smoke(t.x, t.y, 6); sfx('sell');
 }
-function towerStat(t, k) { return TT[t.type][k][t.lvl]; }
+function towerStat(t, k) { return TT[t.type] ? TT[t.type][k][t.lvl] : 0; }
 
 // ====== ATAKI SPECJALNE ======
 function frontEnemy() { let f = null; for (const e of S.enemies) if (!e.dead && !ET[e.type].boss && e.d > 0 && (!f || e.d > f.d)) f = e; return f; }
@@ -966,15 +976,11 @@ function update(dt) {
     if (e.slowT > 0) e.slowT -= dt;
     if (e.flash > 0) e.flash -= dt;
     if (e.stunT > 0) { e.stunT -= dt; continue; }
-    // Wilcze doły / hajducy / wóz na drodze
+    // hajducy / wóz (blokery)
     for (const t of S.towers) {
-      if (!TT[t.type].road && !TT[t.type].block) continue;
+      if (!TT[t.type] || !TT[t.type].block) continue;
       if (Math.hypot(e.x - t.x, e.y - t.y) > (towerStat(t,'range')||20)) continue;
-      if (TT[t.type].road) {
-        // slow + DoT, no OHKO; pits have no HP drain from enemies in v4 simple form
-        e.slowT = Math.max(e.slowT, 0.6); e.slowA = Math.max(e.slowA, towerStat(t,'slow')||.3);
-        if (!e._wilT || S.time - e._wilT > 0.45) { e._wilT = S.time; damage(e, towerStat(t,'dmg')*.35, 'smo'); }
-      } else if (TT[t.type].block && !ET[e.type].boss) {
+      if (!ET[e.type].boss) {
         if (!t.thp) t.thp = TT[t.type].hp[t.lvl];
         if (t.thp > 0 && !e.blockBy) { e.blockBy = t; t.eng = (t.eng||[]); if (!t.eng.includes(e)) t.eng.push(e); }
       }
@@ -1007,14 +1013,14 @@ function update(dt) {
   }
   updateHero(dt);
 
-  // wieże
+  // wieże (odfiltruj usunięte typy np. stare wil)
+  S.towers = S.towers.filter(t => TT[t.type]);
   for (const t of S.towers) {
     const pray = S.prayT > 0 && Math.hypot(t.x - S.prayX, t.y - S.prayY) < 130;
     t.pray = pray;
     t.cd -= dt * (pray ? 1.5 : 1); if (t.anim > 0) t.anim -= dt*4; if (t.pop > 0) t.pop = Math.max(0, t.pop - dt*2.5);
     const R = towerStat(t, 'range');
     t.busy = false;
-    if (t.type === 'wil') { t.busy = S.enemies.some(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R); continue; }
     if (t.type === 'smo') {
       if (t.cd <= 0) {
         const inR = S.enemies.filter(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R);
@@ -1254,9 +1260,13 @@ function endGame(win) {
     if (u.hero) heroData(u.hero);
     if (u.tower) { save.seen = save.seen || {}; save.seen['t_'+u.tower] = false; }
     if (u.spec) { save.seen = save.seen || {}; save.seen['s_'+u.spec] = false; }
+    if (u.chest) {
+      save.bonusGold = (save.bonusGold|0) + CHEST_GOLD;
+      if (h && !SIM_NOXP) { const d = heroData(h.id); d.xp = Math.round(d.xp + CHEST_XP); }
+    }
   }
   persist();
-  LAST = {win, stars, first, map: M.id, xp: S.xp, hero: h && h.id, lvlFrom: before, lvlTo: h ? levelOf(heroData(h.id).xp) : 1};
+  LAST = {win, stars, first, map: M.id, xp: S.xp, hero: h && h.id, lvlFrom: before, lvlTo: h ? levelOf(heroData(h.id).xp) : 1, chest: !!(first && (M.unlock||{}).chest)};
   sfx(win ? 'win' : 'lose');
   if (win) for (let i = 0; i < 6; i++) burst(rnd(60,300), rnd(100,400), ['#ff3b3b','#fff','#ffd84a','#5fd35a'][i%4], 25, 150, 4, 1.2, 60);
   if (!SIM) setTimeout(() => showEnd(win, stars), 1100);
@@ -1466,6 +1476,7 @@ function soldier(c, x, y, ang, anim, s, coat, gunLen, hat) {
 
 function drawTower(c, t, time) {
   const {x, by, w, lvl, type} = t, anim = Math.max(0, t.anim);
+  if (!TT[type]) return;
   const pop = t.pop > 0 ? 1 + Math.sin(t.pop*Math.PI)*.12 : 1;
   c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(x + 2, by - 3, w*.5, w*.2, 0, 0, 7); c.fill();
   c.save(); c.translate(x, by); c.scale(2 - pop, pop); c.translate(-x, -by);
@@ -1559,7 +1570,7 @@ function drawTower(c, t, time) {
   c.restore();
   if (t.pray) { c.globalAlpha = .5 + Math.sin(time*6)*.2; star(c, x + w*.4, by - t.h + 4, 3, '#fff3a0'); c.globalAlpha = 1; }
   // proporczyk na wieży
-  if (type !== 'smo' && type !== 'moz' && type !== 'wil') {
+  if (type !== 'smo' && type !== 'moz') {
     const fx = x - w*.42, fy = by - t.h*(type === 'rus' ? .97 : type === 'arm' ? .62 : (type === 'kus' || type === 'luc') ? .95 : .9);
     flag(c, fx, fy, 10 + lvl*2, 6 + lvl, time + t.seed, ['#ffffff', '#e02b2b']);
   }
@@ -1706,8 +1717,8 @@ function render() {
     if (hint) { const k = (at*1.2) % 1; c.strokeStyle = 'rgba(255,240,120,' + (1-k) + ')'; c.lineWidth = 3; c.beginPath(); c.ellipse(x, y, 18 + k*10, 9 + k*5, 0, 0, 7); c.stroke(); }
     c.fillStyle = 'rgba(90,75,50,.75)'; c.font = '900 12px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('+', x, y + .5);
   });
-  // pola na drodze (Wilcze doły / bloker) – tylko gdy ekwipunek ma road-tower
-  if (S.loadout && S.loadout.some(k => TT[k].road || TT[k].block)) {
+  // pola na drodze – tylko gdy ekwipunek ma broń road:true
+  if (S.loadout && S.loadout.some(k => TT[k] && TT[k].road)) {
     (M.roads||[]).forEach(([x, y], i) => {
       if (S.towers.some(tw => tw.spot === 'r'+i)) return;
       c.fillStyle = 'rgba(40,25,10,.55)'; c.beginPath(); c.ellipse(x, y, 14, 7, 0, 0, 7); c.fill();
@@ -1866,7 +1877,7 @@ function closeMenu() { if (menu) menu.classList.add('hidden'); if (S) S.selected
 function openBuild(i, onRoad) {
   S.selected = {spot: i, onRoad: !!onRoad};
   menu.className = 'build';
-  const keys = (S.loadout || loadoutTowers()).filter(k => !!TT[k].road === !!onRoad);
+  const keys = (S.loadout || loadoutTowers()).filter(k => TT[k] && !!TT[k].road === !!onRoad);
   if (!keys.length) { sfx('click'); return; }
   const maxW = Math.max(200, cv.offsetWidth - 16), n = keys.length;
   const cols = n <= 2 ? n : n === 4 ? 2 : 3;
@@ -1910,7 +1921,7 @@ function tapAt(x, y) {
   if (h && h.sel && !tw) { closeMenu(); heroMove(x, y); return; }
   if (h) h.sel = false;
   if (tw) { sfx('click'); openTower(tw); return; }
-  if (ri >= 0 && !S.towers.some(t => t.spot === 'r'+ri) && (S.loadout||[]).some(k => TT[k].road)) { sfx('click'); openBuild(ri, true); return; }
+  if (ri >= 0 && !S.towers.some(t => t.spot === 'r'+ri) && (S.loadout||[]).some(k => TT[k] && TT[k].road)) { sfx('click'); openBuild(ri, true); return; }
   if (i >= 0 && !S.towers.some(t => t.spot === i)) { sfx('click'); openBuild(i, false); return; }
   closeMenu();
 }
@@ -2361,7 +2372,7 @@ function openPrep(i, endless) {
   const last = save.last || {};
   PICK.hero = heroOpen(last.hero) ? last.hero : 'zaw';
   PICK.spec = specOpen(last.spec) ? last.spec : 'ryc';
-  PICK.towers = (last.towers || ['luc','smo']).filter(towerOpen).slice(0,4);
+  PICK.towers = (last.towers || ['luc','smo']).filter(k => TT[k] && towerOpen(k)).slice(0,4);
   if (PICK.towers.length < 1) PICK.towers = ['luc','smo'].filter(towerOpen);
   $('prepTitle').textContent = m.name + (prepEndless ? ' · Ostatni bastion' : '');
   $('prepYear').textContent = 'rok ' + m.year; $('prepIntro').textContent = prepEndless
@@ -2437,6 +2448,7 @@ function renderUnlock(m) {
   if (u.hero) it.push(`<div class="ul"><img src="${himg(u.hero,0)}" alt=""><div><b>Nowy bohater: ${HEROES[u.hero].name}</b><small>${HEROES[u.hero].desc}</small></div></div>`);
   if (u.tower) it.push(`<div class="ul"><img src="${timg(u.tower,0)}" alt=""><div><b>Nowa wieża: ${TT[u.tower].name}</b><small>${TT[u.tower].desc}</small></div></div>`);
   if (u.spec) it.push(`<div class="ul"><img src="${iimg(SPECS[u.spec].img)}" alt=""><div><b>Nowy atak: ${SPECS[u.spec].name}</b><small>${SPECS[u.spec].desc}</small></div></div>`);
+  if (u.chest) it.push(`<div class="ul"><span class="ic">📦</span><div><b>Skrzynia ze skarbami!</b><small>+${CHEST_GOLD} zł na następną bitwę · +${CHEST_XP} XP dla bohatera</small></div></div>`);
   const nxt = nextUnlockAfter(m.id);
   if (nxt) {
     const nm = MAPS[MAPI[nxt]];
