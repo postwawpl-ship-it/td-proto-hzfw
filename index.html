@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#2a1a0e">
-<title>Obrona Jasnej Góry – Kampania</title>
-<link rel="preload" href="fonts/baloo2.woff2?v=3" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=3">
+<title>OBRONA POLSKI – Bohaterowie</title>
+<link rel="preload" href="fonts/baloo2.woff2?v=4" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="app">
@@ -33,7 +33,7 @@
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     <div class="rays"></div>
     <div class="tcontent">
-      <div class="logo"><span class="l1">Obrona</span><span class="l2">Jasnej Góry</span><span class="l3">— kampania —</span></div>
+      <div class="logo"><span class="l1 gold">OBRONA POLSKI</span><span class="l2 pl">Bohaterowie</span><span class="l3">— kampania —</span></div>
       <div class="tbtns">
         <button class="mbtn play" data-act="play">Graj</button>
         <button class="mbtn" data-act="settings">Ustawienia</button>
@@ -68,12 +68,13 @@
   <div id="pHow" class="panel hidden"><div class="card how">
     <h2>Jak grać</h2>
     <p>Broń polskich twierdz w czterech słynnych bitwach. Nie wpuść wrogów za mury!</p>
-    <div class="tw"><img src="img/t_mus0.webp?v=3" alt=""><div><b>Muszkieterzy</b> – szybki ogień w jednego wroga.</div></div>
-    <div class="tw"><img src="img/t_arm0.webp?v=3" alt=""><div><b>Armata</b> – wolna, ale rani wielu naraz.</div></div>
-    <div class="tw"><img src="img/t_smo0.webp?v=3" alt=""><div><b>Kocioł smoły</b> – spowalnia i parzy wszystkich wokół.</div></div>
-    <div class="tw"><img src="img/t_rus0.webp?v=3" alt=""><div><b>Rusznica wałowa</b> – daleki strzał w najsilniejszego.</div></div>
-    <div class="tw"><img src="img/t_kus0.webp?v=3" alt=""><div><b>Kusznicy</b> – tani i szybcy, bełty przebijają część zbroi.</div></div>
-    <div class="tw"><img src="img/t_moz0.webp?v=3" alt=""><div><b>Moździerz</b> – bomba z bardzo daleka na całe grupy.</div></div>
+    <div class="tw"><img src="img/t_luc0.webp?v=4" alt=""><div><b>Łucznicy</b> – tanie, szybkie strzały (start).</div></div>
+    <div class="tw"><img src="img/t_smo0.webp?v=4" alt=""><div><b>Kocioł smoły</b> – spowalnia i parzy (start).</div></div>
+    <div class="tw"><img src="img/t_wil0.webp?v=4" alt=""><div><b>Wilcze doły</b> – stawiasz NA DRODZE; ranią i spowalniają.</div></div>
+    <div class="tw"><img src="img/t_mus0.webp?v=4" alt=""><div><b>Muszkieterzy</b> – szybki ogień.</div></div>
+    <div class="tw"><img src="img/t_arm0.webp?v=4" alt=""><div><b>Armata</b> – wolna, rani wielu.</div></div>
+    <div class="tw"><img src="img/t_haj0.webp?v=4" alt=""><div><b>Hajducy / Wóz</b> – blokują wrogów na drodze.</div></div>
+    <p class="phint">Do bitwy bierzesz bohatera, 1 atak specjalny i do 4 odblokowanych broni. Po wygranej możesz wejść w <b>Ostatni bastion</b> (nieskończone fale).</p>
     <ul>
       <li>Dotknij <b>kamienne pole</b>, by postawić wieżę; dotknij wieży, by ją ulepszyć.</li>
       <li><b>Bohater</b>: dotknij go, a potem miejsce na mapie – pobiegnie tam i zatrzyma wrogów. Przycisk z jego twarzą to <b>moc specjalna</b>.</li>
@@ -104,7 +105,7 @@
     <div id="endXp" class="xpline"></div>
     <button class="mbtn play" id="endNext" data-act="next">Dalej</button>
     <button class="mbtn small" data-act="again">Zagraj ponownie</button>
-    <button class="mbtn small" data-act="camp">Mapa kampanii</button>
+    <button class="mbtn small" data-act="camp">OBRONA POLSKI</button>
   </div></div>
 
   <!-- MAPA KAMPANII -->
@@ -124,7 +125,9 @@
     <p id="prepIntro"></p>
     <h4>Bohater</h4><div class="picks" id="pickHero"></div>
     <h4>Atak specjalny</h4><div class="picks" id="pickSpec"></div>
+    <h4>Ekwipunek (max 4)</h4><div class="picks towers" id="pickTowers"></div>
     <div class="phint" id="prepHint"></div>
+    <button class="mbtn small" id="prepEndless" data-act="endless">Ostatni bastion</button>
     <button class="mbtn play" data-act="fight">Do boju!</button>
     <button class="mbtn small" data-act="back">Wróć</button>
   </div></div>
@@ -161,6 +164,6 @@
     <button class="mbtn small" data-act="back">Wróć</button>
   </div></div>
 </div>
-<script src="game.js?v=3"></script>
+<script src="game.js?v=4"></script>
 </body>
 </html>

@@ -1,293 +1,371 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '3';
+const V = '4';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
-const SAVE_KEY = 'twierdza-jg-v3', V2_KEY = 'twierdza-jg-v2', V1_KEY = 'twierdza-jg-v1';
-const START_LIVES = 20, CD_BETWEEN = 20;
+const SAVE_KEY = 'twierdza-op-v4', V3_KEY = 'twierdza-jg-v3', V2_KEY = 'twierdza-jg-v2';
+const START_LIVES = 20, CD_BETWEEN = 18;
 const FONT = 'Baloo2, system-ui, sans-serif';
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const rnd = (a,b) => a + Math.random()*(b-a);
 
-// ====== WIEŻE ======
+// ====== WIEŻE (12) ======
+// road:true = Wilcze doły – stawia się na drodze
 const TT = {
-  mus: {name:'Muszkieterzy', desc:'Szybki ogień w jeden cel', cost:[70,60,110], dmg:[14,22,34], rate:[.65,.52,.4], range:[92,100,110]},
-  arm: {name:'Armata', desc:'Wolna, rani wielu naraz, przebija zbroje', cost:[120,100,170], dmg:[34,58,95], rate:[2.2,2.0,1.7], range:[105,115,125], splash:[40,46,54]},
-  smo: {name:'Kocioł smoły', desc:'Spowalnia i parzy wszystkich w pobliżu', cost:[90,80,130], dmg:[6,10,16], rate:[.9,.85,.8], range:[68,76,84], slow:[.32,.42,.52]},
-  rus: {name:'Rusznica wałowa', desc:'Daleki strzał w najsilniejszego; kula przebija zbroje i trafia wroga za nim', cost:[110,100,160], dmg:[65,110,175], rate:[1.9,1.75,1.55], range:[150,165,180]},
-  kus: {name:'Kusznicy', desc:'Bełty lecą szybko i przebijają kolczugi (zbroja słabsza o połowę)', cost:[85,70,120], dmg:[20,31,47], rate:[.85,.75,.62], range:[104,112,122]},
-  moz: {name:'Moździerz', desc:'Bomba po wysokim łuku – bardzo daleko i w całą gromadę', cost:[150,120,190], dmg:[48,80,128], rate:[3.3,3.0,2.7], range:[150,165,182], splash:[50,56,64]},
+  luc: {name:'Łucznicy', desc:'Tanie, szybkie strzały w jeden cel', cost:[55,50,90], dmg:[10,16,24], rate:[.55,.48,.4], range:[88,96,104]},
+  smo: {name:'Kocioł smoły', desc:'Spowalnia i parzy wszystkich w pobliżu', cost:[85,75,120], dmg:[5,9,14], rate:[.95,.88,.8], range:[66,74,82], slow:[.3,.4,.5]},
+  kus: {name:'Kusznicy', desc:'Bełty przebijają kolczugi (zbroja −50%)', cost:[80,70,115], dmg:[18,28,42], rate:[.85,.74,.6], range:[100,110,120]},
+  wil: {name:'Wilcze doły', desc:'Stawia się NA DRODZE. Rani i spowalnia przechodzących', cost:[70,65,110], dmg:[8,14,22], rate:[0,0,0], range:[18,20,22], slow:[.25,.35,.45], road:true, hp:[80,130,200]},
+  bal: {name:'Balista', desc:'Ciężki bełt, duży dystans, jeden cel', cost:[100,90,145], dmg:[40,68,105], rate:[2.1,1.9,1.65], range:[135,150,165]},
+  mus: {name:'Muszkieterzy', desc:'Szybki ogień z muszkietów', cost:[75,65,115], dmg:[14,22,34], rate:[.62,.5,.38], range:[92,100,110]},
+  arm: {name:'Armata', desc:'Wolna, rani wielu, przebija zbroje', cost:[125,105,175], dmg:[36,60,98], rate:[2.3,2.05,1.75], range:[105,115,125], splash:[40,46,54]},
+  rus: {name:'Rusznica wałowa', desc:'Daleki strzał w najsilniejszego; przebija dwóch', cost:[115,100,165], dmg:[65,110,175], rate:[1.95,1.8,1.55], range:[150,165,180]},
+  haj: {name:'Hajducy', desc:'Blokują wrogów na drodze i sieką toporkami', cost:[95,85,140], dmg:[16,26,40], rate:[.7,.6,.5], range:[28,30,32], block:true, hp:[120,200,320]},
+  kar: {name:'Działo kartaczowe', desc:'Kartacz – krótki dystans, szeroki snop', cost:[130,110,180], dmg:[28,48,78], rate:[2.0,1.8,1.55], range:[72,78,85], splash:[55,62,70]},
+  moz: {name:'Moździerz', desc:'Bomba po łuku – daleko, w całą gromadę', cost:[155,125,195], dmg:[48,80,128], rate:[3.3,3.0,2.7], range:[150,165,182], splash:[50,56,64]},
+  woz: {name:'Wóz bojowy', desc:'Tabor: wytrzymały bloker ze strzelcami', cost:[160,140,210], dmg:[18,28,42], rate:[.8,.7,.58], range:[85,92,100], block:true, hp:[200,340,520]},
 };
-const TKEYS = ['mus','arm','smo','rus','kus','moz'];
-const TW = {mus:[42,44,46], arm:[42,44,47], smo:[40,42,44], rus:[31,32,33], kus:[34,36,40], moz:[44,46,50]};
-const TOPF = {mus:[.25,.25,.33], arm:[.2,.2,.21], smo:[.62,.62,.62], rus:[.15,.15,.16], kus:[.4,.36,.3], moz:[.2,.18,.12]};
+const TKEYS = ['luc','smo','kus','wil','bal','mus','arm','rus','haj','kar','moz','woz'];
+const TW = {luc:[40,42,44], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[44,46,50], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
+const TOPF = {luc:[.35,.35,.35], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.3,.28,.25], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
 
 // ====== WROGOWIE ======
-// atk = obrażenia na sekundę zadawane bohaterowi w walce wręcz
 const ET = {
+  // Niemcy / cesarscy (Głogów)
+  ger: {name:'Cesarski piechur', hp:42, spd:34, gold:5, lives:1, armor:0, r:9, img:'e_pie', h:30, atk:6},
+  gkn: {name:'Rycerz cesarski', hp:150, spd:22, gold:12, lives:2, armor:.5, r:11, img:'e_bra', h:40, atk:13},
+  // Mongołowie (Legnica)
+  mon: {name:'Mongoł', hp:38, spd:55, gold:6, lives:1, armor:0, r:9, img:'e_raj', h:32, atk:7},
+  mkn: {name:'Mongolski zbrojny', hp:110, spd:40, gold:10, lives:1, armor:.2, r:10, img:'e_pan', h:36, atk:10},
+  // Krzyżacy
+  kne: {name:'Knecht', hp:50, spd:33, gold:6, lives:1, armor:.1, r:9, img:'e_kne', h:30, atk:6},
+  teu: {name:'Kusznik zakonny', hp:42, spd:44, gold:7, lives:1, armor:0, r:9, img:'e_kus', h:31, atk:7},
+  bra: {name:'Rycerz zakonny', hp:175, spd:22, gold:14, lives:2, armor:.55, r:11, img:'e_bra', h:40, atk:14},
+  ulr: {name:'Wielki Mistrz Ulryk', hp:3100, spd:13, gold:170, lives:10, armor:.35, r:20, img:'e_ulr', h:62, atk:34, boss:true},
+  // Moskwa
+  str: {name:'Strzelec', hp:44, spd:36, gold:6, lives:1, armor:0, r:9, img:'e_pie', h:30, atk:6},
+  boj: {name:'Bojar', hp:130, spd:26, gold:11, lives:2, armor:.35, r:10, img:'e_pan', h:38, atk:12},
+  // Mołdawia
+  mol: {name:'Mołdawianin', hp:48, spd:38, gold:6, lives:1, armor:0, r:9, img:'e_aza', h:30, atk:7},
+  // Maxymilian / Brandenburg (Byczyna)
+  max: {name:'Hajduk Maksymiliana', hp:52, spd:34, gold:7, lives:1, armor:.1, r:9, img:'e_kne', h:30, atk:7},
+  // Szwedzi
   pie: {name:'Piechota', hp:45, spd:34, gold:6, lives:1, armor:0, r:9, img:'e_pie', h:30, atk:6},
   raj: {name:'Rajtar', hp:34, spd:66, gold:7, lives:1, armor:0, r:11, img:'e_raj', h:34, atk:8},
   pan: {name:'Pancerny', hp:140, spd:24, gold:12, lives:2, armor:.5, r:10, img:'e_pan', h:40, atk:12},
   gen: {name:'Generał Müller', hp:2600, spd:14, gold:150, lives:10, armor:.3, r:18, img:'e_gen', h:56, atk:30, boss:true},
-  kne: {name:'Knecht', hp:50, spd:33, gold:6, lives:1, armor:.1, r:9, img:'e_kne', h:30, atk:6},
-  kus: {name:'Kusznik', hp:42, spd:44, gold:7, lives:1, armor:0, r:9, img:'e_kus', h:31, atk:7},
-  bra: {name:'Rycerz zakonny', hp:175, spd:22, gold:14, lives:2, armor:.55, r:11, img:'e_bra', h:40, atk:14},
-  ulr: {name:'Wielki Mistrz Ulryk', hp:3100, spd:13, gold:170, lives:10, armor:.35, r:20, img:'e_ulr', h:62, atk:34, boss:true},
+  // Turcy / Tatarzy
   aza: {name:'Azap', hp:44, spd:40, gold:5, lives:1, armor:0, r:9, img:'e_aza', h:29, atk:6},
   jan: {name:'Janczar', hp:95, spd:28, gold:10, lives:1, armor:.25, r:10, img:'e_jan', h:34, atk:11},
   sip: {name:'Sipahi', hp:68, spd:70, gold:9, lives:1, armor:.1, r:12, img:'e_sip', h:40, atk:9},
+  tat: {name:'Tatar', hp:36, spd:72, gold:7, lives:1, armor:0, r:11, img:'e_tat', h:34, atk:8},
   pas: {name:'Karakasz Pasza', hp:3500, spd:13, gold:180, lives:10, armor:.35, r:20, img:'e_pas', h:58, atk:36, boss:true},
+  // Bossowie dodatkowi (reuse sprites)
+  bat: {name:'Batu-chan', hp:2800, spd:14, gold:160, lives:10, armor:.25, r:20, img:'e_ulr', h:60, atk:32, boss:true},
+  chw: {name:'Chodkiewicz… zaraza, to wróg!', hp:1, spd:1, gold:1, lives:1, armor:0, r:1, img:'e_pie', h:20, atk:1}, // placeholder unused
   kar: {name:'Kara Mustafa', hp:4200, spd:12, gold:220, lives:12, armor:.4, r:20, img:'e_kar', h:62, atk:40, boss:true},
 };
 
 // ====== BOHATEROWIE ======
 const HEROES = {
-  kor: {name:'Przeor Kordecki', short:'Kordecki', ranged:true, hp:200, dmg:13, rate:.75, range:78, spd:62,
-        ab:'Modlitwa', abDesc:'Wieże w pobliżu strzelają o połowę szybciej, a przeor odzyskuje siły.', abCd:30,
-        tiers:['Biały habit i kij','Kolczuga pod habitem','Stalowy pancerz i srebrny krzyż','Złota zbroja i świecący krzyż'],
-        desc:'Przeor klasztoru na Jasnej Górze. Walczy z daleka – rzuca złote promienie.',
-        lines:['Z Bożą pomocą!','Pokój wam… ale nie Szwedom!','Tego klasztoru nie oddam!','Modlę się i celuję!','Spokojnie, mam różaniec!','Najpierw jutrznia, potem bitwa!'],
-        go:['Idę, idę!','Już biegnę, bracie!','Habit nie przeszkadza!'], die:'Muszę chwilę odpocząć…', back:'Wracam z dokładką odwagi!', lvl:'Nowy habit, nowa moc!', abSay:'Módlmy się… i strzelajmy!'},
   zaw: {name:'Zawisza Czarny', short:'Zawisza', ranged:false, hp:420, dmg:26, rate:.8, range:24, spd:58,
-        ab:'Cios Zawiszy', abDesc:'Potężne cięcie wokół rycerza – rani wszystkich i ogłusza ich na chwilę.', abCd:22,
+        ab:'Cios Zawiszy', abDesc:'Potężne cięcie wokół rycerza – rani wszystkich i ogłusza.', abCd:22,
         tiers:['Czarna przeszywanica i miecz','Kolczuga, hełm i tarcza','Stalowa zbroja płytowa','Czarno-złota zbroja z pióropuszem'],
-        desc:'Słynny rycerz z Garbowa. Mówi się: „polegać jak na Zawiszy”.',
-        lines:['Polegaj jak na Zawiszy!','Kto następny?','Moja zbroja lśni!','Na ubitą ziemię!','Słowo rycerza!','Jeden na stu? Uczciwie!'],
-        go:['Rycerz rusza!','Na koń… znaczy, pieszo!','Prowadź, przygodo!'], die:'Tylko… zadrapanie…', back:'Zawisza wrócił!', lvl:'Kowal się postarał!', abSay:'Uwaga… CIOS!'},
+        desc:'Słynny rycerz z Garbowa. „Polegać jak na Zawiszy”.',
+        lines:['Polegaj jak na Zawiszy!','Kto następny?','Na ubitą ziemię!','Słowo rycerza!','Jeden na stu? Uczciwie!','Zawisza nie giął kolan!'],
+        go:['Rycerz rusza!','Na koń… znaczy, pieszo!'], die:'Tylko… zadrapanie…', back:'Zawisza wrócił!', lvl:'Kowal się postarał!', abSay:'Uwaga… CIOS!'},
+  zol: {name:'Hetman Żółkiewski', short:'Żółkiewski', ranged:false, hp:380, dmg:24, rate:.75, range:24, spd:60,
+        ab:'Szyk hetmański', abDesc:'Hetman ustawia szyk: wieże w pobliżu dostają +obrażenia na chwilę.', abCd:26,
+        tiers:['Szary żupan i buława','Kolczuga','Pancerz hetmański','Złota zbroja i buzdygan'],
+        desc:'Stanisław Żółkiewski – zwycięzca spod Kłuszyna.',
+        lines:['Spokój, panowie bracia!','Kłuszyn pamięta!','Buława wie lepiej!','Hetman nie biega – hetman idzie!','Moskwa daleko, ale dojdziemy!'],
+        go:['Hetman w drogę!','Za mną!'], die:'Odstępuję… na chwilę…', back:'Hetman znów stoi!', lvl:'Nowa zbroja hetmana!', abSay:'Szyk – i ognia!'},
   cho: {name:'Hetman Chodkiewicz', short:'Chodkiewicz', ranged:false, hp:360, dmg:23, rate:.7, range:24, spd:60,
-        ab:'Okrzyk hetmana', abDesc:'Wrogowie wokół hetmana zastygają ze strachu, a buława robi porządek.', abCd:26,
+        ab:'Okrzyk hetmana', abDesc:'Wrogowie wokół zastygają ze strachu, buława robi porządek.', abCd:26,
         tiers:['Czerwony żupan i buława','Kolczuga i misiurka','Pancerz i skóra lamparta','Złota zbroja husarska ze skrzydłami'],
-        desc:'Hetman Jan Karol Chodkiewicz – dowodził pod Chocimiem w 1621 roku.',
-        lines:['Ani kroku wstecz!','Hetman jest jeden!','Buława zrobi porządek!','Szabla gotowa!','Chocim stoi!','Wąs mi się jeży!'],
-        go:['Hetman idzie!','Za mną, mości panowie!','Robię obchód!'], die:'Buława… za ciężka…', back:'Hetman znów w siodle!', lvl:'Lepsza zbroja, lepszy humor!', abSay:'STÓJ! Hetman mówi!'},
-  sob: {name:'Król Jan III Sobieski', short:'Sobieski', ranged:false, hp:400, dmg:30, rate:.75, range:26, spd:64,
-        ab:'Lew Lechistanu', abDesc:'Królewski ryk! Wrogowie wokół cofają się w popłochu i dostają po hełmach.', abCd:28,
-        tiers:['Niebieski kontusz i szabla','Kolczuga i hełm','Zbroja i czerwony płaszcz','Złota zbroja, skrzydła i korona'],
-        desc:'Król Polski. Turcy nazywali go „Lwem Lechistanu”.',
-        lines:['Venimus, vidimus, Deus vicit!','Wąs nastroszony – gotowy!','Kawa? Po bitwie!','Lew Lechistanu ryczy!','Do szarży, panowie bracia!','Król też umie się bić!'],
-        go:['Król rusza!','Gdzie mój koń?','Jadę… znaczy, idę!'], die:'Król… robi drzemkę…', back:'Król wrócił!', lvl:'Korona lśni jaśniej!', abSay:'ROAAR! Wynocha!'},
+        desc:'Jan Karol Chodkiewicz – Kircholm i Chocim.',
+        lines:['Ani kroku wstecz!','Hetman jest jeden!','Kircholm to ja!','Chocim stoi!','Wąs mi się jeży!'],
+        go:['Hetman idzie!','Za mną!'], die:'Buława… za ciężka…', back:'Hetman znów w siodle!', lvl:'Lepsza zbroja!', abSay:'STÓJ! Hetman mówi!'},
+  kon: {name:'Hetman Koniecpolski', short:'Koniecpolski', ranged:false, hp:370, dmg:25, rate:.72, range:24, spd:62,
+        ab:'Kontuszowy wicher', abDesc:'Szybki atak wokół – wrogowie cofają się i dostają po nogach.', abCd:24,
+        tiers:['Kontusz i szabla','Kolczuga','Pancerz z buńczukiem','Złota zbroja i skrzydła'],
+        desc:'Stefan Koniecpolski – postrach Szwedów i Tatarów.',
+        lines:['Trzciana! Pamiętacie?','Szabla sama wie!','Tatarom mówię: do widzenia!','Hetman też się spoci!'],
+        go:['Jazda!','W teren!'], die:'Chwilę… odetchnę…', back:'Koniecpolski wraca!', lvl:'Kowal zadowolony!', abSay:'Wicher! Rozprosz ich!'},
+  cza: {name:'Stefan Czarniecki', short:'Czarniecki', ranged:false, hp:350, dmg:27, rate:.7, range:24, spd:66,
+        ab:'Nie damy się!', abDesc:'Krzyk Czarnieckiego: sojusznicy (wieże) strzelają szybciej, on leczy się trochę.', abCd:28,
+        tiers:['Szary kontusz','Kolczuga','Pancerz partyzanta','Złota zbroja i czapka'],
+        desc:'Bohater potopu. „Śpij, kolego…” – ale najpierw bitwa!',
+        lines:['Nie damy Szwecji!','Czarniecki nie śpi!','Partyzantka w akcji!','Za Polskę!'],
+        go:['W las!','Ruszam!'], die:'Na chwilę… w krzaki…', back:'Czarniecki znów tu!', lvl:'Czapka z bączkiem!', abSay:'NIE DAMY SIĘ!'},
+  kor: {name:'Przeor Kordecki', short:'Kordecki', ranged:true, hp:200, dmg:13, rate:.75, range:78, spd:62,
+        ab:'Modlitwa', abDesc:'Wieże w pobliżu strzelają szybciej, przeor odzyskuje siły.', abCd:30,
+        tiers:['Biały habit i kij','Kolczuga pod habitem','Stalowy pancerz i srebrny krzyż','Złota zbroja i świecący krzyż'],
+        desc:'Przeor Jasnej Góry. Walczy z daleka – złote promienie.',
+        lines:['Z Bożą pomocą!','Tego klasztoru nie oddam!','Modlę się i celuję!','Najpierw jutrznia, potem bitwa!'],
+        go:['Idę, idę!','Już biegnę!'], die:'Muszę chwilę odpocząć…', back:'Wracam z odwagi!', lvl:'Nowy habit!', abSay:'Módlmy się… i strzelajmy!'},
 };
-const HKEYS = ['kor','zaw','cho','sob'];
-const XPNEED = [0,60,140,240,360,500,660,840,1040,1260]; // łączne XP do poziomu 1..10
-const tierOf = l => l >= 10 ? 3 : l >= 7 ? 2 : l >= 4 ? 1 : 0;
-const TIER_LV = [1,4,7,10];
-const levelOf = xp => { let l = 1; while (l < 10 && xp >= XPNEED[l]) l++; return l; };
+const HKEYS = ['zaw','zol','cho','kon','cza','kor'];
+// XP do lvl 1..30 (łączne). Wolny przyrost – max koło końca kampanii.
+const XPNEED = (() => { const a=[0]; let t=0; for (let L=1;L<30;L++){ t += Math.round(40 + L*18 + (L>15?L*6:0)); a.push(t);} return a; })();
+const TIER_LV = [1,8,16,25];
+const tierOf = l => l >= 25 ? 3 : l >= 16 ? 2 : l >= 8 ? 1 : 0;
+const levelOf = xp => { let l = 1; while (l < 30 && xp >= XPNEED[l]) l++; return l; };
+const MAX_STAT = 40; // 40 * 2% = +80%
 
 // ====== ATAKI SPECJALNE ======
 const SPECS = {
+  ryc: {name:'Szarża rycerstwa', desc:'Ciężkozbrojni rycerze szarżują drogą i tratują wrogów.', uses:3, cd:38, img:'e_bra'},
+  tat: {name:'Posiłki tatarskie', desc:'Tatarzy Dżalala ad-Dina – jadą pod prąd i ostrzeliwują.', uses:3, cd:34, img:'e_tat'},
   hus: {name:'Husaria', desc:'Skrzydlata jazda szarżuje przez całą drogę.', uses:3, cd:40, img:'e_hus'},
-  ost: {name:'Ostrzał z armat', desc:'Dotknij planszę – spadnie tam grad kul armatnich.', uses:3, cd:28, img:'d_ocan'},
-  tat: {name:'Posiłki tatarskie', desc:'Tatarscy łucznicy jadą pod prąd i zasypują wrogów strzałami.', uses:3, cd:34, img:'e_tat'},
+  ost: {name:'Ostrzał z armat', desc:'Dotknij planszę – spadnie grad kul.', uses:3, cd:28, img:'d_ocan'},
 };
-const SKEYS = ['hus','ost','tat'];
-
-// ====== TEKSTY (humor) ======
-const FACT = {
-  swe: {
-    spawn:['Hej hå!','Framåt!','För kungen!','Lätt match!','Var är maten?','Kall vinter…'],
-    hurt:['Aj!','Oj oj!','Hjälp!','Det gör ont!'],
-    slow:['Varmt! Varmt!','Min mössa!','Smetigt!'],
-    flee:['Mamma!','Hem till Sverige!','Retirera!'],
-    hus:['Jezus Maria, Husaria!','Skrzydła?! Uciekać!','Hjälp! Fåglar med lansar!'],
-    ost:['Kanonkulor!','Ner på marken!','Akta huvudet!'],
-    tat:['Pilar överallt!','Hästar baklänges?!'],
-  },
-  teu: {
-    spawn:['Vorwärts!','Für den Orden!','Achtung!','Mein Helm drückt!','Zu heiß hier!','Ordnung muss sein!'],
-    hurt:['Au weh!','Autsch!','Hilfe!','Ach du lieber!'],
-    slow:['Heiß! Heiß!','Meine Rüstung klebt!','Pfui!'],
-    flee:['Rückzug!','Nach Hause!','Mama!'],
-    hus:['Was?! Flügel?!','Engel mit Lanzen?!','Lauf!'],
-    ost:['Deckung!','Kanonen?! Jetzt schon?!','Kopf runter!'],
-    tat:['Pfeile! Überall!','Die reiten falsch herum!'],
-  },
-  ott: {
-    spawn:['İleri!','Haydi!','Hücum!','Çabuk, çabuk!','Kahve molası?','Sıcak gün!'],
-    hurt:['Aman!','Eyvah!','Ah!','Of!'],
-    slow:['Bıyığım yandı!','Yapış yapış!','Sıcak!'],
-    flee:['Kaçın!','Geri çekil!','Anne!'],
-    hus:['Kanatlılar geliyor!','Eyvah! Skrzydła!','Kaçın! Kanatlar!'],
-    ost:['Gülle!','Yat yere!','Başını eğ!'],
-    tat:['Oklar!','Bunlar kim?!'],
-  },
-};
+const SKEYS = ['ryc','tat','hus','ost'];
+// ====== MAPY (16) + teksty ======
+const NODE_POS = {"glo": [11.35, 54.34], "leg": [11.57, 58.32], "plo": [22.39, 48.58], "gru": [28.61, 38.23], "kor": [19.3, 39.73], "ors": [73.7, 29.12], "obe": [50.0, 80.53], "byc": [19.57, 59.2], "kir": [45.65, 8.41], "klu": [93.26, 18.85], "cec": [63.48, 95.58], "cho": [56.52, 82.12], "gni": [23.13, 35.13], "trz": [23.48, 37.17], "och": [71.3, 76.11], "jg": [24.43, 61.86]};
+const FAC_LINES = {"ger": ["Für den Kaiser!", "Los, vorwärts!", "Polnische Burg? Ha!", "Wo ist das Bier?"], "mon": ["Hurraaa!", "Koń i szabla!", "Step woła!", "Batu! Batu!"], "teu": ["Gott mit uns!", "Zwei Schwerter!", "Für den Orden!", "Nein, nicht schon wieder!"], "mos": ["Za cara!", "Moskwa nie zginie!", "Bojar idzie!", "Ura!"], "mol": ["Moldova!", "Do boju!", "Hospodar kazał!"], "max": ["Maximilian!", "Za arcyksięcia!", "Byczyna czeka?"], "swe": ["För Sverige!", "Kungens män!", "Atak!", "Zimno tu!"], "ott": ["Allah!", "Janczarzy!", "Eyvah!", "Do szturmu!"], "tat": ["Haik!", "Ałła!", "Stepowy wiatr!", "Szybko i znikać!"]};
 const PL = {
-  wave:['Do broni!','Szykować się!','Idą! Wszyscy na stanowiska!','Za Polskę!','Trzymać szyk!','Proch suchy?'],
-  kill:['Za Polskę!','Następny!','Ha! Uciekaj!','Kłaniam się!','Dobranoc!'],
-  leak:['Ała! Brama!','Zamykać wrota!','Przepuścili jednego!','Kto pilnuje bramy?!'],
+  wave:['Do broni!','Szykować się!','Idą!','Za Polskę!','Trzymać szyk!','Proch suchy?'],
+  kill:['Za Polskę!','Następny!','Ha!','Dobranoc!'],
+  leak:['Ała! Brama!','Zamykać wrota!','Kto pilnuje bramy?!'],
   build:['Gotowe!','Stoi jak nowa!','Do roboty!'],
   upg:['Lepiej!','Mocniej!','Teraz się zacznie!'],
-  hus:['Husaria! Szarża!','Skrzydła w górę!','Na nich, panowie bracia!'],
+  hus:['Husaria! Szarża!','Skrzydła w górę!','Na nich!'],
+  ryc:['Szarża rycerstwa!','Kopiami naprzód!','Rycerze, za mną!'],
   ost:['Pal ze wszystkich!','Ognia!','Armaty, mówcie!'],
-  tat:['Lipkowie z odsieczą!','Tatarzy w siodła!','Strzały w powietrze!'],
-  win:['Zwycięstwo!','Hurra!','Twierdza stoi!'],
+  tat:['Lipkowie z odsieczą!','Tatarzy w siodła!','Strzały!'],
+  win:['Zwycięstwo!','Hurra!','Twierdza stoi!','Chwała obronie!'],
+  lose:['Odwrót…','Nie tym razem.','Padliśmy.','Spróbuj ponownie!'],
   tower:{
-    mus:['Ognia!','Celuj!','Pif-paf!','Ładuj!'],
-    arm:['Bum!','Kula w drogę!','Uszy zatkać!'],
-    smo:['Gorąca kąpiel!','Smoła z dostawą!','Uwaga, gorące!'],
-    rus:['Jeden strzał, dwóch mniej!','Z daleka widać!','Na cel!'],
-    kus:['Bełt w drogę!','Naciągaj!','Prosto w przyłbicę!','Cyk!'],
-    moz:['Uwaga, leci!','Z góry na głowę!','Moździerz mówi: BUM!','Kto zamawiał bombę?'],
+    luc:['Celuć!','Strzała!','Czuwaj!'], smo:['Gorąca kąpiel!','Smoła!'], kus:['Bełt!','Naciągaj!'],
+    wil:['Wilcze doły!','Uwaga, dół!'], bal:['Balista!','Ciężki bełt!'], mus:['Ognia!','Pif-paf!'],
+    arm:['Bum!','Kula w drogę!'], rus:['Z daleka!','Na cel!'], haj:['Hajducy!','Toporki!'],
+    kar:['Kartacz!','Snop ognia!'], moz:['Uwaga, leci!','BUM!'], woz:['Tabor stoi!','Z wozu ognia!'],
   },
 };
+const FACT = {
+  swe:{spawn:['Hej hå!','Framåt!','För kungen!'], hurt:['Aj!','Oj oj!'], slow:['Varmt!'], flee:['Hem!'], hus:['Husaria!'], ost:['Kanonkulor!'], tat:['Pilar!'], ryc:['Riddare?!']},
+  teu:{spawn:['Vorwärts!','Für den Orden!'], hurt:['Au weh!'], slow:['Heiß!'], flee:['Rückzug!'], hus:['Flügel?!'], ost:['Deckung!'], tat:['Pfeile!'], ryc:['Ritter?']},
+  ott:{spawn:['İleri!','Haydi!'], hurt:['Aman!'], slow:['Sıcak!'], flee:['Kaçın!'], hus:['Kanatlılar!'], ost:['Gülle!'], tat:['Oklar!'], ryc:['Şövalye!']},
+  ger:{spawn:FAC_LINES.ger, hurt:['Au!','Hilfe!'], slow:['Heiß!'], flee:['Zurück!'], hus:['Was?!'], ost:['Kanonen!'], tat:['Pfeile!'], ryc:['Ritter!']},
+  mon:{spawn:FAC_LINES.mon, hurt:['Aj!'], slow:['Gorąco!'], flee:['Uciekać!'], hus:['Skrzydła?!'], ost:['Bum!'], tat:['Swoi?!'], ryc:['Rycerze!']},
+  mos:{spawn:FAC_LINES.mos, hurt:['Oj!'], slow:['Goriacho!'], flee:['Nazad!'], hus:['Krylja!'], ost:['Pushki!'], tat:['Strely!'], ryc:['Rytsari!']},
+  mol:{spawn:FAC_LINES.mol, hurt:['Au!'], slow:['Calda!'], flee:['Fugi!'], hus:['Aripi!'], ost:['Tunuri!'], tat:['Sageți!'], ryc:['Cavaleri!']},
+  max:{spawn:FAC_LINES.max, hurt:['Au!'], slow:['Heiß!'], flee:['Zurück!'], hus:['Flügel!'], ost:['Kanonen!'], tat:['Pfeile!'], ryc:['Ritter!']},
+  tat:{spawn:FAC_LINES.tat, hurt:['Aj!'], slow:['Sıcak!'], flee:['Kaç!'], hus:['Kanat!'], ost:['Top!'], tat:['Kardeş?!'], ryc:['Atlı!']},
+};
 
-// ====== MAPY ======
 const MAPS = [
- { id:'jg', name:'Jasna Góra', year:1655, fac:'swe', grass:'grass', fort:'fort', fortW:170, fortAR:367/440,
-   flags:'pl', camp:'v2', deco:'v2',
-   path:[[70,-25],[70,95],[290,95],[290,200],[70,200],[70,305],[290,305],[290,405],[180,405],[180,478]],
-   spots:[[180,45],[130,147],[235,147],[335,147],[28,252],[130,252],[235,252],[130,357],[235,357],[335,357],[85,450],[275,450]],
-   gold:230, hk:1, boss:'gen', roster:['pie','raj','pan'], music:'jg', sky:'#cfe3f0',
-   intro:'Szwedzi generała Müllera otoczyli klasztor. Przeor Kordecki mówi: nie oddamy Jasnej Góry!',
-   waves:[
-    [['pie',8,1.1,0]],
-    [['pie',12,.85,0]],
-    [['pie',6,1,0],['raj',6,.8,3]],
-    [['pie',10,.8,0],['pan',4,2,4]],
-    [['raj',14,.5,0],['pie',8,.8,2]],
-    [['pan',8,1.4,0],['pie',12,.7,1]],
-    [['raj',12,.55,0],['pan',6,1.5,2],['pie',14,.6,4]],
-    [['pan',10,1.1,0],['raj',16,.45,3]],
-    [['pie',20,.45,0],['pan',12,1,2],['raj',14,.5,6]],
-    [['pie',10,.7,0],['raj',8,.6,3],['pan',6,1.2,5],['gen',1,1,9],['pie',10,.8,14]],
-   ],
-   bossL:{spawn:'Ten klasztor będzie mój! Ja, generał Müller!', half:'Nie… to niemożliwe!', low:'Zwijać obóz! Natychmiast!', die:'Ja tu jeszcze wrócę… albo nie!'},
-   pl:['Bić Szwaba!','Za Króla!','Jasna Góra nie da się!','Szwedzie, do domu!','Potop? Mamy parasole!'],
-   unlock:{hero:'zaw', tower:'kus', spec:'ost'},
-   hist:{ title:'Obrona Jasnej Góry 1655', img:'hist_jg',
-     text:['W 1655 roku Szwedzi najechali Polskę. Ten najazd nazwano „potopem”, bo wojska wroga zalały prawie cały kraj.',
-       '18 listopada 1655 roku pod klasztor na Jasnej Górze w Częstochowie podeszło wojsko generała Burcharda Müllera.',
-       'Klasztoru broniło tylko około 250–300 ludzi: zakonnicy, żołnierze, puszkarze i szlachta. Dowodził nimi przeor, ojciec Augustyn Kordecki.',
-       'Oblegających było około dziesięć razy więcej, ale przez ponad miesiąc nie zdołali zdobyć murów, choć strzelali z armat.',
-       '27 grudnia 1655 roku wróg odszedł spod klasztoru. Wieść o tej obronie dodała odwagi całej Polsce.'],
-     fun:'W powieści Henryka Sienkiewicza „Potop” bohater Kmicic wysadza w powietrze ogromne szwedzkie działo. To zmyślona scena – ale prawdziwi obrońcy też zniszczyli jedno działo oblężnicze podczas nocnego wypadu!' } },
- { id:'gr', name:'Grunwald', year:1410, fac:'teu', grass:'grass_gr', fort:'fort_gr', fortW:170, fortAR:358/440,
-   flags:'plk', camp:['d_tentw','d_tentw','d_tentb','d_barrels2'], deco:['d_oak','d_oak','d_bush','d_reed','d_pond','d_rock','d_fence2','d_hay2'],
-   path:[[50,-25],[50,60],[150,120],[310,120],[310,215],[200,270],[50,270],[50,360],[180,410],[180,478]],
-   spots:[[132,66],[228,84],[288,74],[102,132],[222,168],[204,228],[72,234],[132,226],[282,270],[138,318],[210,318],[174,366],[60,420]],
-   gold:260, hk:1, boss:'ulr', roster:['kne','kus','bra'], music:'gr', sky:'#d9ecf6',
-   intro:'Lipiec 1410. Krzyżacy stoją w szyku, a ich wielki mistrz przysłał właśnie dwa miecze. Pokażmy, co o tym myślimy!',
-   waves:[
-    [['kne',8,1.1,0]],
-    [['kne',10,.9,0],['kus',4,1,4]],
-    [['kus',10,.7,0],['kne',6,.9,3]],
-    [['kne',10,.8,0],['bra',3,2.2,4]],
-    [['kus',14,.55,0],['kne',8,.8,2]],
-    [['bra',6,1.6,0],['kne',12,.7,1]],
-    [['kus',14,.5,0],['bra',5,1.5,2],['kne',12,.6,4]],
-    [['bra',9,1.2,0],['kus',14,.5,3]],
-    [['kne',20,.45,0],['bra',9,1.1,2],['kus',14,.5,6]],
-    [['bra',11,1,0],['kus',18,.45,2],['kne',16,.5,5]],
-    [['kne',10,.7,0],['kus',8,.6,3],['bra',6,1.2,5],['ulr',1,1,9],['bra',4,1.5,12],['kne',10,.8,14]],
-   ],
-   bossL:{spawn:'Przysłałem dwa miecze! Mam ich więcej!', half:'Donnerwetter! Co to za rycerze?!', low:'Mein Gott… Polacy i Litwini!', die:'Rückzug! Wracam do Malborka… pieszo!'},
-   pl:['Za Jagiełłę!','Bij Krzyżaka!','Litwa, naprzód!','Dwa miecze? Mamy więcej!','Krzyżak w puszce!','Grunwald nasz!'],
-   unlock:{hero:'cho', spec:'tat'},
-   hist:{ title:'Bitwa pod Grunwaldem 1410', img:'hist_gr',
-     text:['15 lipca 1410 roku pod Grunwaldem stoczono jedną z największych bitew średniowiecznej Europy.',
-       'Wojska polskie i litewskie króla Władysława Jagiełły i wielkiego księcia Witolda walczyły z Zakonem Krzyżackim.',
-       'Przed bitwą wielki mistrz Ulryk von Jungingen przysłał królowi dwa nagie miecze – miało to sprowokować Polaków do walki.',
-       'W bitwie walczył słynny rycerz Zawisza Czarny z Garbowa. Do dziś mówimy „polegać jak na Zawiszy”, gdy ktoś jest bardzo słowny.',
-       'Bitwa trwała wiele godzin. Wielki mistrz zginął, a potęga Krzyżaków została mocno osłabiona.'],
-     fun:'Oba miecze grunwaldzkie przez wieki przechowywano w skarbcu na Wawelu i niesiono przed królami podczas koronacji. W 1795 roku zabrali je Prusacy i do dziś nikt nie wie, gdzie są!' } },
- { id:'ch', name:'Chocim', year:1621, fac:'ott', grass:'grass_ch', fort:'fort_ch', fortW:160, fortAR:451/440,
-   flags:'pl', river:true, camp:['d_tento','d_tento','d_ocan'], deco:['d_oak','d_bush','d_bush','d_rock','d_reed','d_hay2','d_fence2'],
-   path:[[300,-25],[300,45],[90,95],[60,180],[250,215],[290,290],[100,330],[80,400],[180,425],[180,478]],
-   spots:[[210,30],[138,48],[258,96],[42,108],[200,128],[146,160],[72,226],[296,222],[150,252],[212,262],[60,282],[236,340],[176,372]],
-   gold:300, hk:1.02, boss:'pas', roster:['aza','jan','sip'], music:'ch', sky:'#e8e0c8',
-   intro:'Jesień 1621. Ogromna armia sułtana stanęła pod Chocimiem nad Dniestrem. Hetman Chodkiewicz mówi: obóz musi wytrzymać!',
-   waves:[
-    [['aza',9,1,0]],
-    [['aza',12,.8,0],['sip',3,1.4,5]],
-    [['jan',5,1.4,0],['aza',10,.7,3]],
-    [['sip',10,.7,0],['aza',8,.7,3]],
-    [['jan',9,1.1,0],['aza',12,.6,2]],
-    [['sip',14,.55,0],['jan',6,1.2,3]],
-    [['aza',20,.42,0],['jan',8,1,3]],
-    [['jan',12,.9,0],['sip',12,.55,4]],
-    [['sip',16,.45,0],['jan',10,.9,2],['aza',14,.5,5]],
-    [['jan',16,.75,0],['sip',14,.5,3]],
-    [['aza',24,.35,0],['jan',12,.8,2],['sip',14,.5,6]],
-    [['jan',10,.8,0],['sip',10,.55,3],['pas',1,1,9],['jan',6,1.2,12],['aza',14,.5,14]],
-   ],
-   bossL:{spawn:'Chocim będzie mój! Evet!', half:'Aman, aman! Twardzi ci Lehowie!', low:'Gdzie mój wielbłąd?!', die:'Pokój! Podpiszmy pokój!'},
-   pl:['Chocim się nie podda!','Kozacy, do szabel!','Twardo jak hetman!','Ani kroku w tył!','Dniestr za nami – nie cofamy się!'],
-   unlock:{hero:'sob', tower:'moz'},
-   hist:{ title:'Obrona Chocimia 1621', img:'hist_ch',
-     text:['Jesienią 1621 roku ogromna armia turecka sułtana Osmana II ruszyła na Rzeczpospolitą.',
-       'Pod Chocimiem nad Dniestrem zatrzymało ją wojsko polskie i litewskie hetmana Jana Karola Chodkiewicza. Pomagali mu Kozacy zaporoscy.',
-       'Obrońcy zbudowali umocniony obóz i przez ponad miesiąc odpierali szturmy wojsk tureckich, których było co najmniej dwa razy więcej.',
-       'Stary hetman zmarł w obozie 24 września 1621 roku. Przed śmiercią przekazał buławę Stanisławowi Lubomirskiemu, który dowodził do końca.',
-       'Turcy nie zdobyli obozu i w październiku zawarto pokój. Polska była bezpieczna.'],
-     fun:'W pewnej chwili w polskim obozie została podobno tylko jedna beczka prochu! Na szczęście Turcy też mieli już dość wojny.' } },
- { id:'wi', name:'Wiedeń', year:1683, fac:'ott', grass:'grass_wi', fort:'fort_wi', fortW:160, fortAR:500/440,
-   flags:'at', camp:['d_tento','d_tento','d_tento','d_ocan'], deco:['d_vine','d_vine','d_mill','d_oak','d_bush','d_rock','d_hay2'],
-   path:[[30,-25],[30,140],[150,140],[150,40],[300,40],[300,250],[60,250],[60,340],[250,340],[250,405],[180,420],[180,478]],
-   spots:[[102,72],[234,90],[90,190],[186,100],[240,160],[336,120],[336,196],[180,196],[40,200],[130,295],[200,295],[300,298],[110,392]],
-   gold:330, hk:1.06, boss:'kar', roster:['aza','jan','sip'], music:'wi', sky:'#f0e6c8',
-   intro:'Wrzesień 1683. Wielki wezyr Kara Mustafa oblega Wiedeń. Król Jan III Sobieski przybywa z odsieczą!',
-   waves:[
-    [['aza',10,.9,0],['sip',3,1.2,5]],
-    [['jan',6,1.2,0],['aza',10,.7,3]],
-    [['sip',12,.6,0],['aza',8,.7,2]],
-    [['jan',10,1,0],['aza',14,.55,2]],
-    [['sip',16,.5,0],['jan',6,1.1,3]],
-    [['aza',22,.4,0],['jan',10,.9,3]],
-    [['jan',14,.8,0],['sip',12,.5,4]],
-    [['pas',1,1,0],['jan',8,1,2],['aza',16,.45,4]],
-    [['sip',20,.4,0],['jan',12,.8,3]],
-    [['jan',18,.65,0],['sip',16,.45,3],['aza',16,.4,6]],
-    [['aza',28,.3,0],['jan',14,.7,2],['sip',18,.4,6]],
-    [['jan',12,.7,0],['sip',12,.5,3],['kar',1,1,9],['jan',8,1,12],['sip',10,.6,14],['aza',16,.45,16]],
-   ],
-   bossL:{spawn:'Wiedeń? Biorę na wynos!', half:'Kim jest ten król z wąsem?!', low:'Eyvah! Skrzydła na wzgórzu!', die:'Zostawiam namioty… i kawę!'},
-   pl:['Za Wiedeń!','Król jedzie!','Skrzydła w górę!','Kawa po bitwie!','Venimus, vidimus…!','Z Kahlenbergu w dół!'],
-   unlock:{final:true},
-   hist:{ title:'Odsiecz Wiedeńska 1683', img:'hist_wi',
-     text:['Latem 1683 roku wielka armia turecka wielkiego wezyra Kara Mustafy oblegała Wiedeń, stolicę cesarstwa.',
-       'Na pomoc miastu przybył król Polski Jan III Sobieski z wojskiem polskim, a razem z nim wojska cesarskie i niemieckie.',
-       'Sobieski został głównym dowódcą całej odsieczy. 12 września 1683 roku wojska zeszły ze wzgórza Kahlenberg na tureckie obozy.',
-       'Pod wieczór ruszyła wielka szarża kawalerii z polską husarią na czele – jedna z największych szarż w historii.',
-       'Turcy uciekli, zostawiając obóz, a Wiedeń został uratowany. Turcy nazywali Sobieskiego „Lwem Lechistanu”.'],
-     fun:'Po bitwie król napisał do papieża: „Venimus, vidimus, Deus vicit” – „Przybyliśmy, zobaczyliśmy, Bóg zwyciężył”. A legenda mówi, że z worków kawy zostawionych przez Turków powstały pierwsze wiedeńskie kawiarnie!' } },
+ { id:"glo", name:"Głogów", year:1109, big:false, fac:"ger", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
+   gold:200, hk:0.92, boss:null, roster:["ger", "gkn"], music:"jg", sky:"#d9e6f0",
+   intro:"Rok 1109. Cesarz Henryk V oblega Głogów. Obrońcy nie oddadzą grodu!",
+   unlock:{"tower": "kus"},
+   hist:{"title": "OBRONA GŁOGOWA 1109", "img": "hist_jg", "text": ["Cesarz Henryk V najechał Śląsk i obległ Głogów.", "Obrońcy bronili się dzielnie mimo okrutnych gróźb.", "Grody śląskie nie upadły. Henryk odszedł z niczym.", "Jedna z najwcześniejszych słynnych obron Polski."], "fun": "Kronikarze piszą, że obrońców nie złamały nawet najstraszniejsze groźby cesarza."},
+   waves:[[["ger", 4, 1.1, 0]], [["ger", 4, 1.05, 0], ["gkn", 2, 0.96, 3]], [["ger", 5, 1.0, 0], ["gkn", 3, 0.92, 3]], [["ger", 6, 0.95, 0], ["gkn", 4, 0.88, 3]], [["ger", 7, 0.9, 0], ["gkn", 4, 0.84, 3]], [["ger", 8, 0.85, 0], ["gkn", 5, 0.8, 3]], [["ger", 9, 0.8, 0], ["gkn", 6, 0.76, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"leg", name:"Legnica", year:1241, big:false, fac:"mon", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179]], roads:[[70, 95], [290, 95], [290, 200]],
+   gold:210, hk:0.95, boss:null, roster:["mon", "mkn"], music:"jg", sky:"#e8e0c8",
+   intro:"1241. Mongołowie Batu-chana. Henryk Pobożny staje do heroicznej obrony!",
+   unlock:{"tower": "wil"},
+   hist:{"title": "LEGNICA 1241", "img": "hist_gr", "text": ["Mongołowie Batu-chana szli przez Europę.", "Pod Legnicą stawił im czoła Henryk Pobożny.", "Bitwa przegrana, Henryk zginął – ale najazd wyhamował.", "Heroiczna obrona kupiła Europie czas."], "fun": "Mongołowie używali dymu i forteli, by mieszać szyki rycerstwa."},
+   waves:[[["mon", 4, 1.1, 0]], [["mon", 4, 1.05, 0], ["mkn", 2, 0.96, 3]], [["mon", 5, 1.0, 0], ["mkn", 3, 0.92, 3]], [["mon", 6, 0.95, 0], ["mkn", 4, 0.88, 3]], [["mon", 7, 0.9, 0], ["mkn", 4, 0.84, 3]], [["mon", 8, 0.85, 0], ["mkn", 5, 0.8, 3]], [["mon", 9, 0.8, 0], ["mkn", 6, 0.76, 3]], [["mon", 10, 0.75, 0], ["mkn", 6, 0.72, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"plo", name:"Płowce", year:1331, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
+   gold:220, hk:0.98, boss:null, roster:["kne", "teu"], music:"gr", sky:"#d5e8d5",
+   intro:"1331. Władysław Łokietek ściera się z Krzyżakami pod Płowcami.",
+   unlock:{"tower": "bal"},
+   hist:{"title": "PŁOWCE 1331", "img": "hist_gr", "text": ["Łokietek starł się z Krzyżakami pod Płowcami.", "Bitwa zacięta – obie strony krzyczały „zwycięstwo!”.", "Dla Polski ważne: król nie został rozbity.", "Kolejny etap zmagań z zakonem."], "fun": "Łokietek był nieduży – stąd przydomek – ale miał wielki temperament!"},
+   waves:[[["kne", 4, 1.1, 0]], [["kne", 4, 1.05, 0], ["teu", 2, 0.96, 3]], [["kne", 5, 1.0, 0], ["teu", 3, 0.92, 3]], [["kne", 6, 0.95, 0], ["teu", 4, 0.88, 3]], [["kne", 7, 0.9, 0], ["teu", 4, 0.84, 3]], [["kne", 8, 0.85, 0], ["teu", 5, 0.8, 3]], [["kne", 9, 0.8, 0], ["teu", 6, 0.76, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"gru", name:"Grunwald", year:1410, big:true, fac:"teu", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230], [126, 266], [124, 296]], roads:[[40, 100], [320, 100], [320, 200], [80, 200]],
+   gold:260, hk:1.0, boss:"ulr", roster:["kne", "teu", "bra"], music:"gr", sky:"#d9ecf6",
+   intro:"15 lipca 1410. Jagiełło i Witold przeciw Krzyżakom. Dwa miecze? Dzięki, nie trzeba!",
+   unlock:{"tower": "mus", "spec": "tat", "chest": true},
+   hist:{"title": "BITWA POD GRUNWALDEM 1410", "img": "hist_gr", "text": ["15 lipca 1410 Polacy i Litwini starli się z Krzyżakami.", "Zakon przysłał dwa miecze – „żebyście mieli czym walczyć”.", "Zawisza Czarny bił się w pierwszym szeregu.", "Wielki mistrz Ulryk zginął. Zakon już nigdy nie był tak silny."], "fun": "Miecze grunwaldzkie trzymano na Wawelu. W 1795 zabrali je Prusacy."},
+   waves:[[["kne", 4, 1.1, 0]], [["kne", 5, 1.05, 0], ["teu", 3, 0.96, 3]], [["kne", 6, 1.0, 0], ["teu", 4, 0.92, 3]], [["kne", 7, 0.95, 0], ["teu", 5, 0.88, 3], ["bra", 3, 0.81, 5]], [["kne", 8, 0.9, 0], ["teu", 5, 0.84, 3], ["bra", 4, 0.78, 5]], [["kne", 9, 0.85, 0], ["teu", 6, 0.8, 3], ["bra", 4, 0.75, 5]], [["kne", 10, 0.8, 0], ["teu", 7, 0.76, 3], ["bra", 5, 0.72, 5]], [["kne", 11, 0.75, 0], ["teu", 7, 0.72, 3], ["bra", 5, 0.69, 5]], [["kne", 12, 0.7, 0], ["teu", 8, 0.68, 3], ["bra", 6, 0.66, 5]], [["kne", 13, 0.65, 0], ["teu", 9, 0.64, 3], ["bra", 6, 0.63, 5]], [["kne", 14, 0.6, 0], ["teu", 9, 0.6, 3], ["bra", 7, 0.6, 5]], [["kne", 15, 0.55, 0], ["teu", 10, 0.56, 3], ["bra", 7, 0.57, 5], ["ulr", 1, 1, 8], ["kne", 6, 0.7, 12]]],
+   bossL:{"spawn": "Zwei Schwerter für euch!", "half": "Der Orden wankt!", "low": "Zurück!", "die": "Jungingen fällt…"},
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"kor", name:"Koronowo", year:1410, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
+   gold:230, hk:1.02, boss:null, roster:["kne", "teu", "bra"], music:"gr", sky:"#d8ecd8",
+   intro:"Październik 1410. Po Grunwaldzie – jeszcze Koronowo.",
+   unlock:{"tower": "arm"},
+   hist:{"title": "KORONOWO 1410", "img": "hist_gr", "text": ["Kilka miesięcy po Grunwaldzie Krzyżacy znów uderzyli.", "Pod Koronowem znów przegrali.", "To dopięcie zwycięstwa roku 1410.", "Zakon musiał negocjować pokój."], "fun": "Koronowo bywa nazywane „drugim Grunwaldem”."},
+   waves:[[["kne", 4, 1.1, 0]], [["kne", 4, 1.05, 0], ["teu", 2, 0.96, 3]], [["kne", 5, 1.0, 0], ["teu", 3, 0.92, 3]], [["kne", 6, 0.95, 0], ["teu", 4, 0.88, 3], ["bra", 3, 0.81, 5]], [["kne", 7, 0.9, 0], ["teu", 4, 0.84, 3], ["bra", 3, 0.78, 5]], [["kne", 8, 0.85, 0], ["teu", 5, 0.8, 3], ["bra", 4, 0.75, 5]], [["kne", 9, 0.8, 0], ["teu", 6, 0.76, 3], ["bra", 4, 0.72, 5]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"ors", name:"Orsza", year:1514, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+   flags:'pl', river:true, camp:'v2', deco:'v2',
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
+   gold:240, hk:1.04, boss:null, roster:["str", "boj"], music:"ch", sky:"#e8dcc0",
+   intro:"1514. Ostrogski i Daszkiewicz biją Moskwę pod Orszą.",
+   unlock:{"tower": "rus"},
+   hist:{"title": "ORSZA 1514", "img": "hist_ch", "text": ["Wojska polsko-litewskie biły Moskwę nad Dnieprem.", "Ostrogski i Daszkiewicz rozgromili liczniejszego wroga.", "Orsza stała się dumą Rzeczypospolitej.", "Malowano ją na obrazach przez lata."], "fun": "Po Orszy wybito medal – zwycięstwo było ogromne!"},
+   waves:[[["str", 4, 1.1, 0]], [["str", 4, 1.05, 0], ["boj", 2, 0.96, 3]], [["str", 5, 1.0, 0], ["boj", 3, 0.92, 3]], [["str", 6, 0.95, 0], ["boj", 4, 0.88, 3]], [["str", 7, 0.9, 0], ["boj", 4, 0.84, 3]], [["str", 8, 0.85, 0], ["boj", 5, 0.8, 3]], [["str", 9, 0.8, 0], ["boj", 6, 0.76, 3]], [["str", 10, 0.75, 0], ["boj", 6, 0.72, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"obe", name:"Obertyn", year:1531, big:false, fac:"mol", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
+   gold:240, hk:1.05, boss:null, roster:["mol", "aza"], music:"ch", sky:"#e6d8b8",
+   intro:"1531. Hetman Tarnowski rozbija Mołdawian pod Obertynem. Tabor rządzi!",
+   unlock:{"tower": "haj"},
+   hist:{"title": "OBERTYN 1531", "img": "hist_ch", "text": ["Hetman Tarnowski ustawił tabor – wóz za wozem.", "Mołdawianie odbijali się od wozów.", "Artyleria i jazda dokończyły dzieła.", "Mistrzowski przykład użycia taboru."], "fun": "Tabor to ruchoma twierdza. Husyci też tak walczyli!"},
+   waves:[[["mol", 4, 1.1, 0]], [["mol", 4, 1.05, 0], ["aza", 2, 0.96, 3]], [["mol", 5, 1.0, 0], ["aza", 3, 0.92, 3]], [["mol", 6, 0.95, 0], ["aza", 4, 0.88, 3]], [["mol", 7, 0.9, 0], ["aza", 4, 0.84, 3]], [["mol", 8, 0.85, 0], ["aza", 5, 0.8, 3]], [["mol", 9, 0.8, 0], ["aza", 6, 0.76, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"byc", name:"Byczyna", year:1588, big:false, fac:"max", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
+   gold:250, hk:1.06, boss:null, roster:["max", "gkn"], music:"jg", sky:"#e0e4f0",
+   intro:"1588. Zamoyski bierze do niewoli Maksymiliana pod Byczyną.",
+   unlock:{"tower": "kar"},
+   hist:{"title": "BYCZYNA 1588", "img": "hist_jg", "text": ["O koronę walczył arcyksiążę Maksymilian.", "Zamoyski pokonał go pod Byczyną i wziął do niewoli.", "Wygrał Zygmunt III Waza.", "Unia z Litwą trwała dalej."], "fun": "Zamoyski traktował jeńca godnie – bo to arcyksiążę."},
+   waves:[[["max", 4, 1.1, 0]], [["max", 4, 1.05, 0], ["gkn", 2, 0.96, 3]], [["max", 5, 1.0, 0], ["gkn", 3, 0.92, 3]], [["max", 6, 0.95, 0], ["gkn", 4, 0.88, 3]], [["max", 7, 0.9, 0], ["gkn", 4, 0.84, 3]], [["max", 8, 0.85, 0], ["gkn", 5, 0.8, 3]], [["max", 9, 0.8, 0], ["gkn", 6, 0.76, 3]], [["max", 10, 0.75, 0], ["gkn", 6, 0.72, 3]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"kir", name:"Kircholm", year:1605, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[30, -25], [30, 140], [150, 140], [150, 40], [300, 40], [300, 250], [60, 250], [60, 340], [250, 340], [250, 405], [180, 420], [180, 478]], spots:[[75, 107], [60, 160], [96, 154], [126, 153], [200, 85], [106, 60], [270, 31], [258, 92], [258, 156], [252, 208], [168, 270]], roads:[[30, 140], [150, 140], [300, 250], [60, 250]],
+   gold:280, hk:1.08, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
+   intro:"1605. Chodkiewicz i husaria – mniejszość przeciw Szwedom. Kircholm!",
+   unlock:{"tower": "moz", "spec": "hus", "hero": "zol"},
+   hist:{"title": "KIRCHOLM 1605", "img": "hist_wi", "text": ["Chodkiewicz miał ok. 4 tysiące, Szwedzi – ponad 10 tysięcy.", "Husaria uderzyła jak burza.", "Krótkie, totalne zwycięstwo.", "Kircholm uczy się w szkołach kawalerii do dziś."], "fun": "Karol IX ledwo uciekł – podobno zmienił konia i zniknął!"},
+   waves:[[["pie", 4, 1.1, 0]], [["pie", 5, 1.05, 0], ["raj", 3, 0.96, 3]], [["pie", 6, 1.0, 0], ["raj", 4, 0.92, 3]], [["pie", 7, 0.95, 0], ["raj", 5, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 8, 0.9, 0], ["raj", 5, 0.84, 3], ["pan", 4, 0.78, 5]], [["pie", 9, 0.85, 0], ["raj", 6, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 10, 0.8, 0], ["raj", 7, 0.76, 3], ["pan", 5, 0.72, 5]], [["pie", 11, 0.75, 0], ["raj", 7, 0.72, 3], ["pan", 5, 0.69, 5]], [["pie", 12, 0.7, 0], ["raj", 8, 0.68, 3], ["pan", 6, 0.66, 5]], [["pie", 13, 0.65, 0], ["raj", 9, 0.64, 3], ["pan", 6, 0.63, 5]], [["pie", 14, 0.6, 0], ["raj", 9, 0.6, 3], ["pan", 7, 0.6, 5]], [["pie", 15, 0.55, 0], ["raj", 10, 0.56, 3], ["pan", 7, 0.57, 5], ["gen", 1, 1, 8], ["pie", 6, 0.7, 12]]],
+   bossL:{"spawn": "Szwedzki młot uderza!", "half": "Nie…!", "low": "Odwrót!", "die": "Szuchy…"},
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"klu", name:"Kłuszyn", year:1610, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230]], roads:[[40, 100], [320, 100], [320, 200]],
+   gold:260, hk:1.1, boss:null, roster:["str", "boj", "pan"], music:"ch", sky:"#e8d8b0",
+   intro:"1610. Żółkiewski z husarią rozbija Moskwę pod Kłuszynem.",
+   unlock:{"tower": "woz", "hero": "cho"},
+   hist:{"title": "KŁUSZYN 1610", "img": "hist_ch", "text": ["Żółkiewski z husarią uderzył na wielką armię moskiewską.", "Mniejszość pokonała większość.", "Droga na Moskwę stanęła otworem.", "Jeden z największych triumfów husarii."], "fun": "Po Kłuszynie Żółkiewski wkroczył do Moskwy."},
+   waves:[[["str", 4, 1.1, 0]], [["str", 4, 1.05, 0], ["boj", 2, 0.96, 3]], [["str", 5, 1.0, 0], ["boj", 3, 0.92, 3]], [["str", 6, 0.95, 0], ["boj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["str", 7, 0.9, 0], ["boj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["str", 8, 0.85, 0], ["boj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["str", 9, 0.8, 0], ["boj", 6, 0.76, 3], ["pan", 4, 0.72, 5]], [["str", 10, 0.75, 0], ["boj", 6, 0.72, 3], ["pan", 5, 0.69, 5]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"cec", name:"Cecora", year:1620, big:false, fac:"ott", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+   flags:'pl', river:true, camp:'v2', deco:'v2',
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
+   gold:250, hk:1.08, boss:null, roster:["aza", "jan", "sip", "tat"], music:"ch", sky:"#e8e0c8",
+   intro:"1620. Odwrót spod Cecory. Przetrwaj napór i ocal tabor!",
+   unlock:{"chest": true},
+   hist:{"title": "ODWRÓT SPOD CECORY 1620", "img": "hist_ch", "text": ["Wyprawa na Turków skończyła się klęską.", "Hetman Żółkiewski zginął, chroniąc odwrót.", "Tabor bił się do końca.", "W grze to misja przetrwania: ocal tabor."], "fun": "Żółkiewski miał ponad 70 lat. Wybrał śmierć w boju."},
+   waves:[[["aza", 4, 1.1, 0]], [["aza", 4, 1.05, 0], ["jan", 2, 0.96, 3]], [["aza", 5, 1.0, 0], ["jan", 3, 0.92, 3]], [["aza", 6, 0.95, 0], ["jan", 4, 0.88, 3], ["sip", 3, 0.81, 5]], [["aza", 7, 0.9, 0], ["jan", 4, 0.84, 3], ["sip", 3, 0.78, 5], ["tat", 2, 0.85, 6]], [["aza", 8, 0.85, 0], ["jan", 5, 0.8, 3], ["sip", 4, 0.75, 5], ["tat", 3, 0.85, 6]], [["aza", 9, 0.8, 0], ["jan", 6, 0.76, 3], ["sip", 4, 0.72, 5], ["tat", 3, 0.85, 6]], [["aza", 10, 0.75, 0], ["jan", 6, 0.72, 3], ["sip", 5, 0.69, 5], ["tat", 4, 0.85, 6]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"cho", name:"Chocim", year:1621, big:true, fac:"ott", grass:"grass_ch", fort:"fort_ch", fortW:180, fortAR:367/440,
+   flags:'pl', river:true, camp:'v2', deco:'v2',
+   path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229], [237, 261], [253, 320]], roads:[[300, 45], [90, 95], [60, 180], [250, 215]],
+   gold:300, hk:1.1, boss:"pas", roster:["aza", "jan", "sip"], music:"ch", sky:"#e8e0c8",
+   intro:"1621. Hetman Chodkiewicz broni obozu pod Chocimiem nad Dniestrem.",
+   unlock:{"spec": "ost", "hero": "kon"},
+   hist:{"title": "OBRONA CHOCIMIA 1621", "img": "hist_ch", "text": ["Ogromna armia sułtana stanęła pod Chocimiem.", "Chodkiewicz bronił obozu nad Dniestrem.", "Zmarł w trakcie obrony – obóz się ostał.", "Pokój uratował Rzeczpospolitą."], "fun": "W obozie została podobno jedna beczka prochu. Turcy też mieli dość."},
+   waves:[[["aza", 4, 1.1, 0]], [["aza", 5, 1.05, 0], ["jan", 3, 0.96, 3]], [["aza", 6, 1.0, 0], ["jan", 4, 0.92, 3]], [["aza", 7, 0.95, 0], ["jan", 5, 0.88, 3], ["sip", 3, 0.81, 5]], [["aza", 8, 0.9, 0], ["jan", 5, 0.84, 3], ["sip", 4, 0.78, 5]], [["aza", 9, 0.85, 0], ["jan", 6, 0.8, 3], ["sip", 4, 0.75, 5]], [["aza", 10, 0.8, 0], ["jan", 7, 0.76, 3], ["sip", 5, 0.72, 5]], [["aza", 11, 0.75, 0], ["jan", 7, 0.72, 3], ["sip", 5, 0.69, 5]], [["aza", 12, 0.7, 0], ["jan", 8, 0.68, 3], ["sip", 6, 0.66, 5]], [["aza", 13, 0.65, 0], ["jan", 9, 0.64, 3], ["sip", 6, 0.63, 5]], [["aza", 14, 0.6, 0], ["jan", 9, 0.6, 3], ["sip", 7, 0.6, 5]], [["aza", 15, 0.55, 0], ["jan", 10, 0.56, 3], ["sip", 7, 0.57, 5], ["pas", 1, 1, 8], ["aza", 6, 0.7, 12]]],
+   bossL:{"spawn": "Chocim będzie mój! Evet!", "half": "Aman!", "low": "Gdzie wielbłąd?!", "die": "Pokój!"},
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"gni", name:"Gniew", year:1626, big:false, fac:"swe", grass:"grass_ch", fort:"fort_ch", fortW:160, fortAR:367/440,
+   flags:'pl', river:true, camp:'v2', deco:'v2',
+   path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
+   gold:270, hk:1.12, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d0e0f0",
+   intro:"1626. Koniecpolski staje Szwedom pod Gniewem nad Wisłą.",
+   unlock:{"chest": true},
+   hist:{"title": "GNIEW 1626", "img": "hist_wi", "text": ["Szwedzi Gustawa Adolfa weszli do Prus.", "Koniecpolski starł się z nimi pod Gniewem.", "Twardy opór nad Wisłą.", "Początek wojny o ujście Wisły."], "fun": "Gustaw Adolf był mistrzem nowoczesnej armii."},
+   waves:[[["pie", 4, 1.1, 0]], [["pie", 4, 1.05, 0], ["raj", 2, 0.96, 3]], [["pie", 5, 1.0, 0], ["raj", 3, 0.92, 3]], [["pie", 6, 0.95, 0], ["raj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 7, 0.9, 0], ["raj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["pie", 8, 0.85, 0], ["raj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 9, 0.8, 0], ["raj", 6, 0.76, 3], ["pan", 4, 0.72, 5]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"trz", name:"Trzciana", year:1629, big:false, fac:"swe", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
+   gold:280, hk:1.14, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d8ecd0",
+   intro:"1629. Koniecpolski bije Szwedów pod Trzcianą.",
+   unlock:{"hero": "cza"},
+   hist:{"title": "TRZCIANA 1629", "img": "hist_wi", "text": ["Koniecpolski dogonił Szwedów pod Trzcianą.", "Polska jazda rozbiła oddziały króla.", "Gustaw Adolf omal nie trafił do niewoli.", "Droga do rozejmu w Altmarku."], "fun": "Gustaw Adolf zgubił kapelusz w ucieczce."},
+   waves:[[["pie", 4, 1.1, 0]], [["pie", 4, 1.05, 0], ["raj", 2, 0.96, 3]], [["pie", 5, 1.0, 0], ["raj", 3, 0.92, 3]], [["pie", 6, 0.95, 0], ["raj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 7, 0.9, 0], ["raj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["pie", 8, 0.85, 0], ["raj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 9, 0.8, 0], ["raj", 6, 0.76, 3], ["pan", 4, 0.72, 5]], [["pie", 10, 0.75, 0], ["raj", 6, 0.72, 3], ["pan", 5, 0.69, 5]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"och", name:"Ochmatów", year:1644, big:false, fac:"tat", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
+   gold:290, hk:1.15, boss:null, roster:["tat", "aza", "sip"], music:"ch", sky:"#ead8a8",
+   intro:"1644. Koniecpolski rozbija Tatarów pod Ochmatowem.",
+   unlock:{"hero": "kor"},
+   hist:{"title": "OCHMATÓW 1644", "img": "hist_ch", "text": ["Tatarzy poszli w głąb Ukrainy.", "Koniecpolski zaskoczył ich pod Ochmatowem.", "Stepy zobaczyły polską jazdę w sile.", "Jedno z ostatnich wielkich zwycięstw hetmana."], "fun": "Tatarzy nazywali go „gniewem Bożym”."},
+   waves:[[["tat", 4, 1.1, 0]], [["tat", 4, 1.05, 0], ["aza", 2, 0.96, 3]], [["tat", 5, 1.0, 0], ["aza", 3, 0.92, 3]], [["tat", 6, 0.95, 0], ["aza", 4, 0.88, 3], ["sip", 3, 0.81, 5]], [["tat", 7, 0.9, 0], ["aza", 4, 0.84, 3], ["sip", 3, 0.78, 5]], [["tat", 8, 0.85, 0], ["aza", 5, 0.8, 3], ["sip", 4, 0.75, 5]], [["tat", 9, 0.8, 0], ["aza", 6, 0.76, 3], ["sip", 4, 0.72, 5]], [["tat", 10, 0.75, 0], ["aza", 6, 0.72, 3], ["sip", 5, 0.69, 5]]],
+   bossL:null,
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
+ { id:"jg", name:"Jasna Góra", year:1655, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+   flags:'pl', river:false, camp:'v2', deco:'v2',
+   path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179], [111, 258], [125, 316]], roads:[[70, 95], [290, 95], [290, 200], [70, 200]],
+   gold:300, hk:1.12, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
+   intro:"1655. Potop. Przeor Kordecki: klasztoru nie oddamy!",
+   unlock:{"final": true, "chest": true},
+   hist:{"title": "OBRONA JASNEJ GÓRY 1655", "img": "hist_jg", "text": ["Potop szwedzki zalał Rzeczpospolitą.", "Klasztor bronił przeor Kordecki.", "Kilkuset obrońców przeciw armii Müllera.", "Symbol: jeszcze Polska nie zginęła."], "fun": "W „Potopie” Kmicic wysadza działo – zmyślone, ale klimat prawdziwy!"},
+   waves:[[["pie", 4, 1.1, 0]], [["pie", 5, 1.05, 0], ["raj", 3, 0.96, 3]], [["pie", 6, 1.0, 0], ["raj", 4, 0.92, 3]], [["pie", 7, 0.95, 0], ["raj", 5, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 8, 0.9, 0], ["raj", 5, 0.84, 3], ["pan", 4, 0.78, 5]], [["pie", 9, 0.85, 0], ["raj", 6, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 10, 0.8, 0], ["raj", 7, 0.76, 3], ["pan", 5, 0.72, 5]], [["pie", 11, 0.75, 0], ["raj", 7, 0.72, 3], ["pan", 5, 0.69, 5]], [["pie", 12, 0.7, 0], ["raj", 8, 0.68, 3], ["pan", 6, 0.66, 5]], [["pie", 13, 0.65, 0], ["raj", 9, 0.64, 3], ["pan", 6, 0.63, 5]], [["pie", 14, 0.6, 0], ["raj", 9, 0.6, 3], ["pan", 7, 0.6, 5]], [["pie", 15, 0.55, 0], ["raj", 10, 0.56, 3], ["pan", 7, 0.57, 5], ["gen", 1, 1, 8], ["pie", 6, 0.7, 12]]],
+   bossL:{"spawn": "Szwedzki młot uderza!", "half": "Nie…!", "low": "Odwrót!", "die": "Szuchy…"},
+   pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
 ];
-const MAPI = {}; MAPS.forEach((m,i) => MAPI[m.id] = i);
+const MAPI = Object.fromEntries(MAPS.map((m,i) => [m.id,i]));
+const BIG_IDS = MAPS.filter(m => m.big).map(m => m.id);
 const TOTAL_STARS = MAPS.length*3;
-
 // ====== ZAPIS ======
-let save = {music:true, sfx:true, speed:1, maps:{}, heroes:{}, games:0, wins:0, last:{hero:'kor', spec:'hus'}, seen:{}};
+let save = {music:true, sfx:true, speed:1, maps:{}, heroes:{}, games:0, wins:0,
+  last:{hero:'zaw', spec:'ryc', towers:['luc','smo']}, seen:{}, notice:null};
 try {
   const raw = localStorage.getItem(SAVE_KEY);
   if (raw) Object.assign(save, JSON.parse(raw));
-  else { // przeniesienie z v2 (albo v1)
-    const o = JSON.parse(localStorage.getItem(V2_KEY) || localStorage.getItem(V1_KEY) || 'null');
-    if (o) { if (o.music !== undefined) save.music = o.music; if (o.sfx !== undefined) save.sfx = o.sfx; if (o.mute) save.sfx = false; if (o.speed) save.speed = o.speed;
-      if ((o.wins|0) > 0) save.maps.jg = {stars: Math.max(1, o.bestStars|0), best: 10, wins: o.wins|0, seen: false}; }
+  else {
+    // v3 → v4: reset progress, keep audio prefs
+    const o = JSON.parse(localStorage.getItem(V3_KEY) || localStorage.getItem(V2_KEY) || 'null');
+    if (o) {
+      if (o.music !== undefined) save.music = o.music;
+      if (o.sfx !== undefined) save.sfx = o.sfx;
+      if (o.speed) save.speed = o.speed;
+      save.notice = 'Nowa kampania OBRONA POLSKI – Bohaterowie! Postęp z v3 zresetowany (ustawienia dźwięku zostawione).';
+    }
   }
+  if (!save.last) save.last = {hero:'zaw', spec:'ryc', towers:['luc','smo']};
+  if (!save.last.towers) save.last.towers = ['luc','smo'];
 } catch(e) {}
 const DBG_XP = Q.has('xp') ? +Q.get('xp') : null;
 function persist() { if (SIM) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e) {} }
-const mapRec = id => save.maps[id] || {stars:0, best:0, wins:0};
+const mapRec = id => save.maps[id] || {stars:0, best:0, wins:0, endless:0};
 const won = id => DEBUG || mapRec(id).stars > 0;
-const mapOpen = i => i === 0 || won(MAPS[i-1].id);
-const HERO_FROM = {kor:null, zaw:'jg', cho:'gr', sob:'ch'};
-const HERO_START = {kor:0, zaw:60, cho:140, sob:240};
-const TOWER_FROM = {kus:'jg', moz:'ch'};
-const SPEC_FROM = {hus:null, ost:'jg', tat:'gr'};
+const mapOpen = i => DEBUG || i === 0 || won(MAPS[i-1].id);
+const HERO_FROM = {zaw:null, zol:'kir', cho:'klu', kon:'cho', cza:'trz', kor:'och'};
+const HERO_START = {zaw:0, zol:200, cho:350, kon:500, cza:700, kor:900};
+const TOWER_FROM = {luc:null, smo:null, kus:'glo', wil:'leg', bal:'plo', mus:'gru', arm:'kor', rus:'ors', haj:'obe', kar:'byc', moz:'kir', woz:'klu'};
+const SPEC_FROM = {ryc:null, tat:'gru', hus:'kir', ost:'cho'};
 const heroOpen = h => !HERO_FROM[h] || won(HERO_FROM[h]);
 const towerOpen = k => !TOWER_FROM[k] || won(TOWER_FROM[k]);
 const specOpen = k => !SPEC_FROM[k] || won(SPEC_FROM[k]);
 function heroData(id) {
   let d = save.heroes[id];
-  if (!d) d = save.heroes[id] = {xp: HERO_START[id], st:[0,0,0]};
+  if (!d) d = save.heroes[id] = {xp: HERO_START[id]||0, st:[0,0,0]};
   if (DBG_XP !== null && !d.dbg) { d.xp = DBG_XP; d.dbg = true; }
   return d;
 }
 const heroLvl = id => levelOf(heroData(id).xp);
-const heroPts = id => heroLvl(id) - 1 - heroData(id).st.reduce((a,b) => a+b, 0);
-const mapName = id => MAPS[MAPI[id]].name;
+const heroPts = id => Math.max(0, heroLvl(id) - 1 - heroData(id).st.reduce((a,b) => a+b, 0));
+const mapName = id => (MAPS[MAPI[id]]||{}).name || id;
+function loadoutTowers() {
+  const t = (save.last && save.last.towers) || ['luc','smo'];
+  return t.filter(towerOpen).slice(0,4);
+}
 
 // ====== DŹWIĘK (WebAudio) ======
 const AU = {ctx:null, sfxBus:null, musBus:null, noise:null, last:{}};
@@ -471,16 +549,18 @@ const F = () => FACT[M.fac];
 
 // ====== STAN GRY ======
 let S;
-let PICK = {hero:'kor', spec:'hus'};
+let PICK = {hero:'zaw', spec:'ryc', towers:['luc','smo']};
+let ENDLESS = false;
 function newGame() {
-  const sp = SPECS[PICK.spec] || SPECS.hus;
+  const sp = SPECS[PICK.spec] || SPECS.ryc;
+  const towers = (PICK.towers && PICK.towers.length) ? PICK.towers.slice(0,4) : loadoutTowers();
   S = {gold: DEBUG ? 5000 : M.gold, lives:START_LIVES, wave:0, time:0, queue:[], enemies:[], towers:[], proj:[], parts:[], floats:[],
-       hussars:[], tatars:[], corpses:[], bubbles:[], decals:[], countdown:null, cdArmed:false, paid:true,
-       spec: PICK.spec, specLeft: sp.uses, charge:0, aiming:false,
+       hussars:[], tatars:[], knights:[], corpses:[], bubbles:[], decals:[], countdown:null, cdArmed:false, paid:true,
+       spec: PICK.spec, specLeft: sp.uses, charge:0, aiming:false, loadout: towers,
        over:false, result:null, shake:0, fortFlash:0, selected:null, banner:null, running:false, paused:false,
        speed:save.speed || 1, kills:0, bossStep:0, tracers:[], beams:[], nextChat:6, lastCry:-9, lastGate:-99, lastFlee:-9, lastSlow:-9,
-       xp:0, prayT:0, hero:null};
-  makeHero(PICK.hero);
+       xp:0, prayT:0, hero:null, endless:ENDLESS, endlessWave:0};
+  makeHero(PICK.hero || 'zaw');
   closeMenu();
 }
 
@@ -500,20 +580,39 @@ function say(text, kind, o, dy, prio) {
 }
 function towerHead(t) { return t.gy - 14; }
 
+function endlessWaveDef(w) {
+  const roster = M.roster, boss = M.boss;
+  const n = Math.min(40, 8 + Math.floor(w*1.6));
+  const iv = Math.max(.28, .9 - w*0.02);
+  const wave = [[roster[0], Math.ceil(n*0.5), iv, 0]];
+  if (roster[1]) wave.push([roster[1], Math.ceil(n*0.3), iv*1.1, 2]);
+  if (roster[2]) wave.push([roster[2], Math.ceil(n*0.2), iv*1.2, 4]);
+  if (w % 10 === 0 && boss) wave.push([boss, 1, 1, 6]);
+  return wave;
+}
 function startWave(early) {
-  if (S.wave >= WAVES.length || S.over) return;
+  if (S.over) return;
+  if (!S.endless && S.wave >= WAVES.length) return;
   if (early && S.countdown !== null) {
     const bonus = Math.ceil(S.countdown)*2;
     if (bonus > 0) { S.gold += bonus; floatT(180, FORT.y + 50, '+'+bonus+' zł za odwagę!', '#ffe14d', 14); sfx('coin'); }
   }
   S.wave++; S.countdown = null; S.cdArmed = true; S.paid = false;
   const w = S.wave;
-  for (const [type, n0, iv0, delay] of WAVES[w-1]) { const n = ET[type].boss ? n0 : Math.round(n0*CM), iv = iv0/CM; for (let i = 0; i < n; i++) S.queue.push({t: S.time + delay + i*iv, type, w}); }
+  const def = S.endless ? endlessWaveDef(w) : WAVES[w-1];
+  const hkEnd = S.endless ? (1 + (w-1)*0.08) : 1;
+  for (const [type, n0, iv0, delay] of def) {
+    const n = ET[type].boss ? n0 : Math.round(n0*CM), iv = iv0/CM;
+    for (let i = 0; i < n; i++) S.queue.push({t: S.time + delay + i*iv, type, w, hkMul: hkEnd});
+  }
   S.queue.sort((a,b) => a.t - b.t);
-  if (w === WAVES.length) banner('Fala '+w+' – OSTATNIA!', 'Nadciąga ' + ET[M.boss].name + '!');
-  else banner('Fala '+w, WAVES[w-1].map(g=>ET[g[0]].name).filter((v,i,a)=>a.indexOf(v)===i).join(' · '));
+  if (!S.endless && w === WAVES.length && M.boss) banner('Fala '+w+' – OSTATNIA!', 'Nadciąga ' + ET[M.boss].name + '!');
+  else if (S.endless && w % 10 === 0) banner('Ostatni bastion – fala '+w, 'Mini-boss!');
+  else banner((S.endless?'Bastion · ':'')+'Fala '+w, def.map(g=>ET[g[0]].name).filter((v,i,a)=>a.indexOf(v)===i).join(' · '));
   say(pick(w === 1 ? M.pl : M.pl.concat(PL.wave)), 'fort', FORT_SPOT, 0, true);
   S.waveShout = true; S.nextChat = Math.max(S.nextChat, 4);
+  // hero return after resting through a wave
+  if (S.hero && S.hero.restUntilWave != null && S.wave > S.hero.restUntilWave) heroReturn();
   sfx('horn');
 }
 function banner(text, sub, t=2.2) { S.banner = {text, sub, t, max:t}; }
@@ -526,9 +625,9 @@ function smoke(x, y, n, size=8, col='#e8e4dc') {
   for (let i = 0; i < n && S.parts.length < 350; i++) S.parts.push({x:x+rnd(-6,6), y:y+rnd(-6,6), vx:rnd(-15,15), vy:rnd(-30,-5), life:rnd(.5,.9), max:.9, color:col, size:rnd(.6,1.2)*size, grav:0, kind:'smoke'});
 }
 
-function spawn(type, w) {
-  const T = ET[type], hp = Math.round(T.hp * (T.boss ? BOSSK : HP_SCALE(w)) * M.hk);
-  const e = {type, hp, max:hp, d:-OFF-20, lane:T.boss?0:rnd(-7,7), x:0, y:0, face:1, slowT:0, slowA:0, stunT:0, flash:0, seed:Math.random()*10, dead:false, said:0};
+function spawn(type, w, hkMul) {
+  const T = ET[type], hp = Math.round(T.hp * (T.boss ? BOSSK : HP_SCALE(w)) * M.hk * (hkMul||1));
+  const e = {type, hp, max:hp, d:-OFF-20, lane:T.boss?0:rnd(-7,7), x:0, y:0, face:1, slowT:0, slowA:0, stunT:0, flash:0, seed:Math.random()*10, dead:false, said:0, roadSlow:0};
   const p = posAt(e.d); e.x = p.x; e.y = p.y;
   S.enemies.push(e);
   if (T.boss) { S.shake = 12; sfx('boss'); banner(T.name.toUpperCase() + '!', 'Zatrzymaj go przed bramą!', 2.5); e.sayAt = 1.5; }
@@ -583,15 +682,20 @@ function towerGeom(t) {
   const w = TW[t.type][t.lvl], img = IMG['t_'+t.type+t.lvl], h = img && img.width ? w*img.height/img.width : w*1.2;
   t.w = w; t.h = h; t.by = t.y + 13; t.gy = t.by - h*(1 - TOPF[t.type][t.lvl]);
 }
-function build(i, type) {
-  if (S.over || S.towers.some(t => t.spot === i) || !towerOpen(type)) return false;
+function build(i, type, onRoad) {
+  if (S.over || !towerOpen(type)) return false;
+  if (S.loadout && !S.loadout.includes(type)) return false;
+  const road = !!TT[type].road;
+  if (road !== !!onRoad) return false;
+  const key = onRoad ? ('r'+i) : i;
+  if (S.towers.some(t => t.spot === key)) return false;
   const c = TT[type].cost[0]; if (S.gold < c) return false;
   S.gold -= c;
-  const [x, y] = SPOTS[i];
-  const t = {spot:i, x, y, type, lvl:0, cd:.2, ang:-Math.PI/2, anim:0, spent:c, pop:1, seed:Math.random()*6};
+  const [x, y] = onRoad ? (M.roads[i] || PATH[Math.min(PATH.length-2, i+1)]) : SPOTS[i];
+  const t = {spot:key, x, y, type, lvl:0, cd:.2, ang:-Math.PI/2, anim:0, spent:c, pop:1, seed:Math.random()*6, onRoad:!!onRoad};
   towerGeom(t); S.towers.push(t);
   burst(x, y, '#e8d5a8', 14, 90, 3, .5); smoke(x, y+6, 5, 7); sfx('build');
-  if (S.towers.length === 1 || Math.random() < .3) say(pick(PL.build.concat(PL.tower[type])), 'pl', {x:t.x, y:towerHead(t)}, 0, false);
+  if (S.towers.length === 1 || Math.random() < .3) say(pick(PL.build.concat(PL.tower[type]||[])), 'pl', {x:t.x, y:towerHead(t)}, 0, false);
   return true;
 }
 function upgrade(t) {
@@ -620,12 +724,13 @@ function useSpec() {
 function spendSpec() { S.specLeft--; S.charge = S.specLeft > 0 ? SPECS[S.spec].cd : 0; }
 function fireSpec(x, y) {
   const sp = SPECS[S.spec], fe = frontEnemy();
-  if (S.spec === 'hus') {
+  if (S.spec === 'hus' || S.spec === 'ryc') {
     spendSpec();
-    const dmg = 90 + 25*S.wave;
-    for (let i = 0; i < 6; i++) S.hussars.push({d: PLEN + i*26, hit: new Set(), dmg, lane: (i%2 ? 7 : -7), seed: i*1.3});
-    banner('SZARŻA HUSARII!', S.specLeft ? `Zostało szarż: ${S.specLeft}/${sp.uses}` : 'To była ostatnia szarża!', 1.6); S.shake = 6; sfx('charge');
-    say(pick(F().hus), 'sw', fe || FORT_SPOT, fe ? ET[fe.type].h + 4 : 0, true);
+    const dmg = (S.spec === 'hus' ? 90 : 70) + 25*S.wave;
+    const n = S.spec === 'hus' ? 6 : 5;
+    for (let i = 0; i < n; i++) S.hussars.push({d: PLEN + i*26, hit: new Set(), dmg, lane: (i%2 ? 7 : -7), seed: i*1.3, kind: S.spec});
+    banner(S.spec === 'hus' ? 'SZARŻA HUSARII!' : 'SZARŻA RYCERSTWA!', S.specLeft ? `Zostało: ${S.specLeft}/${sp.uses}` : 'Ostatnia szarża!', 1.6); S.shake = 6; sfx('charge');
+    say(pick(F()[S.spec] || F().hus), 'sw', fe || FORT_SPOT, fe ? ET[fe.type].h + 4 : 0, true);
     S.husShout = 0.9;
   } else if (S.spec === 'ost') {
     spendSpec(); S.aiming = false;
@@ -649,17 +754,35 @@ function fireSpec(x, y) {
 // ====== BOHATER ======
 function heroStats(id) {
   const B = HEROES[id], d = heroData(id), L = heroLvl(id), [s, k, u] = d.st;
-  return {hp: Math.round(B.hp*(1 + .08*(L-1))*(1 + .12*k)), dmg: Math.round(B.dmg*(1 + .07*(L-1))*(1 + .1*s)), power: 1 + .15*u + .03*(L-1),
-          abCd: Math.round(B.abCd*(1 - .06*u)), lvl: L, tier: tierOf(L)};
+  // uncapped: each point = +2% to that stat (shown as %)
+  return {hp: Math.round(B.hp*(1 + .08*(L-1))*(1 + .02*k)), dmg: Math.round(B.dmg*(1 + .07*(L-1))*(1 + .02*s)), power: 1 + .02*u + .03*(L-1),
+          abCd: Math.max(4, Math.round(B.abCd*(1 - .015*u))), lvl: L, tier: tierOf(L),
+          pctS: s*2, pctK: k*2, pctU: u*2};
 }
 function makeHero(id) {
-  if (!HEROES[id] || !heroOpen(id)) id = 'kor';
+  if (!HEROES[id] || !heroOpen(id)) id = 'zaw';
   const st = heroStats(id), p = posAt(PLEN - 95);
-  S.hero = {id, x: p.x, y: p.y, rx: p.x, ry: p.y, tx: null, ty: null, hp: st.hp, ...st, max: st.hp, cd: 0, dead: false, respawn: 0,
+  S.hero = {id, x: p.x, y: p.y, rx: p.x, ry: p.y, tx: null, ty: null, hp: st.hp, ...st, max: st.hp, cd: 0, dead: false, limp: false, restUntilWave: null,
             face: 1, anim: 0, walk: 0, eng: [], abT: 8, sel: false, idle: 0, xp0: heroData(id).xp, nextLine: 12};
+}
+function heroLimp() {
+  const h = S.hero; if (!h || h.limp) return;
+  h.limp = true; h.dead = true; h.sel = false; h.restUntilWave = S.wave === 0 ? 1 : S.wave; // ≥1 pełna fala
+  for (const e of h.eng) e.blockBy = null; h.eng = [];
+  h.tx = FORT_SPOT.x; h.ty = FORT_SPOT.y + 20;
+  banner(HEROES[h.id].name + ' ranny!', 'Odpoczywa w twierdzy ≥1 falę', 2.2);
+  heroSay('Do twierdzy…', true); sfx('hurt');
+}
+function heroReturn() {
+  const h = S.hero; if (!h || !h.limp) return;
+  h.limp = false; h.dead = false; h.restUntilWave = null;
+  const st = heroStats(h.id); h.max = st.hp; h.hp = st.hp; h.dmg = st.dmg; h.power = st.power;
+  const p = posAt(PLEN - 95); h.x = p.x; h.y = p.y; h.rx = p.x; h.ry = p.y; h.tx = null; h.ty = null;
+  banner(HEROES[h.id].name + ' wraca!', 'Znów w szeregu', 1.8); heroSay(pick(HEROES[h.id].lines), true); sfx('horn');
 }
 function heroSay(text, prio) { const h = S.hero; if (h && !h.dead) say(text, 'hero', h, 44, prio); }
 function gainXp(n) {
+  if (S.endless) n *= 0.35;
   S.xp += n;
   const h = S.hero; if (!h || SIM_NOXP) return;
   const L = levelOf(h.xp0 + S.xp);
@@ -707,9 +830,13 @@ function updateHero(dt) {
   const h = S.hero; if (!h) return;
   if (h.abT > 0) h.abT = Math.max(0, h.abT - dt);
   if (h.anim > 0) h.anim -= dt*4;
-  if (h.dead) {
-    h.respawn -= dt;
-    if (h.respawn <= 0) { h.dead = false; h.hp = h.max; h.x = h.rx; h.y = h.ry; h.tx = null; burst(h.x, h.y - 20, '#fff6b0', 18, 90, 3, .7); heroSay(HEROES[h.id].back, true); sfx('up'); }
+  if (h.limp || h.dead) {
+    // limping toward fort
+    if (h.tx != null) {
+      const dx = h.tx - h.x, dy = h.ty - h.y, l = Math.hypot(dx, dy);
+      if (l < 4) { h.tx = null; h.x = FORT_SPOT.x; h.y = FORT_SPOT.y + 20; }
+      else { const v = Math.min(l, 40*dt); h.x += dx/l*v; h.y += dy/l*v; }
+    }
     return;
   }
   const B = HEROES[h.id];
@@ -761,9 +888,9 @@ function updateHero(dt) {
   if (hurt > 0) { h.hp -= hurt*dt; h.idle = 0; }
   else { h.idle += dt; if (h.idle > 3 && h.hp < h.max) h.hp = Math.min(h.max, h.hp + h.max*.06*dt); }
   if (h.hp <= 0) {
-    h.dead = true; h.hp = 0; h.respawn = 11; for (const e of h.eng) e.blockBy = null; h.eng = []; h.sel = false;
-    smoke(h.x, h.y, 6, 9); say(B.die, 'hero', {x:h.x, y:h.y}, 30, true); sfx('lose');
-    S.corpses.push({hero: true, id: h.id, tier: h.tier, x: h.x, y: h.y, face: h.face, t: 0, mode: 'fall', dur: 1.4, dir: -h.face, seed: 0});
+    h.hp = 0;
+    smoke(h.x, h.y, 6, 9); say(B.die, 'hero', {x:h.x, y:h.y}, 30, true);
+    heroLimp();
   }
   // gadanie
   h.nextLine -= dt;
@@ -776,7 +903,7 @@ function update(dt) {
   S.time += dt;
   if (S.charge > 0) S.charge = Math.max(0, S.charge - dt);
   if (S.prayT > 0) S.prayT -= dt;
-  while (S.queue.length && S.queue[0].t <= S.time) { const q = S.queue.shift(); spawn(q.type, q.w); }
+  while (S.queue.length && S.queue[0].t <= S.time) { const q = S.queue.shift(); spawn(q.type, q.w, q.hkMul); }
   if (S.cdArmed && !S.queue.length) { S.cdArmed = false; if (S.wave < WAVES.length) S.countdown = CD_BETWEEN; }
   if (S.countdown !== null) { S.countdown -= dt; if (S.countdown <= 0) startWave(false); }
 
@@ -787,6 +914,32 @@ function update(dt) {
     if (e.slowT > 0) e.slowT -= dt;
     if (e.flash > 0) e.flash -= dt;
     if (e.stunT > 0) { e.stunT -= dt; continue; }
+    // Wilcze doły / hajducy / wóz na drodze
+    for (const t of S.towers) {
+      if (!TT[t.type].road && !TT[t.type].block) continue;
+      if (Math.hypot(e.x - t.x, e.y - t.y) > (towerStat(t,'range')||20)) continue;
+      if (TT[t.type].road) {
+        // slow + DoT, no OHKO; pits have no HP drain from enemies in v4 simple form
+        e.slowT = Math.max(e.slowT, 0.6); e.slowA = Math.max(e.slowA, towerStat(t,'slow')||.3);
+        if (!e._wilT || S.time - e._wilT > 0.45) { e._wilT = S.time; damage(e, towerStat(t,'dmg')*.35, 'smo'); }
+      } else if (TT[t.type].block && !ET[e.type].boss) {
+        if (!t.thp) t.thp = TT[t.type].hp[t.lvl];
+        if (t.thp > 0 && !e.blockBy) { e.blockBy = t; t.eng = (t.eng||[]); if (!t.eng.includes(e)) t.eng.push(e); }
+      }
+    }
+    if (e.blockBy && e.blockBy !== S.hero) {
+      const bl = e.blockBy;
+      if (bl.dead || (bl.thp !== undefined && bl.thp <= 0)) { e.blockBy = null; }
+      else {
+        e.face = bl.x < e.x ? -1 : 1;
+        // enemy damages blocker
+        if (bl.thp !== undefined) {
+          bl.thp -= T.atk * dt;
+          if (bl.thp <= 0) { floatT(bl.x, bl.y-20, 'Zniszczone!', '#ff6b6b', 12); S.towers.splice(S.towers.indexOf(bl),1); e.blockBy=null; smoke(bl.x,bl.y,8); }
+        }
+        continue;
+      }
+    }
     if (e.blockBy && (e.blockBy.dead || e.blockBy !== S.hero)) e.blockBy = null;
     if (e.blockBy) { e.face = e.blockBy.x < e.x ? -1 : 1; continue; }
     e.d += T.spd * (e.slowT > 0 ? 1 - e.slowA : 1) * dt;
@@ -809,6 +962,7 @@ function update(dt) {
     t.cd -= dt * (pray ? 1.5 : 1); if (t.anim > 0) t.anim -= dt*4; if (t.pop > 0) t.pop = Math.max(0, t.pop - dt*2.5);
     const R = towerStat(t, 'range');
     t.busy = false;
+    if (t.type === 'wil') { t.busy = S.enemies.some(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R); continue; }
     if (t.type === 'smo') {
       if (t.cd <= 0) {
         const inR = S.enemies.filter(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R);
@@ -823,6 +977,31 @@ function update(dt) {
           if (S.time - S.lastSlow > 14 && Math.random() < .25) { const e = inR.find(e => !e.dead && !ET[e.type].boss); if (e) { S.lastSlow = S.time; say(pick(F().slow), 'sw', e, ET[e.type].h + 4, false); } }
         }
       } else t.busy = S.enemies.some(e => !e.dead && Math.hypot(e.x-t.x, e.y-t.y) <= R);
+      continue;
+    }
+    if (t.type === 'haj') {
+      t.eng = (t.eng||[]).filter(e => !e.dead && e.blockBy === t);
+      if (t.cd <= 0 && t.eng.length) {
+        t.cd = towerStat(t,'rate'); t.anim = 1; const e = t.eng[0];
+        damage(e, towerStat(t,'dmg'), 'hero'); burst(e.x, e.y-10, '#fff', 3, 50, 2, .2); sfx('slash');
+      }
+      t.busy = t.eng.length > 0; continue;
+    }
+    if (t.type === 'woz') {
+      t.eng = (t.eng||[]).filter(e => !e.dead && e.blockBy === t);
+      // melee on blockers + ranged shot
+      if (t.cd <= 0) {
+        let best = t.eng[0] || null;
+        if (!best) for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-t.x,e.y-t.y)<=R && (!best||e.d>best.d)) best=e;
+        if (best) {
+          t.cd = towerStat(t,'rate'); t.anim = 1; t.busy = true;
+          if (t.eng.includes(best)) { damage(best, towerStat(t,'dmg'), 'hero'); sfx('slash'); }
+          else {
+            S.tracers.push({x1:t.x, y1:t.gy, x2:best.x, y2:best.y-10, life:.1, max:.1, w:1.5, col:'90,60,30'});
+            damage(best, towerStat(t,'dmg')*.7, 'kus'); sfx('shot');
+          }
+        }
+      } else t.busy = t.eng.length > 0;
       continue;
     }
     let best = null;
@@ -843,10 +1022,16 @@ function update(dt) {
           S.tracers.push({x1:mx, y1:my, x2:best.x, y2:best.y-10, life:.08, max:.08, w:2, col:'255,240,160'});
           damage(best, towerStat(t,'dmg'), 'mus'); burst(best.x, best.y-10, '#fff1a8', 3, 60, 2, .2); sfx('shot');
           smoke(mx, my, 1, 5);
-        } else if (t.type === 'kus') {
+        } else if (t.type === 'luc' || t.type === 'kus' || t.type === 'bal') {
           const kx = t.x + Math.cos(t.ang)*10, ky = t.gy + Math.sin(t.ang)*10;
-          S.tracers.push({x1:kx, y1:ky, x2:best.x, y2:best.y-12, life:.12, max:.12, w:1.6, col:'90,60,30'});
-          damage(best, towerStat(t,'dmg'), 'kus'); burst(best.x, best.y-12, '#d9c29a', 3, 50, 2, .2); sfx('twang');
+          const col = t.type==='bal' ? '60,40,20' : '90,60,30';
+          S.tracers.push({x1:kx, y1:ky, x2:best.x, y2:best.y-12, life: t.type==='bal'?.16:.12, max:.16, w: t.type==='bal'?2.4:1.6, col});
+          damage(best, towerStat(t,'dmg'), t.type==='luc'?'mus':'kus'); burst(best.x, best.y-12, '#d9c29a', 3, 50, 2, .2); sfx(t.type==='luc'?'arrow':'twang');
+        } else if (t.type === 'kar') {
+          const dmg = towerStat(t,'dmg'), splash = towerStat(t,'splash');
+          S.tracers.push({x1:mx, y1:my, x2:best.x, y2:best.y-10, life:.1, max:.1, w:4, col:'255,200,100'});
+          for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-best.x, e.y-best.y) <= splash) damage(e, dmg, 'arm');
+          burst(best.x, best.y-10, '#ff9a1a', 12, 100, 3, .35); smoke(mx, my, 3, 6); sfx('boom'); S.shake = Math.max(S.shake, 1.5);
         } else if (t.type === 'rus') {
           const rx = t.x + Math.cos(t.ang)*22, ry = t.gy + Math.sin(t.ang)*22;
           S.tracers.push({x1:rx, y1:ry, x2:best.x, y2:best.y-12, life:.16, max:.16, w:3, col:'255,200,120'});
@@ -901,7 +1086,7 @@ function update(dt) {
     if (Math.random() < .3) S.parts.push({x:p.x+rnd(-8,8), y:p.y+8, vx:rnd(-10,10), vy:rnd(-20,-5), life:.5, max:.5, color:'#d9c08a', size:6, grav:0, kind:'smoke'});
     if (Math.random() < .12) S.parts.push({x:h.x+rnd(-6,6), y:h.y-30, vx:rnd(-20,20), vy:rnd(-10,10), life:.9, max:.9, color:'#ffffff', size:2.4, grav:30, kind:'feather'});
   }
-  if (S.husShout !== undefined) { S.husShout -= dt; if (S.husShout <= 0) { S.husShout = undefined; const lead = S.hussars.find(h => h.x !== undefined && h.d <= PLEN); if (lead) say(pick(PL.hus), 'hus', lead, 44, true); } }
+  if (S.husShout !== undefined) { S.husShout -= dt; if (S.husShout <= 0) { S.husShout = undefined; const lead = S.hussars.find(h => h.x !== undefined && h.d <= PLEN); if (lead) say(pick(PL[lead.kind||'hus']||PL.hus), 'hus', lead, 44, true); } }
   S.hussars = S.hussars.filter(h => h.d > -40);
   // Tatarzy (lipkowie w służbie Rzeczypospolitej)
   for (const r of S.tatars) {
@@ -933,11 +1118,15 @@ function update(dt) {
   // koniec fali
   if (!S.paid && !S.queue.length && !S.enemies.length && S.wave > 0 && !S.over) {
     S.paid = true;
-    gainXp(10);
-    if (S.wave >= WAVES.length) endGame(true);
+    gainXp(S.endless ? 4 : 10);
+    if (!S.endless && S.wave >= WAVES.length) endGame(true);
     else {
       const b = 15 + S.wave*3; S.gold += b; floatT(180, 250, 'Fala odparta! +'+b+' zł', '#7dff6a', 16, 1.6); sfx('coin');
       if (S.towers.length) { const t = pick(S.towers); say(pick(['Odparci!','Chwała Bogu!'].concat(M.pl)), 'pl', {x:t.x, y:towerHead(t)}, 0, true); }
+      if (S.endless) {
+        const rec = Object.assign({stars:0, best:0, wins:0, endless:0}, save.maps[M.id]);
+        if (S.wave > (rec.endless||0)) { rec.endless = S.wave; save.maps[M.id] = rec; persist(); }
+      }
     }
   }
   updateFx(dt);
@@ -968,19 +1157,27 @@ let LAST = null; // wynik ostatniej bitwy (do ekranów końcowych)
 function endGame(win) {
   if (S.over) return;
   S.over = true; S.result = win ? 'win' : 'lose';
-  const stars = win ? (S.lives >= 17 ? 3 : S.lives >= 10 ? 2 : 1) : 0;
+  const stars = (!S.endless && win) ? (S.lives >= 17 ? 3 : S.lives >= 10 ? 2 : 1) : 0;
   S.stars = stars;
-  const rec = Object.assign({stars:0, best:0, wins:0}, save.maps[M.id]);
-  const first = win && !(rec.stars > 0);
-  rec.stars = Math.max(rec.stars, stars); rec.best = Math.max(rec.best, win ? WAVES.length : S.wave - 1); if (win) rec.wins++;
-  if (win) gainXp(50 + 25*stars);
+  const rec = Object.assign({stars:0, best:0, wins:0, endless:0}, save.maps[M.id]);
+  const first = !S.endless && win && !(rec.stars > 0);
+  if (!S.endless) {
+    rec.stars = Math.max(rec.stars, stars); rec.best = Math.max(rec.best, win ? WAVES.length : Math.max(0, S.wave - 1)); if (win) rec.wins++;
+  } else {
+    rec.endless = Math.max(rec.endless||0, Math.max(0, S.wave - (win?0:1)));
+  }
+  if (win && !S.endless) gainXp(50 + 25*stars);
   const h = S.hero, before = h ? levelOf(h.xp0) : 1;
   if (h && !SIM_NOXP) { const d = heroData(h.id); d.xp = Math.round(h.xp0 + S.xp); }
   save.maps[M.id] = rec;
-  if (win) save.wins = (save.wins|0) + 1;
+  if (win && !S.endless) save.wins = (save.wins|0) + 1;
   save.games = (save.games|0) + 1;
-  // nowe postaci dostają startowe doświadczenie przy odblokowaniu
-  if (first && M.unlock.hero) heroData(M.unlock.hero);
+  if (first) {
+    const u = M.unlock || {};
+    if (u.hero) heroData(u.hero);
+    if (u.tower) { save.seen = save.seen || {}; save.seen['t_'+u.tower] = false; }
+    if (u.spec) { save.seen = save.seen || {}; save.seen['s_'+u.spec] = false; }
+  }
   persist();
   LAST = {win, stars, first, map: M.id, xp: S.xp, hero: h && h.id, lvlFrom: before, lvlTo: h ? levelOf(heroData(h.id).xp) : 1};
   sfx(win ? 'win' : 'lose');
@@ -1256,7 +1453,7 @@ function drawTower(c, t, time) {
   c.restore();
   if (t.pray) { c.globalAlpha = .5 + Math.sin(time*6)*.2; star(c, x + w*.4, by - t.h + 4, 3, '#fff3a0'); c.globalAlpha = 1; }
   // proporczyk na wieży
-  if (type !== 'smo' && type !== 'moz') {
+  if (type !== 'smo' && type !== 'moz' && type !== 'wil') {
     const fx = x - w*.42, fy = by - t.h*(type === 'rus' ? .97 : type === 'arm' ? .62 : type === 'kus' ? .95 : .9);
     flag(c, fx, fy, 10 + lvl*2, 6 + lvl, time + t.seed, ['#ffffff', '#e02b2b']);
   }
@@ -1390,10 +1587,19 @@ function render() {
   const hint = S.towers.length === 0 && S.running;
   SPOTS.forEach(([x, y], i) => {
     if (S.towers.some(tw => tw.spot === i)) return;
-    if (S.selected && S.selected.spot === i && !S.selected.tower) { c.strokeStyle = '#fff3c4'; c.lineWidth = 2.5; c.beginPath(); c.ellipse(x, y, 19, 9.5, 0, 0, 7); c.stroke(); }
+    if (S.selected && S.selected.spot === i && !S.selected.tower && !S.selected.onRoad) { c.strokeStyle = '#fff3c4'; c.lineWidth = 2.5; c.beginPath(); c.ellipse(x, y, 19, 9.5, 0, 0, 7); c.stroke(); }
     if (hint) { const k = (at*1.2) % 1; c.strokeStyle = 'rgba(255,240,120,' + (1-k) + ')'; c.lineWidth = 3; c.beginPath(); c.ellipse(x, y, 18 + k*10, 9 + k*5, 0, 0, 7); c.stroke(); }
     c.fillStyle = 'rgba(90,75,50,.75)'; c.font = '900 12px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('+', x, y + .5);
   });
+  // pola na drodze (Wilcze doły / bloker) – tylko gdy ekwipunek ma road-tower
+  if (S.loadout && S.loadout.some(k => TT[k].road || TT[k].block)) {
+    (M.roads||[]).forEach(([x, y], i) => {
+      if (S.towers.some(tw => tw.spot === 'r'+i)) return;
+      c.fillStyle = 'rgba(40,25,10,.55)'; c.beginPath(); c.ellipse(x, y, 14, 7, 0, 0, 7); c.fill();
+      c.strokeStyle = 'rgba(255,200,80,.7)'; c.lineWidth = 1.5; c.setLineDash([3,2]); c.beginPath(); c.ellipse(x, y, 14, 7, 0, 0, 7); c.stroke(); c.setLineDash([]);
+      c.fillStyle = '#ffe14d'; c.font = '900 11px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⬇', x, y + .5);
+    });
+  }
   // zasięg zaznaczonej wieży
   const selT = S.selected && S.selected.tower;
   if (selT) { const R = towerStat(selT, 'range'); c.fillStyle = 'rgba(255,255,255,.14)'; c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath(); c.arc(selT.x, selT.y, R, 0, 7); c.fill(); c.stroke(); c.setLineDash([]); }
@@ -1489,21 +1695,21 @@ function placeMenu(x, y, above) {
   menu.style.left = left + 'px'; menu.style.top = top + 'px';
 }
 function closeMenu() { if (menu) menu.classList.add('hidden'); if (S) S.selected = null; }
-function openBuild(i) {
-  S.selected = {spot: i};
+function openBuild(i, onRoad) {
+  S.selected = {spot: i, onRoad: !!onRoad};
   menu.className = 'build';
-  const keys = TKEYS.filter(towerOpen);
-  // Fit inside the map frame: wrapping grid, max width = canvas - margins.
+  const keys = (S.loadout || loadoutTowers()).filter(k => !!TT[k].road === !!onRoad);
+  if (!keys.length) { sfx('click'); return; }
   const maxW = Math.max(200, cv.offsetWidth - 16), n = keys.length;
-  const cols = n <= 2 ? n : n === 4 ? 2 : 3; // 1–2 row, 4 → 2×2, 3/5/6 → 3-col wrap
+  const cols = n <= 2 ? n : n === 4 ? 2 : 3;
   menu.style.width = Math.min(maxW, 14 + cols * 102) + 'px';
-  menu.innerHTML = '<div class="opts" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))">' + keys.map(k => `<button class="opt" data-k="${k}"><img src="${timg(k,0)}" alt=""><span class="n">${TT[k].name}</span><span class="c">${TT[k].cost[0]} zł</span></button>`).join('') + '</div><div class="hint" id="optHint">Wybierz wieżę</div>';
+  menu.innerHTML = '<div class="opts" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))">' + keys.map(k => `<button class="opt" data-k="${k}"><img src="${timg(k,0)}" alt=""><span class="n">${TT[k].name}</span><span class="c">${TT[k].cost[0]} zł</span></button>`).join('') + '</div><div class="hint" id="optHint">'+(onRoad?'Na drodze':'Wybierz broń z ekwipunku')+'</div>';
   menu.querySelectorAll('.opt').forEach(b => {
     b.addEventListener('pointerenter', () => { $('optHint').textContent = TT[b.dataset.k].desc; });
     b.addEventListener('click', ev => { ev.stopPropagation(); audioInit();
-      if (build(i, b.dataset.k)) closeMenu(); else { sfx('click'); bumpGold(); $('optHint').textContent = TT[b.dataset.k].desc; } });
+      if (build(i, b.dataset.k, onRoad)) closeMenu(); else { sfx('click'); bumpGold(); $('optHint').textContent = TT[b.dataset.k].desc; } });
   });
-  refreshMenu(); placeMenu(SPOTS[i][0], SPOTS[i][1]);
+  refreshMenu(); placeMenu(onRoad ? M.roads[i][0] : SPOTS[i][0], onRoad ? M.roads[i][1] : SPOTS[i][1]);
 }
 function openTower(tw) {
   S.selected = {spot: tw.spot, tower: tw};
@@ -1529,13 +1735,15 @@ function tapAt(x, y) {
   if (!S.running || S.over || S.paused) return;
   if (S.aiming) { fireSpec(x, y); return; }
   const h = S.hero;
-  if (h && !h.dead && Math.hypot(h.x - x, (h.y - 14) - y) < 26) { closeMenu(); h.sel = !h.sel; sfx('click'); if (h.sel && Math.random() < .5) heroSay(pick(HEROES[h.id].lines)); return; }
+  if (h && !h.limp && !h.dead && Math.hypot(h.x - x, (h.y - 14) - y) < 26) { closeMenu(); h.sel = !h.sel; sfx('click'); if (h.sel && Math.random() < .5) heroSay(pick(HEROES[h.id].lines)); return; }
   const tw = S.towers.slice().sort((a, b) => b.by - a.by).find(t => (Math.abs(x - t.x) < t.w*.5 && y < t.by && y > t.by - t.h) || Math.hypot(t.x - x, t.y - y) < 22);
   const i = SPOTS.findIndex(s => Math.hypot(s[0] - x, s[1] - y) < 24);
+  const ri = (M.roads||[]).findIndex(s => Math.hypot(s[0] - x, s[1] - y) < 22);
   if (h && h.sel && !tw) { closeMenu(); heroMove(x, y); return; }
   if (h) h.sel = false;
   if (tw) { sfx('click'); openTower(tw); return; }
-  if (i >= 0 && !S.towers.some(t => t.spot === i)) { sfx('click'); openBuild(i); return; }
+  if (ri >= 0 && !S.towers.some(t => t.spot === 'r'+ri) && (S.loadout||[]).some(k => TT[k].road)) { sfx('click'); openBuild(ri, true); return; }
+  if (i >= 0 && !S.towers.some(t => t.spot === i)) { sfx('click'); openBuild(i, false); return; }
   closeMenu();
 }
 cv.addEventListener('pointerdown', ev => {
@@ -1546,8 +1754,9 @@ cv.addEventListener('pointerdown', ev => {
 $('stage').addEventListener('pointerdown', ev => { if (ev.target === $('stage')) closeMenu(); });
 $('btnWave').addEventListener('click', () => { audioInit(); if (!S.running || S.over || S.paused) return; if (S.wave === 0 || S.countdown !== null) startWave(true); });
 $('btnSpec').addEventListener('click', () => { audioInit(); if (!S.paused) useSpec(); });
-$('btnHero').addEventListener('click', () => { audioInit(); if (S.paused) return; const h = S.hero; if (!h || h.dead) return;
-  if (!heroAbility()) { h.sel = !h.sel; sfx('click'); } });
+$('btnHero').addEventListener('click', () => { audioInit(); if (S.paused) return; const h = S.hero; if (!h) return;
+  if (h.limp) { if (h.restUntilWave != null && S.wave > h.restUntilWave) heroReturn(); else { sfx('click'); banner('Bohater odpoczywa', 'Wróci po pełnej fali', 1.4); } return; }
+  if (h.dead) return; if (!heroAbility()) { h.sel = !h.sel; sfx('click'); } });
 $('btnSpeed').addEventListener('click', () => { audioInit(); sfx('click'); S.speed = S.speed === 1 ? 2 : 1; save.speed = S.speed; persist(); syncSettings(); });
 $('btnPause').addEventListener('click', () => { audioInit(); sfx('click'); setPause(true); });
 
@@ -1596,74 +1805,125 @@ function resetProgress() {
   const b = $('setReset');
   if (Date.now() - resetAsk > 3500) { resetAsk = Date.now(); b.classList.add('ask'); b.querySelector('span').textContent = '❓ Na pewno? Dotknij jeszcze raz'; sfx('click');
     setTimeout(() => { if (Date.now() - resetAsk >= 3400) { b.classList.remove('ask'); b.querySelector('span').textContent = '🗑️ Reset postępu'; } }, 3600); return; }
-  resetAsk = 0; save.maps = {}; save.heroes = {}; save.games = 0; save.wins = 0; save.last = {hero:'kor', spec:'hus'}; save.seen = {}; persist();
+  resetAsk = 0; save.maps = {}; save.heroes = {}; save.games = 0; save.wins = 0; save.last = {hero:'zaw', spec:'ryc', towers:['luc','smo']}; save.seen = {}; persist();
   b.classList.remove('ask'); b.querySelector('span').textContent = '✅ Postęp wyzerowany'; sfx('lose'); renderCamp(); renderBestLine();
 }
 const starsHtml = n => [0,1,2].map(i => `<span class="${i < n ? 'on' : ''}">★</span>`).join('');
 function totalStars() { return MAPS.reduce((a, m) => a + (mapRec(m.id).stars|0), 0); }
 function renderRecords() {
-  $('recMaps').innerHTML = MAPS.map((m, i) => { const r = mapRec(m.id); return `<div class="recm"><span>${mapOpen(i) ? m.name + ' ' + m.year : '🔒 ???'}</span><span class="st">${starsHtml(r.stars)}</span></div>`; }).join('');
+  $('recMaps').innerHTML = MAPS.map((m, i) => { const r = mapRec(m.id); const e = r.endless|0; return `<div class="recm"><span>${mapOpen(i) ? m.name + ' ' + m.year : '🔒 ???'}${e?` · bastion ${e}`:''}</span><span class="st">${starsHtml(r.stars)}</span></div>`; }).join('');
   $('recWins').textContent = save.wins|0;
   $('recGames').textContent = save.games|0;
 }
 function renderBestLine() {
   const t = totalStars();
-  $('bestLine').innerHTML = save.games ? `Kampania: <span class="st">★ ${t}/${TOTAL_STARS}</span> · bitwy wygrane: ${MAPS.filter(m => mapRec(m.id).stars > 0).length}/${MAPS.length}` : 'Cztery wielkie bitwy czekają!';
+  $('bestLine').innerHTML = save.games ? `Kampania: <span class="st">★ ${t}/${TOTAL_STARS}</span> · bitwy: ${MAPS.filter(m => mapRec(m.id).stars > 0).length}/${MAPS.length}` : 'Szesnaście bitew o Polskę czeka!';
 }
 
 // ---- mapa kampanii ----
-const NODE_POS = {jg:[52,44], gr:[45,25], ch:[78,85], wi:[22,85]};
+function windPath(pts) {
+  // winding old-map road between nodes (quadratic bends)
+  if (!pts.length) return '';
+  let d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i-1], b = pts[i];
+    const mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+    const dx = b[0]-a[0], dy = b[1]-a[1];
+    const side = (i%2 ? 1 : -1);
+    const cx = mx - dy*0.18*side, cy = my + dx*0.18*side;
+    d += ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1);
+  }
+  return d;
+}
 function renderCamp() {
   $('campStars').textContent = '★ ' + totalStars() + '/' + TOTAL_STARS;
-  const pts = MAPS.map(m => NODE_POS[m.id]);
-  $('routePath').setAttribute('d', 'M' + pts.map(p => p.join(' ')).join(' L'));
+  const unlocked = [];
+  for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) unlocked.push(NODE_POS[MAPS[i].id]);
+  // draw road only through opened chain
+  const roadPts = [];
+  for (let i = 0; i < MAPS.length; i++) {
+    if (!mapOpen(i) && !won(MAPS[i].id) && i > 0) break;
+    roadPts.push(NODE_POS[MAPS[i].id]);
+    if (!won(MAPS[i].id) && i > 0) break; // stop after first open-but-not-won
+  }
+  if (roadPts.length < 2) roadPts.push(...MAPS.slice(0,2).map(m => NODE_POS[m.id]));
+  $('routePath').setAttribute('d', windPath(roadPts));
+  $('routePath').classList.add('draw');
   $('nodes').innerHTML = MAPS.map((m, i) => {
     const op = mapOpen(i), r = mapRec(m.id), w = r.stars > 0, [x, y] = NODE_POS[m.id];
-    return `<button class="node ${w ? 'won' : op ? 'open' : 'lock'}" data-i="${i}" style="left:${x}%;top:${y}%"><div class="ring">${op ? m.year : '🔒'}</div><div class="nm">${op ? m.name : '???'}</div><div class="st">${op ? starsHtml(r.stars) : ''}</div></button>`;
+    const end = (r.endless|0) > 0 ? `<div class="endb">Bastion ${r.endless}</div>` : '';
+    return `<button class="node ${m.big?'big':''} ${w ? 'won' : op ? 'open' : 'lock'}" data-i="${i}" style="left:${x}%;top:${y}%"><div class="ring">${op ? m.year : '🔒'}</div><div class="nm">${op ? m.name : '???'}</div><div class="st">${op ? starsHtml(r.stars) : ''}</div>${end}</button>`;
   }).join('');
   $('nodes').querySelectorAll('.node').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); audioInit(); const i = +b.dataset.i;
     if (mapOpen(i)) openPrep(i); else { sfx('click'); b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300}); } }));
 }
-let prepI = 0;
-function openPrep(i) {
-  prepI = i; const m = MAPS[i];
-  PICK.hero = heroOpen(save.last.hero) ? save.last.hero : 'kor'; PICK.spec = specOpen(save.last.spec) ? save.last.spec : 'hus';
-  $('prepTitle').textContent = m.name; $('prepYear').textContent = 'rok ' + m.year; $('prepIntro').textContent = m.intro;
+let prepI = 0, prepEndless = false;
+function openPrep(i, endless) {
+  prepI = i; prepEndless = !!endless; const m = MAPS[i];
+  const last = save.last || {};
+  PICK.hero = heroOpen(last.hero) ? last.hero : 'zaw';
+  PICK.spec = specOpen(last.spec) ? last.spec : 'ryc';
+  PICK.towers = (last.towers || ['luc','smo']).filter(towerOpen).slice(0,4);
+  if (PICK.towers.length < 1) PICK.towers = ['luc','smo'].filter(towerOpen);
+  $('prepTitle').textContent = m.name + (prepEndless ? ' · Ostatni bastion' : '');
+  $('prepYear').textContent = 'rok ' + m.year; $('prepIntro').textContent = prepEndless
+    ? ('Ostatni bastion: nieskończone fale na mapie ' + m.name + '. Mini-boss co 10 fal. Rekord: fala ' + (mapRec(m.id).endless||0) + '.')
+    : m.intro;
+  const endBtn = $('prepEndless');
+  if (endBtn) { endBtn.classList.toggle('hidden', !won(m.id)); endBtn.classList.toggle('sel', prepEndless); }
   renderPrep(); openPanel('prep');
+}
+function toggleTowerPick(k) {
+  if (!towerOpen(k)) return renderPrep(`🔒 ${TT[k].name} – odblokujesz po bitwie: ${mapName(TOWER_FROM[k])}.`);
+  const arr = PICK.towers.slice();
+  const ix = arr.indexOf(k);
+  if (ix >= 0) { if (arr.length <= 1) return renderPrep('Zostaw przynajmniej 1 broń.'); arr.splice(ix,1); }
+  else {
+    if (arr.length >= 4) return renderPrep('Maks. 4 bronie w ekwipunku – odznacz inną.');
+    arr.push(k);
+    if (save.seen) save.seen['t_'+k] = true;
+  }
+  PICK.towers = arr; renderPrep();
 }
 function renderPrep(hint) {
   $('pickHero').innerHTML = HKEYS.map(k => { const op = heroOpen(k);
     return `<button class="pk ${op ? '' : 'lock'} ${PICK.hero === k ? 'sel' : ''}" data-h="${k}"><img src="${himg(k, op ? heroTier(k) : 0)}" alt="">${op ? '' : '<span class="lk">🔒</span>'}${HEROES[k].short}<small>${op ? 'poz. ' + heroLvl(k) : '&nbsp;'}</small></button>`; }).join('');
-  $('pickSpec').innerHTML = SKEYS.map(k => { const op = specOpen(k);
-    return `<button class="pk ${op ? '' : 'lock'} ${PICK.spec === k ? 'sel' : ''}" data-s="${k}"><img src="${iimg(SPECS[k].img)}" alt="">${op ? '' : '<span class="lk">🔒</span>'}${SPECS[k].name}<small>${SPECS[k].uses}×</small></button>`; }).join('');
-  $('prepHint').textContent = hint || `${HEROES[PICK.hero].short}: ${HEROES[PICK.hero].ab}. ${SPECS[PICK.spec].name}: ${SPECS[PICK.spec].desc}`;
+  $('pickSpec').innerHTML = SKEYS.map(k => { const op = specOpen(k); const neu = save.seen && save.seen['s_'+k] === false;
+    return `<button class="pk ${op ? '' : 'lock'} ${PICK.spec === k ? 'sel' : ''} ${neu?'new':''}" data-s="${k}"><img src="${iimg(SPECS[k].img)}" alt="">${op ? '' : '<span class="lk">🔒</span>'}${SPECS[k].name}<small>${SPECS[k].uses}×</small></button>`; }).join('');
+  const pt = $('pickTowers');
+  if (pt) {
+    pt.innerHTML = TKEYS.map(k => { const op = towerOpen(k), on = PICK.towers.includes(k), neu = save.seen && save.seen['t_'+k] === false;
+      return `<button class="pk ${op?'':'lock'} ${on?'sel':''} ${neu?'new':''}" data-t="${k}"><img src="${timg(k,0)}" alt="">${op?'':'<span class="lk">🔒</span>'}${TT[k].name}<small>${on?'✓ w ekwip.':(op?TT[k].cost[0]+' zł':'&nbsp;')}</small></button>`; }).join('');
+    pt.querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); toggleTowerPick(b.dataset.t); }));
+  }
+  $('prepHint').textContent = hint || `${HEROES[PICK.hero].short} · ${SPECS[PICK.spec].name} · bronie: ${PICK.towers.map(k=>TT[k].name).join(', ')} (${PICK.towers.length}/4)`;
   $('pickHero').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); const k = b.dataset.h;
     if (!heroOpen(k)) return renderPrep(`🔒 ${HEROES[k].name} – odblokujesz, wygrywając bitwę: ${mapName(HERO_FROM[k])}.`);
     PICK.hero = k; renderPrep(); }));
   $('pickSpec').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); const k = b.dataset.s;
     if (!specOpen(k)) return renderPrep(`🔒 ${SPECS[k].name} – odblokujesz, wygrywając bitwę: ${mapName(SPEC_FROM[k])}.`);
-    PICK.spec = k; renderPrep(); }));
+    PICK.spec = k; if (save.seen) save.seen['s_'+k] = true; renderPrep(); }));
 }
 
 // ---- bohaterowie ----
-let heroTab = 'kor';
-const STN = [['Siła', 'obrażenia +10%'], ['Krzepa', 'zdrowie +12%'], ['Umiejętność', 'mocniejsza i częstsza moc']];
+let heroTab = 'zaw';
+const STN = [['Siła', 'obrażenia +2% / pkt'], ['Krzepa', 'zdrowie +2% / pkt'], ['Umiejętność', 'moc +2% / pkt']];
 function renderHeroes() {
   $('hTabs').innerHTML = HKEYS.map(k => `<button class="pk ${heroOpen(k) ? '' : 'lock'} ${heroTab === k ? 'sel' : ''}" data-h="${k}"><img src="${himg(k, heroOpen(k) ? heroTier(k) : 0)}" alt="">${HEROES[k].short}</button>`).join('');
   $('hTabs').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); heroTab = b.dataset.h; renderHeroes(); }));
   const k = heroTab, B = HEROES[k], op = heroOpen(k);
   if (!op) { $('hBody').innerHTML = `<div class="hb"><img src="${himg(k,0)}" alt="" style="filter:grayscale(1) brightness(.5)"><div><h3>${B.name}</h3><div class="hdesc">${B.desc}</div><div class="hlock">🔒 Odblokujesz, wygrywając bitwę: <b>${mapName(HERO_FROM[k])}</b>.</div></div></div>`; return; }
   const d = heroData(k), L = heroLvl(k), st = heroStats(k), pts = heroPts(k), T = tierOf(L);
-  const lo = XPNEED[L-1], hi = L >= 10 ? lo : XPNEED[L], pct = L >= 10 ? 100 : Math.round((d.xp - lo)/(hi - lo)*100);
-  $('hBody').innerHTML = `<div class="hb"><img src="${himg(k, T)}" alt=""><div style="flex:1"><h3>${B.name}</h3><div class="lv">Poziom ${L}/10 · ${B.ranged ? 'walczy z daleka' : 'walczy wręcz'}</div>
-      <div class="xpb"><i style="width:${pct}%"></i></div><div class="hdesc">${L >= 10 ? 'Maksymalny poziom!' : 'Doświadczenie: ' + d.xp + ' / ' + hi}<br>❤ ${st.hp} · ⚔ ${st.dmg}</div></div></div>
+  const lo = XPNEED[L-1]||0, hi = L >= 30 ? lo : (XPNEED[L]||lo+1), pct = L >= 30 ? 100 : Math.round((d.xp - lo)/Math.max(1,hi - lo)*100);
+  $('hBody').innerHTML = `<div class="hb"><img src="${himg(k, T)}" alt=""><div style="flex:1"><h3>${B.name}</h3><div class="lv">Poziom ${L}/30 · ${B.ranged ? 'walczy z daleka' : 'walczy wręcz'}</div>
+      <div class="xpb"><i style="width:${pct}%"></i></div><div class="hdesc">${L >= 30 ? 'Maksymalny poziom!' : 'Doświadczenie: ' + d.xp + ' / ' + hi}<br>❤ ${st.hp} · ⚔ ${st.dmg} · Siła +${st.pctS||0}% · Krzepa +${st.pctK||0}% · Um. +${st.pctU||0}%</div></div></div>
     <div class="pts">${pts > 0 ? 'Punkty do wydania: ' + pts : 'Brak wolnych punktów – zdobywaj poziomy w bitwach!'}</div>
-    ${STN.map(([n, s], i) => `<div class="srow"><span><b>${n}</b> <small>${s}</small></span><span class="dots">${'●'.repeat(d.st[i])}${'○'.repeat(3 - d.st[i])}</span><button data-st="${i}" ${pts > 0 && d.st[i] < 3 ? '' : 'disabled'}>+</button></div>`).join('')}
+    ${STN.map(([n, s], i) => `<div class="srow"><span><b>${n}</b> <small>${s} (teraz +${(d.st[i]||0)*2}%)</small></span><span class="dots">${d.st[i]||0}</span><button data-st="${i}" ${pts > 0 && d.st[i] < MAX_STAT ? '' : 'disabled'}>+</button></div>`).join('')}
     <div class="abil"><b>Moc: ${B.ab}</b> – ${B.abDesc} (co ${st.abCd} s)</div>
     <div class="tiers">${[0,1,2,3].map(t => `<div class="${t <= T ? '' : 'no'} ${t === T ? 'cur' : ''}"><img src="${himg(k,t)}" alt=""><br>poz. ${TIER_LV[t]}</div>`).join('')}</div>
     <div class="hdesc" style="margin-top:4px">${B.tiers[T]}${T < 3 ? ' → na poz. ' + TIER_LV[T+1] + ': ' + B.tiers[T+1] : ''}</div>`;
   $('hBody').querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); const i = +b.dataset.st;
-    if (heroPts(k) > 0 && d.st[i] < 3) { d.st[i]++; persist(); sfx('up'); renderHeroes(); } }));
+    if (heroPts(k) > 0 && d.st[i] < MAX_STAT) { d.st[i]++; persist(); sfx('up'); renderHeroes(); } }));
 }
 
 // ---- odblokowania, historia, kronika ----
@@ -1673,7 +1933,7 @@ function renderUnlock(m) {
   if (u.tower) it.push(`<div class="ul"><img src="${timg(u.tower,0)}" alt=""><div><b>Nowa wieża: ${TT[u.tower].name}</b><small>${TT[u.tower].desc}</small></div></div>`);
   if (u.spec) it.push(`<div class="ul"><img src="${iimg(SPECS[u.spec].img)}" alt=""><div><b>Nowy atak: ${SPECS[u.spec].name}</b><small>${SPECS[u.spec].desc}</small></div></div>`);
   if (MAPS[i+1]) it.push(`<div class="ul"><span class="ic">🗺️</span><div><b>Nowa bitwa: ${MAPS[i+1].name} ${MAPS[i+1].year}</b><small>Czeka na mapie kampanii.</small></div></div>`);
-  if (u.final) it.push(`<div class="ul"><span class="ic">🏆</span><div><b>Kampania ukończona!</b><small>Obroniłeś Polskę w czterech wielkich bitwach. Zbierz wszystkie gwiazdki – ${totalStars()}/${TOTAL_STARS}!</small></div></div>`);
+  if (u.final) it.push(`<div class="ul"><span class="ic">🏆</span><div><b>Kampania ukończona!</b><small>Obroniłeś Polskę! Zbierz gwiazdki – ${totalStars()}/${TOTAL_STARS}. Spróbuj Ostatniego bastionu!</small></div></div>`);
   $('unlockList').innerHTML = it.map((s, k) => s.replace('class="ul"', `class="ul" style="animation-delay:${k*.15}s"`)).join('');
   $('unlock').querySelector('h2').textContent = u.final ? 'Zwycięstwo!' : 'Odblokowano!';
 }
@@ -1706,22 +1966,64 @@ document.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click',
   else if (a === 'settings') openPanel('pSettings');
   else if (a === 'records') openPanel('pRecords');
   else if (a === 'how') openPanel('pHow');
-  else if (a === 'heroes') { heroTab = heroOpen(heroTab) ? heroTab : 'kor'; openPanel('pHeroes'); }
+  else if (a === 'heroes') { heroTab = heroOpen(heroTab) ? heroTab : 'zaw'; openPanel('pHeroes'); }
   else if (a === 'chron') openPanel('pChron');
   else if (a === 'back') closePanel(b.closest('.panel').id);
   else if (a === 'resume') { audioInit(); sfx('click'); setPause(false); }
   else if (a === 'menu') goTitle();
   else if (a === 'leave' || a === 'camp') { sfx('click'); goCamp(); }
   else if (a === 'again') startBattle(M.id);
-  else if (a === 'fight') { save.last = {hero: PICK.hero, spec: PICK.spec}; persist(); startBattle(MAPS[prepI].id); }
+  else if (a === 'fight') { ENDLESS = prepEndless; save.last = {hero: PICK.hero, spec: PICK.spec, towers: PICK.towers.slice(0,4)}; persist(); startBattle(MAPS[prepI].id); }
+  else if (a === 'endless') { prepEndless = !prepEndless; openPrep(prepI, prepEndless); }
+  else if (a === 'bastion') { sfx('click'); ENDLESS = true; $('hist').classList.add('hidden'); openPrep(MAPI[LAST.map], true); }
   else if (a === 'next') { sfx('click'); afterWin(); }
   else if (a === 'unext') { $('unlock').classList.add('hidden'); showHist(LAST.map, false); }
-  else if (a === 'hnext') { sfx('click'); if (histFromChron) { closePanel('hist'); openPanel('pChron'); } else goCamp(); }
+  else if (a === 'hnext') { sfx('click'); if (histFromChron) { closePanel('hist'); openPanel('pChron'); } else if (LAST && LAST.win && !LAST._bastionShown) { LAST._bastionShown = true; showBastionChoice(); } else goCamp(); }
   else if (a === 'reset') resetProgress();
   else if (a === 'music' || a === 'sfx' || a === 'speed') toggle(a);
 }));
 
+function showBastionChoice() {
+  // After history: Dalej (camp) | Ostatni bastion
+  $('hist').classList.add('hidden');
+  $('endTitle').textContent = 'Co dalej?';
+  $('end').classList.remove('lose');
+  $('stars').innerHTML = '';
+  $('endText').innerHTML = `Bitwa <b>${MAPS[MAPI[LAST.map]].name}</b> za tobą.<br>Wróć na mapę albo zostań bronić w <b>Ostatnim bastionie</b> (nieskończone fale).`;
+  $('endXp').innerHTML = '';
+  $('endNext').classList.add('hidden');
+  const again = $('end').querySelector('[data-act="again"]');
+  again.classList.add('hidden');
+  let row = $('bastionRow');
+  if (!row) {
+    row = document.createElement('div'); row.id = 'bastionRow'; row.className = 'brow';
+    row.innerHTML = `<button class="mbtn play" data-act="camp">Dalej</button><button class="mbtn play gold" data-act="bastion">Ostatni bastion</button>`;
+    $('end').querySelector('.card')?.appendChild(row) || $('end').appendChild(row);
+    row.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', ev => {
+      ev.stopPropagation(); const a = b.dataset.act;
+      if (a === 'camp') { row.classList.add('hidden'); again.classList.remove('hidden'); goCamp(); }
+      if (a === 'bastion') { row.classList.add('hidden'); again.classList.remove('hidden'); ENDLESS = true; openPrep(MAPI[LAST.map], true); }
+    }));
+  }
+  row.classList.remove('hidden');
+  closeMenu(); show('end');
+}
 function showEnd(win, stars) {
+  const bastionRow = $('bastionRow'); if (bastionRow) bastionRow.classList.add('hidden');
+  $('end').querySelector('[data-act="again"]').classList.remove('hidden');
+  if (S.endless) {
+    $('endTitle').textContent = 'OSTATNI BASTION';
+    $('end').classList.add('lose');
+    $('stars').innerHTML = '';
+    const best = mapRec(M.id).endless || 0;
+    $('endText').innerHTML = `Doszedłeś do fali <b>${Math.max(0,S.wave-(win?0:1))}</b>.<br>Rekord na tej mapie: <b>${best}</b>.`;
+    const L = LAST || {};
+    $('endXp').innerHTML = L.hero ? `${HEROES[L.hero].short}: +${Math.round(L.xp)} XP` : '';
+    $('endNext').classList.add('hidden');
+    $('end').querySelector('[data-act="again"]').classList.add('play');
+    $('end').querySelector('[data-act="again"]').classList.remove('small');
+    closeMenu(); show('end'); return;
+  }
   $('endTitle').textContent = win ? 'ZWYCIĘSTWO!' : 'PORAŻKA';
   $('end').classList.toggle('lose', !win);
   $('stars').innerHTML = [0,1,2].map(i => `<span class="${i < stars ? 'on' : ''}" style="animation-delay:${.3 + i*.35}s">★</span>`).join('');
@@ -1729,7 +2031,7 @@ function showEnd(win, stars) {
     ? `${pick(PL.win)} Bitwa wygrana: <b>${M.name} ${M.year}</b>!<br>Zostało <b>${S.lives}</b> ❤ · pokonani wrogowie: <b>${S.kills}</b>.<br>${stars < 3 ? 'Strać mniej żyć, a zdobędziesz 3 gwiazdki!' : 'Perfekcyjna obrona!'}`
     : `Wróg wdarł się za mury w fali <b>${S.wave}</b>.<br>Ulepszaj wieże, ustaw bohatera na drodze i oszczędzaj atak specjalny!`;
   const L = LAST || {};
-  $('endXp').innerHTML = L.hero ? `${HEROES[L.hero].short}: +${L.xp} XP${L.lvlTo > L.lvlFrom ? ` · <span class="up">awans na poziom ${L.lvlTo}!</span>${tierOf(L.lvlTo) > tierOf(L.lvlFrom) ? ' Nowa zbroja!' : ''}` : ''}` : '';
+  $('endXp').innerHTML = L.hero ? `${HEROES[L.hero].short}: +${Math.round(L.xp)} XP${L.lvlTo > L.lvlFrom ? ` · <span class="up">awans na poziom ${L.lvlTo}!</span>${tierOf(L.lvlTo) > tierOf(L.lvlFrom) ? ' Nowa zbroja!' : ''}` : ''}` : '';
   $('endNext').classList.toggle('hidden', !win);
   $('end').querySelector('[data-act="again"]').classList.toggle('play', !win);
   $('end').querySelector('[data-act="again"]').classList.toggle('small', win);
@@ -1740,12 +2042,12 @@ const last = {};
 function setTxt(id, v) { if (last[id] !== v) { last[id] = v; $(id).textContent = v; } }
 function setCls(el, c, on) { if (el.classList.contains(c) !== !!on) el.classList.toggle(c, !!on); }
 function ui() {
-  setTxt('gold', String(S.gold)); setTxt('lives', String(S.lives)); setTxt('wave', `${S.wave}/${WAVES.length}`);
+  setTxt('gold', String(S.gold)); setTxt('lives', String(S.lives)); setTxt('wave', S.endless ? `${S.wave}∞` : `${S.wave}/${WAVES.length}`);
   const bw = $('btnWave');
   let lbl, sub, en;
   if (S.wave === 0) { lbl = '▶ Fala 1'; sub = 'zaczynamy?'; en = S.running; }
   else if (S.countdown !== null) { const b = Math.ceil(S.countdown)*2; lbl = `▶ Fala ${S.wave+1}`; sub = `+${b} zł · za ${Math.ceil(S.countdown)} s`; en = true; }
-  else if (S.wave >= WAVES.length) { lbl = 'Ostatnia fala!'; sub = `wrogów: ${S.enemies.length + S.queue.length}`; en = false; }
+  else if (!S.endless && S.wave >= WAVES.length) { lbl = 'Ostatnia fala!'; sub = `wrogów: ${S.enemies.length + S.queue.length}`; en = false; }
   else { lbl = 'Fala trwa…'; sub = `wrogów: ${S.enemies.length + S.queue.length}`; en = false; }
   setTxt('waveLbl', lbl); setTxt('waveSub', sub);
   en = en && !S.over && !S.paused;
@@ -1764,10 +2066,12 @@ function ui() {
   const h = S.hero, hb = $('btnHero');
   if (h) {
     const src = himg(h.id, h.tier); if (last.heroImg !== src) { last.heroImg = src; $('heroImg').src = src; }
-    const rd = !h.dead && h.abT <= 0 && S.running && !S.over;
-    setCls(hb, 'ready', rd); setCls(hb, 'dead', h.dead);
-    $('heroFill').style.height = (h.dead ? 100 : h.abT / h.abCd * 100) + '%';
-    setTxt('heroSub', h.dead ? `wraca ${Math.ceil(h.respawn)} s` : h.abT > 0 ? `${HEROES[h.id].ab.split(' ')[0]} ${Math.ceil(h.abT)} s` : HEROES[h.id].ab.split(' ')[0] + '!');
+    const limp = !!h.limp;
+    const canRet = limp && h.restUntilWave != null && S.wave > h.restUntilWave;
+    const rd = !h.dead && !limp && h.abT <= 0 && S.running && !S.over;
+    setCls(hb, 'ready', rd || canRet); setCls(hb, 'dead', h.dead || limp);
+    $('heroFill').style.height = (limp || h.dead ? 100 : h.abT / h.abCd * 100) + '%';
+    setTxt('heroSub', limp ? (canRet ? 'WRÓĆ ▶' : 'odpoczywa…') : h.abT > 0 ? `${HEROES[h.id].ab.split(' ')[0]} ${Math.ceil(h.abT)} s` : HEROES[h.id].ab.split(' ')[0] + '!');
   }
   setTxt('btnSpeed', 'x' + S.speed);
   refreshMenu();
@@ -1793,7 +2097,13 @@ window.addEventListener('resize', () => { if (started) { fit(); closeMenu(); } }
 function boot() {
   newGame(); fit(); started = true; syncSettings(); renderBestLine(); renderCamp();
   document.body.classList.remove('loading');
-  if (Q.has('autostart')) { const id = Q.get('map') || 'jg'; if (Q.get('hero')) PICK.hero = Q.get('hero'); if (Q.get('spec')) PICK.spec = Q.get('spec'); startBattle(id); }
+  if (save.notice) { const n = save.notice; save.notice = null; persist(); setTimeout(() => alert(n), 200); }
+  if (Q.has('autostart')) {
+    const id = Q.get('map') || 'glo'; if (Q.get('hero')) PICK.hero = Q.get('hero'); if (Q.get('spec')) PICK.spec = Q.get('spec');
+    if (Q.get('towers')) PICK.towers = Q.get('towers').split(',');
+    ENDLESS = Q.has('endless');
+    startBattle(id);
+  }
   else if (Q.has('camp')) goCamp();
   else { show('title'); document.body.classList.add('onTitle'); }
   requestAnimationFrame(frame);
@@ -1812,7 +2122,8 @@ window.TD = {
   build: (i, k) => build(i, k), upgrade: i => upgrade(S.towers.find(t => t.spot === i)), next: () => startWave(true),
   spec: (x, y) => { if (S.spec === 'ost') { if (!S.aiming) useSpec(); return fireSpec(x ?? 180, y ?? 250); } return useSpec(); },
   husaria: () => useSpec(),
-  start: (id, hero, spec) => { if (hero) PICK.hero = hero; if (spec) PICK.spec = spec; startBattle(id || 'jg'); },
+  start: (id, hero, spec) => { if (hero) PICK.hero = hero; if (spec) PICK.spec = spec; ENDLESS=false; startBattle(id || 'glo'); },
+  bastion: (id) => { ENDLESS=true; startBattle(id || M.id); },
   sim(sec, cb) { SIM = true; const n = Math.round(sec*60); for (let i = 0; i < n && !S.over; i++) { update(1/60); if (cb) cb(S); } SIM = false; return {wave:S.wave, lives:S.lives, gold:S.gold, over:S.over, result:S.result, specLeft:S.specLeft, hero: S.hero && {lvl:S.hero.lvl, dead:S.hero.dead, hp:S.hero.hp}}; },
   win: (stars=3) => { S.lives = stars >= 3 ? 20 : stars === 2 ? 12 : 5; S.wave = WAVES.length; endGame(true); },
   lose: () => { S.lives = 0; endGame(false); },
@@ -1820,7 +2131,7 @@ window.TD = {
   giveXp: (id, n) => { heroData(id).xp += n; persist(); },
   hero: () => S.hero, moveHero: (x, y) => heroMove(x, y), ability: () => heroAbility(), tap: (x, y) => tapAt(x, y),
   toScreen: (x, y) => { const r = cv.getBoundingClientRect(); return [r.left + x/W*r.width, r.top + (y + OFF)/VH*r.height]; },
-  camp: goCamp, prep: i => openPrep(i), heroes: id => { heroTab = id || 'kor'; openPanel('pHeroes'); }, hist: id => showHist(id, true), chron: () => openPanel('pChron'),
+  camp: goCamp, prep: i => openPrep(i), heroes: id => { heroTab = id || 'zaw'; openPanel('pHeroes'); }, hist: id => showHist(id, true), chron: () => openPanel('pChron'),
   cov: i => { const [sx, sy] = SPOTS[i]; let c = 0; for (let d = 0; d < PLEN; d += 8) { const q = posAt(d); if (Math.hypot(q.x - sx, q.y - sy) < 85) c++; } return c; },
   open: k => towerOpen(k),
   setSpeed: n => { S.speed = n; }, openTower: i => openTower(S.towers.find(t => t.spot === i)), openBuild, pause: setPause, goTitle,
