@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.6';
+const V = '4.7';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -2204,6 +2204,8 @@ function renderCamp() {
   });
 }
 let chapterI = 0;
+let prepI = 0;
+let prepEndless = false;
 function openChapter(ci) {
   audioInit(); sfx('click');
   chapterI = ci;
@@ -2226,24 +2228,46 @@ function openChapter(ci) {
     const r = mapRec(id);
     const isBoss = id === ch.boss;
     const wonB = r.stars > 0;
-    const cls = ['chNode', isBoss ? 'boss' : '', wonB ? 'won' : op ? 'open' : 'lock'].filter(Boolean).join(' ');
+    const cls = ['chNode', isBoss ? 'boss' : '', wonB ? 'won' : '', op ? 'open' : 'lock'].filter(Boolean).join(' ');
     const ring = op ? (isBoss ? '⚔' : String(j + 1)) : (isBoss ? '⚔' : '🔒');
     const st = op ? `<span class="cst">${starsHtml(r.stars)}</span>` : '';
     const sub = isBoss ? 'Wielka bitwa' : 'Potyczka';
     const title = op ? m.name : (isBoss ? ch.name : '???');
     const meta = op ? `${m.year} · ${sub}` : (isBoss ? `🔒 ${ch.year} · ${sub}` : 'Zablokowane');
-    parts.push(`<button class="${cls}" data-i="${i}" ${op?'':'disabled'}><span class="cring">${ring}</span><span class="cinfo"><b>${title}</b><small>${meta}</small></span>${st}</button>`);
+    parts.push(`<button type="button" class="${cls}" data-i="${i}" data-open="${op?1:0}"><span class="cring">${ring}</span><span class="cinfo"><b>${title}</b><small>${meta}</small></span>${st}</button>`);
     if (j < ch.maps.length - 1) parts.push('<div class="chRoad" aria-hidden="true"></div>');
   });
   $('chPath').innerHTML = parts.join('');
-  $('chPath').querySelectorAll('.chNode.open').forEach(b => b.addEventListener('click', ev => {
-    ev.stopPropagation();
-    const i = +b.dataset.i;
-    if (mapOpen(i)) { $('pChapter').classList.add('hidden'); openPrep(i); }
-  }));
+  $('chPath').querySelectorAll('.chNode').forEach(b => {
+    b.addEventListener('click', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      const i = +b.dataset.i;
+      if (mapOpen(i)) {
+        sfx('click');
+        $('pChapter').classList.add('hidden');
+        openPrep(i);
+      } else {
+        sfx('click');
+        b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(0)'}], {duration:320});
+        toast('Zablokowane');
+      }
+    });
+  });
   // keep camp visible underneath
   $('camp').classList.remove('hidden');
   $('pChapter').classList.remove('hidden');
+}
+function toast(msg) {
+  let el = $('toast');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'toast';
+    el.setAttribute('role','status');
+    document.getElementById('app').appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 1400);
 }
 function closeChapter() {
   sfx('click');
@@ -2263,6 +2287,7 @@ function openPrep(i, endless) {
     : m.intro;
   const endBtn = $('prepEndless');
   if (endBtn) { endBtn.classList.toggle('hidden', !won(m.id)); endBtn.classList.toggle('sel', prepEndless); }
+  const pc = $('pChapter'); if (pc) pc.classList.add('hidden');
   renderPrep(); openPanel('prep');
 }
 function toggleTowerPick(k) {
@@ -2301,8 +2326,13 @@ function renderPrep(hint) {
 let heroTab = 'zaw';
 const STN = [['Siła', 'obrażenia +2% / pkt'], ['Krzepa', 'zdrowie +2% / pkt'], ['Umiejętność', 'moc +2% / pkt']];
 function renderHeroes() {
-  $('hTabs').innerHTML = HKEYS.map(k => `<button class="pk ${heroOpen(k) ? '' : 'lock'} ${heroTab === k ? 'sel' : ''}" data-h="${k}"><img src="${himg(k, heroOpen(k) ? heroTier(k) : 0)}" alt="">${HEROES[k].short}</button>`).join('');
-  $('hTabs').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); sfx('click'); heroTab = b.dataset.h; renderHeroes(); }));
+  $('hTabs').innerHTML = HKEYS.map(k => `<button class="pk ${heroOpen(k) ? '' : 'lock'} ${heroTab === k ? 'sel' : ''}" data-h="${k}" aria-label="${HEROES[k].name}" title="${HEROES[k].name}"><img src="${himg(k, heroOpen(k) ? heroTier(k) : 0)}" alt="${HEROES[k].name}"></button>`).join('');
+  $('hTabs').querySelectorAll('.pk').forEach(b => b.addEventListener('click', ev => {
+    ev.stopPropagation(); sfx('click');
+    const k = b.dataset.h; heroTab = k;
+    toast(HEROES[k].name);
+    renderHeroes();
+  }));
   const k = heroTab, B = HEROES[k], op = heroOpen(k);
   if (!op) { $('hBody').innerHTML = `<div class="hb"><img src="${himg(k,0)}" alt="" style="filter:grayscale(1) brightness(.5)"><div><h3>${B.name}</h3><div class="hdesc">${B.desc}</div><div class="hlock">🔒 Odblokujesz, wygrywając bitwę: <b>${mapName(HERO_FROM[k])}</b>.</div></div></div>`; return; }
   const d = heroData(k), L = heroLvl(k), st = heroStats(k), pts = heroPts(k), T = tierOf(L);
