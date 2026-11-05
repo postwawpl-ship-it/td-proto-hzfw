@@ -3,7 +3,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4.8';
+const V = '4.9';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -20,7 +20,7 @@ const TT = {
   smo: {name:'Kocioł smoły', desc:'Spowalnia i parzy wszystkich w pobliżu', cost:[85,75,120], dmg:[5,9,14], rate:[.95,.88,.8], range:[66,74,82], slow:[.3,.4,.5]},
   kus: {name:'Kusznicy', desc:'Bełty przebijają kolczugi (zbroja −50%)', cost:[80,70,115], dmg:[18,28,42], rate:[.85,.74,.6], range:[100,110,120]},
   wil: {name:'Wilcze doły', desc:'Stawia się NA DRODZE. Rani i spowalnia przechodzących', cost:[70,65,110], dmg:[8,14,22], rate:[0,0,0], range:[18,20,22], slow:[.25,.35,.45], road:true, hp:[80,130,200]},
-  bal: {name:'Balista', desc:'Ciężki bełt, duży dystans, jeden cel', cost:[100,90,145], dmg:[40,68,105], rate:[2.1,1.9,1.65], range:[135,150,165]},
+  bal: {name:'Balista', desc:'Ciężki bełt, duży dystans, jeden cel', cost:[100,90,145], dmg:[80,130,200], rate:[4.2,3.8,3.3], range:[135,150,165]},
   mus: {name:'Muszkieterzy', desc:'Szybki ogień z muszkietów', cost:[75,65,115], dmg:[14,22,34], rate:[.62,.5,.38], range:[92,100,110]},
   arm: {name:'Armata', desc:'Wolna, rani wielu, przebija zbroje', cost:[125,105,175], dmg:[36,60,98], rate:[2.3,2.05,1.75], range:[105,115,125], splash:[40,46,54]},
   rus: {name:'Rusznica wałowa', desc:'Daleki strzał w najsilniejszego; przebija dwóch', cost:[115,100,165], dmg:[65,110,175], rate:[1.95,1.8,1.55], range:[150,165,180]},
@@ -30,8 +30,8 @@ const TT = {
   woz: {name:'Wóz bojowy', desc:'Tabor: wytrzymały bloker ze strzelcami', cost:[160,140,210], dmg:[18,28,42], rate:[.8,.7,.58], range:[85,92,100], block:true, hp:[200,340,520]},
 };
 const TKEYS = ['luc','smo','kus','wil','bal','mus','arm','rus','haj','kar','moz','woz'];
-const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[44,46,50], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
-const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.3,.28,.25], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
+const TW = {luc:[34,36,40], smo:[40,42,44], kus:[34,36,40], wil:[36,38,40], bal:[48,50,54], mus:[42,44,46], arm:[42,44,47], rus:[31,32,33], haj:[38,40,44], kar:[44,46,50], moz:[44,46,50], woz:[48,52,56]};
+const TOPF = {luc:[.4,.36,.3], smo:[.62,.62,.62], kus:[.4,.36,.3], wil:[.5,.5,.5], bal:[.38,.36,.34], mus:[.25,.25,.33], arm:[.2,.2,.21], rus:[.15,.15,.16], haj:[.45,.45,.45], kar:[.25,.22,.2], moz:[.2,.18,.12], woz:[.4,.4,.4]};
 
 // ====== WROGOWIE ======
 const ET = {
@@ -1075,15 +1075,17 @@ function update(dt) {
           damage(best, towerStat(t,'dmg'), 'mus'); burst(best.x, best.y-10, '#fff1a8', 3, 60, 2, .2); sfx('shot');
           smoke(mx, my, 1, 5);
         } else if (t.type === 'luc' || t.type === 'kus' || t.type === 'bal') {
-          const kx = t.x + Math.cos(t.ang)*10, ky = t.gy + Math.sin(t.ang)*10;
+          const bal = t.type === 'bal';
+          const kx = t.x + Math.cos(t.ang)*(bal?14:10), ky = t.gy + Math.sin(t.ang)*(bal?14:10);
           const dist = Math.hypot(best.x - kx, best.y - 12 - ky);
-          const spd = t.type === 'bal' ? 320 : t.type === 'kus' ? 380 : 340;
-          const dur = Math.max(.18, Math.min(.55, dist / spd));
+          const spd = bal ? 240 : t.type === 'kus' ? 380 : 340;
+          const dur = Math.max(bal ? .32 : .18, Math.min(bal ? .85 : .55, dist / spd));
           const lead = best.blockBy || best.stunT > 0 ? 0 : ET[best.type].spd * (best.slowT > 0 ? 1 - best.slowA : 1);
           const aim = lead ? posAt(best.d + lead * dur) : {x: best.x, y: best.y};
-          S.proj.push({sx:kx, sy:ky, tx:aim.x, ty:aim.y - 12, t:0, dur, dmg:towerStat(t,'dmg'), splash: t.type==='bal'?10:6,
-            src: t.type==='bal'?'bal':t.type==='kus'?'kus':'luc', kind: t.type==='luc'?'arrow':'bolt', hi:false});
+          S.proj.push({sx:kx, sy:ky, tx:aim.x, ty:aim.y - 12, t:0, dur, dmg:towerStat(t,'dmg'), splash: bal?16:6,
+            src: bal?'bal':t.type==='kus'?'kus':'luc', kind: t.type==='luc'?'arrow':(bal?'hbolt':'bolt'), hi:bal});
           sfx(t.type==='luc'?'arrow':'twang');
+          if (bal) { t.anim = 1; S.shake = Math.max(S.shake, 1.2); smoke(kx, ky, 3, 6); }
         } else if (t.type === 'kar') {
           const dmg = towerStat(t,'dmg'), splash = towerStat(t,'splash');
           S.tracers.push({x1:mx, y1:my, x2:best.x, y2:best.y-10, life:.1, max:.1, w:4, col:'255,200,100'});
@@ -1117,12 +1119,21 @@ function update(dt) {
     if (Math.random() < .5 && S.parts.length < 330) { const q = projPos(p); S.parts.push({x:q.x, y:q.y, vx:0, vy:-6, life:.35, max:.35, color: p.fall ? '#b8b0a4' : '#cfcac2', size:3, grav:0, kind:'smoke'}); }
     if (p.t >= p.dur) {
       p.done = true;
-      if (p.kind === 'arrow' || p.kind === 'bolt') {
+      if (p.kind === 'arrow' || p.kind === 'bolt' || p.kind === 'hbolt') {
         let hit = null, hd = p.splash + 14;
         for (const e of S.enemies) if (!e.dead) { const dd = Math.hypot(e.x - p.tx, e.y - 12 - p.ty); if (dd < hd) { hd = dd; hit = e; } }
         if (hit) damage(hit, p.dmg, p.src);
         else for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-p.tx, e.y-p.ty) <= p.splash + 8) { damage(e, p.dmg, p.src); break; }
-        burst(p.tx, p.ty, '#d9c29a', 4, 55, 2, .22);
+        if (p.kind === 'hbolt') {
+          burst(p.tx, p.ty, '#c4a574', 10, 90, 3.2, .35);
+          burst(p.tx, p.ty, '#fff1c8', 6, 55, 2.4, .28);
+          smoke(p.tx, p.ty, 5, 8, '#bdb6aa');
+          S.parts.push({x:p.tx, y:p.ty, vx:0, vy:0, life:.28, max:.28, color:'#ffe7a0', size:18, grav:0, kind:'ring'});
+          S.shake = Math.max(S.shake, 2.6);
+          sfx('twang');
+        } else {
+          burst(p.tx, p.ty, '#d9c29a', 4, 55, 2, .22);
+        }
       } else {
         for (const e of S.enemies) if (!e.dead && Math.hypot(e.x-p.tx, e.y-p.ty) <= p.splash) damage(e, p.dmg, p.src);
         const big = p.src === 'moz' || p.fall;
@@ -1199,7 +1210,7 @@ function update(dt) {
 function projPos(p) {
   const k = Math.max(0, Math.min(1, p.t / p.dur));
   if (p.fall) return {x: p.sx + (p.tx - p.sx)*k, y: p.sy + (p.ty - p.sy)*k*k, gx: p.tx, gy: p.ty};
-  const arc = p.kind === 'arrow' ? 28 + p.dur*36 : p.kind === 'bolt' ? 18 + p.dur*28 : (p.hi ? 70 + p.dur*30 : 20 + p.dur*30);
+  const arc = p.kind === 'arrow' ? 28 + p.dur*36 : p.kind === 'hbolt' ? 36 + p.dur*42 : p.kind === 'bolt' ? 18 + p.dur*28 : (p.hi ? 70 + p.dur*30 : 20 + p.dur*30);
   const hgt = Math.sin(k*Math.PI) * arc;
   return {x: p.sx + (p.tx - p.sx)*k, y: p.sy + (p.ty - p.sy)*k - hgt, gx: p.sx + (p.tx - p.sx)*k, gy: p.sy + (p.ty - p.sy)*k + 12*(1-k)};
 }
@@ -1512,6 +1523,16 @@ function drawTower(c, t, time) {
     for (let k = 0; k < 3; k++) { const ph = (time*1.2 + k*.33 + t.seed) % 1; c.globalAlpha = (1-ph)*.6; circ(c, x - 5*s + k*5*s, cy - 2*s - ph*14*s, (1.5 + ph*3)*s, '#4b3b30', null); }
     c.globalAlpha = 1;
     if (anim > .5) { c.strokeStyle = 'rgba(255,140,30,.85)'; c.lineWidth = 2; c.beginPath(); c.ellipse(x, cy, 14 + (1-anim)*12, 5 + (1-anim)*4, 0, 0, 7); c.stroke(); }
+  } else if (type === 'bal') {
+    // odrzut / błysk przy strzale ciężkiego bełtu
+    if (anim > .35) {
+      c.save(); c.translate(x, gy - 2); c.rotate(t.ang);
+      const flash = (anim - .35) / .65;
+      c.globalAlpha = Math.max(0, 1 - flash) * .9;
+      circ(c, 18, 0, 5 + flash * 6, '#fff3a0', null);
+      circ(c, 22, 0, 2.5 + flash * 3, '#ffffff', null);
+      c.globalAlpha = 1; c.restore();
+    }
   } else if (type === 'kus') {
     // kusznik
     soldier(c, x, gy, t.ang, 0, .8, lvl == 2 ? '#7a2a1a' : '#6b4a2a', 0, lvl == 2 ? '#ffcc33' : '#2a62c9');
@@ -1729,20 +1750,32 @@ function render() {
   for (const p of S.proj) {
     if (p.t < 0) continue;
     const q = projPos(p);
-    if (p.kind === 'arrow' || p.kind === 'bolt') {
-      const k = Math.max(0.001, Math.min(1, p.t / p.dur));
+    if (p.kind === 'arrow' || p.kind === 'bolt' || p.kind === 'hbolt') {
       const q2 = projPos(Object.assign({}, p, {t: p.t - 0.016}));
       const ang = Math.atan2(q.y - q2.y, q.x - q2.x);
-      const len = p.kind === 'bolt' ? 14 : 11;
+      const heavy = p.kind === 'hbolt';
+      const len = heavy ? 28 : p.kind === 'bolt' ? 14 : 11;
+      const thick = heavy ? 4.2 : p.kind === 'bolt' ? 2.4 : 1.8;
       c.save(); c.translate(q.x, q.y); c.rotate(ang);
-      c.strokeStyle = p.kind === 'bolt' ? '#3a2a14' : '#5a3417'; c.lineWidth = p.kind === 'bolt' ? 2.4 : 1.8;
-      c.beginPath(); c.moveTo(-len*.45, 0); c.lineTo(len*.55, 0); c.stroke();
-      c.fillStyle = p.kind === 'bolt' ? '#6a4a28' : '#c41e3a';
-      c.beginPath(); c.moveTo(len*.55, 0); c.lineTo(len*.2, -2.4); c.lineTo(len*.2, 2.4); c.fill();
-      c.strokeStyle = '#e8e0cc'; c.lineWidth = 1;
-      c.beginPath(); c.moveTo(-len*.45, 0); c.lineTo(-len*.2, -2); c.moveTo(-len*.45, 0); c.lineTo(-len*.2, 2); c.stroke();
+      // shaft
+      c.strokeStyle = heavy ? '#4a3018' : p.kind === 'bolt' ? '#3a2a14' : '#5a3417';
+      c.lineWidth = thick; c.lineCap = 'round';
+      c.beginPath(); c.moveTo(-len*.48, 0); c.lineTo(len*.5, 0); c.stroke();
+      if (heavy) {
+        c.strokeStyle = '#6b4a28'; c.lineWidth = 2.2;
+        c.beginPath(); c.moveTo(-len*.4, 0); c.lineTo(len*.35, 0); c.stroke();
+      }
+      // tip
+      c.fillStyle = heavy ? '#2a2a2e' : p.kind === 'bolt' ? '#6a4a28' : '#c41e3a';
+      const tip = len*.55, back = heavy ? len*.18 : len*.2, hw = heavy ? 4.2 : 2.4;
+      c.beginPath(); c.moveTo(tip, 0); c.lineTo(back, -hw); c.lineTo(back, hw); c.fill();
+      // fletching
+      c.strokeStyle = heavy ? '#c41e3a' : '#e8e0cc'; c.lineWidth = heavy ? 2 : 1;
+      const ft = -len*.45;
+      c.beginPath(); c.moveTo(ft, 0); c.lineTo(ft + (heavy?7:3.2), - (heavy?4.5:2));
+      c.moveTo(ft, 0); c.lineTo(ft + (heavy?7:3.2), (heavy?4.5:2)); c.stroke();
       c.restore();
-      c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(q.gx, q.gy + 2, 3, 1.4, 0, 0, 7); c.fill();
+      c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(q.gx, q.gy + 2, heavy?5:3, heavy?2.2:1.4, 0, 0, 7); c.fill();
     } else {
       const r = p.hi ? 5.5 : 4.5;
       c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(q.gx, q.gy + 3, r, r*.45, 0, 0, 7); c.fill();
