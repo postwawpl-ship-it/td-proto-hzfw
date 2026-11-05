@@ -1,7 +1,7 @@
 'use strict';
 (() => {
 // ====== KONFIGURACJA ======
-const V = '4';
+const V = '4.1';
 const W = 360, H = 560;
 const Q = new URLSearchParams(location.search);
 const DEBUG = Q.has('debug');
@@ -124,7 +124,10 @@ const SPECS = {
 };
 const SKEYS = ['ryc','tat','hus','ost'];
 // ====== MAPY (16) + teksty ======
-const NODE_POS = {"glo": [11.35, 54.34], "leg": [11.57, 58.32], "plo": [22.39, 48.58], "gru": [28.61, 38.23], "kor": [19.3, 39.73], "ors": [73.7, 29.12], "obe": [50.0, 80.53], "byc": [19.57, 59.2], "kir": [45.65, 8.41], "klu": [93.26, 18.85], "cec": [63.48, 95.58], "cho": [56.52, 82.12], "gni": [23.13, 35.13], "trz": [23.48, 37.17], "och": [71.3, 76.11], "jg": [24.43, 61.86]};
+const NODE_POS = {"glo": [14.5, 49.5], "leg": [18.5, 59.0], "plo": [24.0, 48.5], "gru": [38.5, 37.5], "kor": [20.5, 41.0], "ors": [79.98, 30.01], "obe": [56.9, 76.91], "byc": [28.0, 54.0], "kir": [53.3, 11.01], "klu": [95.58, 20.63], "cec": [68.39, 89.38], "cho": [62.71, 78.34], "gni": [26.5, 34.5], "trz": [36.5, 28.0], "och": [80.9, 73.03], "jg": [32.0, 62.5]};
+const NODE_LBL = {"glo": [-8, -28], "leg": [18, 26], "plo": [-28, -12], "gru": [26, -8], "kor": [-26, 22], "ors": [0, -18], "obe": [16, 10], "byc": [20, 8], "kir": [0, 20], "klu": [-12, 14], "cec": [10, 24], "cho": [-22, -18], "gni": [-24, -14], "trz": [24, 16], "och": [0, 20], "jg": [0, 28]};
+const CAMP_ROADS = [{"a":"glo","b":"leg","pts":[[14.5,49.5],[14.04,49.82],[13.71,50.31],[13.54,50.94],[13.55,51.65],[13.73,52.42],[14.06,53.22],[14.51,54.05],[15.03,54.87],[15.58,55.68],[16.11,56.47],[16.59,57.21],[17.02,57.88],[17.38,58.44],[17.68,58.87],[17.94,59.11],[18.16,59.14]]},{"a":"leg","b":"plo","pts":[[18.5,59.0],[18.08,58.63],[17.81,58.07],[17.73,57.36],[17.84,56.57],[18.14,55.71],[18.6,54.82],[19.18,53.91],[19.84,53.01],[20.52,52.12],[21.18,51.26],[21.78,50.44],[22.32,49.71],[22.77,49.09],[23.14,48.62],[23.44,48.36],[23.68,48.33]]},{"a":"plo","b":"gru","pts":[[24.0,48.5],[24.56,48.91],[25.39,49.03],[26.39,48.88],[27.52,48.43],[28.72,47.73],[29.95,46.81],[31.19,45.72],[32.42,44.54],[33.63,43.33],[34.81,42.16],[35.92,41.08],[36.92,40.12],[37.76,39.31],[38.4,38.66],[38.75,38.17],[38.77,37.85]]},{"a":"gru","b":"kor","pts":[[38.5,37.5],[38.43,38.2],[37.97,38.9],[37.17,39.55],[36.09,40.1],[34.76,40.53],[33.24,40.83],[31.59,41.03],[29.87,41.16],[28.15,41.26],[26.48,41.36],[24.92,41.46],[23.53,41.57],[22.35,41.66],[21.44,41.7],[20.83,41.64],[20.58,41.44]]},{"a":"kor","b":"ors","pts":[[20.5,41.0],[21.5,42.67],[23.69,43.94],[26.86,44.7],[30.83,44.89],[35.41,44.5],[40.44,43.59],[45.76,42.29],[51.21,40.74],[56.64,39.09],[61.9,37.49],[66.83,36.04],[71.25,34.78],[74.99,33.71],[77.85,32.8],[79.65,31.98],[80.2,31.2]]},{"a":"ors","b":"obe","pts":[[79.98,30.01],[81.36,31.34],[82.11,33.56],[82.16,36.46],[81.49,39.86],[80.14,43.6],[78.21,47.57],[75.85,51.67],[73.21,55.81],[70.49,59.9],[67.86,63.87],[65.43,67.59],[63.29,70.95],[61.48,73.79],[60.0,75.93],[58.84,77.21],[57.99,77.45]]},{"a":"obe","b":"byc","pts":[[56.9,76.91],[57.41,75.6],[57.25,73.92],[56.43,72.02],[55.0,70.04],[53.01,68.04],[50.58,66.09],[47.83,64.21],[44.89,62.38],[41.9,60.61],[39.01,58.9],[36.32,57.27],[33.94,55.79],[31.92,54.53],[30.32,53.62],[29.18,53.17],[28.56,53.3]]},{"a":"byc","b":"kir","pts":[[28.0,54.0],[26.71,52.59],[26.1,50.39],[26.21,47.6],[27.05,44.4],[28.58,40.92],[30.7,37.28],[33.26,33.55],[36.08,29.81],[38.98,26.12],[41.79,22.55],[44.39,19.19],[46.68,16.16],[48.62,13.59],[50.19,11.67],[51.4,10.54],[52.26,10.4]]},{"a":"kir","b":"klu","pts":[[53.3,11.01],[53.42,12.66],[54.45,14.36],[56.28,15.96],[58.81,17.33],[61.92,18.44],[65.49,19.27],[69.37,19.87],[73.42,20.32],[77.48,20.68],[81.42,21.03],[85.09,21.39],[88.38,21.75],[91.15,22.05],[93.31,22.21],[94.74,22.11],[95.35,21.66]]},{"a":"klu","b":"cec","pts":[[95.58,20.63],[96.97,22.07],[97.64,24.86],[97.53,28.74],[96.63,33.47],[94.99,38.84],[92.72,44.65],[89.97,50.75],[86.93,56.96],[83.81,63.14],[80.78,69.12],[77.99,74.74],[75.52,79.78],[73.44,84.04],[71.75,87.29],[70.44,89.3],[69.52,89.83]]},{"a":"cec","b":"cho","pts":[[68.39,89.38],[68.81,89.01],[69.07,88.43],[69.15,87.7],[69.02,86.87],[68.71,85.98],[68.24,85.04],[67.64,84.09],[66.97,83.13],[66.27,82.19],[65.59,81.27],[64.97,80.42],[64.43,79.64],[63.96,78.98],[63.58,78.49],[63.27,78.21],[63.03,78.17]]},{"a":"cho","b":"gni","pts":[[62.71,78.34],[60.9,79.01],[58.48,78.67],[55.67,77.35],[52.66,75.12],[49.57,72.09],[46.49,68.4],[43.47,64.24],[40.5,59.81],[37.61,55.32],[34.82,50.96],[32.17,46.92],[29.77,43.33],[27.74,40.29],[26.24,37.88],[25.46,36.19],[25.56,35.27]]},{"a":"gni","b":"trz","pts":[[26.5,34.5],[26.91,34.89],[27.5,35.09],[28.21,35.11],[28.99,34.92],[29.82,34.54],[30.67,34.0],[31.52,33.33],[32.37,32.59],[33.2,31.82],[34.0,31.08],[34.76,30.4],[35.44,29.8],[36.02,29.29],[36.46,28.87],[36.69,28.55],[36.7,28.31]]},{"a":"trz","b":"och","pts":[[36.5,28.0],[38.3,27.22],[40.88,27.5],[44.01,28.79],[47.5,31.03],[51.18,34.13],[54.94,37.91],[58.73,42.2],[62.49,46.78],[66.18,51.42],[69.75,55.92],[73.12,60.1],[76.17,63.82],[78.75,66.96],[80.67,69.44],[81.74,71.21],[81.76,72.18]]},{"a":"och","b":"jg","pts":[[80.9,73.03],[80.74,71.13],[79.53,69.18],[77.4,67.37],[74.46,65.81],[70.85,64.58],[66.73,63.67],[62.24,63.02],[57.57,62.57],[52.88,62.2],[48.33,61.85],[44.09,61.48],[40.29,61.11],[37.09,60.8],[34.6,60.65],[32.94,60.78],[32.26,61.31]]}];
+const CAMP_ASPECT = 1.1272;
 const FAC_LINES = {"ger": ["Für den Kaiser!", "Los, vorwärts!", "Polnische Burg? Ha!", "Wo ist das Bier?"], "mon": ["Hurraaa!", "Koń i szabla!", "Step woła!", "Batu! Batu!"], "teu": ["Gott mit uns!", "Zwei Schwerter!", "Für den Orden!", "Nein, nicht schon wieder!"], "mos": ["Za cara!", "Moskwa nie zginie!", "Bojar idzie!", "Ura!"], "mol": ["Moldova!", "Do boju!", "Hospodar kazał!"], "max": ["Maximilian!", "Za arcyksięcia!", "Byczyna czeka?"], "swe": ["För Sverige!", "Kungens män!", "Atak!", "Zimno tu!"], "ott": ["Allah!", "Janczarzy!", "Eyvah!", "Do szturmu!"], "tat": ["Haik!", "Ałła!", "Stepowy wiatr!", "Szybko i znikać!"]};
 const PL = {
   wave:['Do broni!','Szykować się!','Idą!','Za Polskę!','Trzymać szyk!','Proch suchy?'],
@@ -158,7 +161,7 @@ const FACT = {
 };
 
 const MAPS = [
- { id:"glo", name:"Głogów", year:1109, big:false, fac:"ger", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+ { id:"glo", name:"Głogów", year:1109, big:false, fac:"ger", grass:"grass", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
    gold:200, hk:0.92, boss:null, roster:["ger", "gkn"], music:"jg", sky:"#d9e6f0",
@@ -168,7 +171,7 @@ const MAPS = [
    waves:[[["ger", 4, 1.1, 0]], [["ger", 4, 1.05, 0], ["gkn", 2, 0.96, 3]], [["ger", 5, 1.0, 0], ["gkn", 3, 0.92, 3]], [["ger", 6, 0.95, 0], ["gkn", 4, 0.88, 3]], [["ger", 7, 0.9, 0], ["gkn", 4, 0.84, 3]], [["ger", 8, 0.85, 0], ["gkn", 5, 0.8, 3]], [["ger", 9, 0.8, 0], ["gkn", 6, 0.76, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"leg", name:"Legnica", year:1241, big:false, fac:"mon", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+ { id:"leg", name:"Legnica", year:1241, big:false, fac:"mon", grass:"grass", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179]], roads:[[70, 95], [290, 95], [290, 200]],
    gold:210, hk:0.95, boss:null, roster:["mon", "mkn"], music:"jg", sky:"#e8e0c8",
@@ -178,7 +181,7 @@ const MAPS = [
    waves:[[["mon", 4, 1.1, 0]], [["mon", 4, 1.05, 0], ["mkn", 2, 0.96, 3]], [["mon", 5, 1.0, 0], ["mkn", 3, 0.92, 3]], [["mon", 6, 0.95, 0], ["mkn", 4, 0.88, 3]], [["mon", 7, 0.9, 0], ["mkn", 4, 0.84, 3]], [["mon", 8, 0.85, 0], ["mkn", 5, 0.8, 3]], [["mon", 9, 0.8, 0], ["mkn", 6, 0.76, 3]], [["mon", 10, 0.75, 0], ["mkn", 6, 0.72, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"plo", name:"Płowce", year:1331, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+ { id:"plo", name:"Płowce", year:1331, big:false, fac:"teu", grass:"grass_gr", fort:"fort_grod", fortW:150, fortAR:0.7481,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
    gold:220, hk:0.98, boss:null, roster:["kne", "teu"], music:"gr", sky:"#d5e8d5",
@@ -188,7 +191,7 @@ const MAPS = [
    waves:[[["kne", 4, 1.1, 0]], [["kne", 4, 1.05, 0], ["teu", 2, 0.96, 3]], [["kne", 5, 1.0, 0], ["teu", 3, 0.92, 3]], [["kne", 6, 0.95, 0], ["teu", 4, 0.88, 3]], [["kne", 7, 0.9, 0], ["teu", 4, 0.84, 3]], [["kne", 8, 0.85, 0], ["teu", 5, 0.8, 3]], [["kne", 9, 0.8, 0], ["teu", 6, 0.76, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"gru", name:"Grunwald", year:1410, big:true, fac:"teu", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+ { id:"gru", name:"Grunwald", year:1410, big:true, fac:"teu", grass:"grass", fort:"fort_tabor", fortW:170, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230], [126, 266], [124, 296]], roads:[[40, 100], [320, 100], [320, 200], [80, 200]],
    gold:260, hk:1.0, boss:"ulr", roster:["kne", "teu", "bra"], music:"gr", sky:"#d9ecf6",
@@ -198,7 +201,7 @@ const MAPS = [
    waves:[[["kne", 4, 1.1, 0]], [["kne", 5, 1.05, 0], ["teu", 3, 0.96, 3]], [["kne", 6, 1.0, 0], ["teu", 4, 0.92, 3]], [["kne", 7, 0.95, 0], ["teu", 5, 0.88, 3], ["bra", 3, 0.81, 5]], [["kne", 8, 0.9, 0], ["teu", 5, 0.84, 3], ["bra", 4, 0.78, 5]], [["kne", 9, 0.85, 0], ["teu", 6, 0.8, 3], ["bra", 4, 0.75, 5]], [["kne", 10, 0.8, 0], ["teu", 7, 0.76, 3], ["bra", 5, 0.72, 5]], [["kne", 11, 0.75, 0], ["teu", 7, 0.72, 3], ["bra", 5, 0.69, 5]], [["kne", 12, 0.7, 0], ["teu", 8, 0.68, 3], ["bra", 6, 0.66, 5]], [["kne", 13, 0.65, 0], ["teu", 9, 0.64, 3], ["bra", 6, 0.63, 5]], [["kne", 14, 0.6, 0], ["teu", 9, 0.6, 3], ["bra", 7, 0.6, 5]], [["kne", 15, 0.55, 0], ["teu", 10, 0.56, 3], ["bra", 7, 0.57, 5], ["ulr", 1, 1, 8], ["kne", 6, 0.7, 12]]],
    bossL:{"spawn": "Zwei Schwerter für euch!", "half": "Der Orden wankt!", "low": "Zurück!", "die": "Jungingen fällt…"},
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"kor", name:"Koronowo", year:1410, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+ { id:"kor", name:"Koronowo", year:1410, big:false, fac:"teu", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:0.8136,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
    gold:230, hk:1.02, boss:null, roster:["kne", "teu", "bra"], music:"gr", sky:"#d8ecd8",
@@ -208,7 +211,7 @@ const MAPS = [
    waves:[[["kne", 4, 1.1, 0]], [["kne", 4, 1.05, 0], ["teu", 2, 0.96, 3]], [["kne", 5, 1.0, 0], ["teu", 3, 0.92, 3]], [["kne", 6, 0.95, 0], ["teu", 4, 0.88, 3], ["bra", 3, 0.81, 5]], [["kne", 7, 0.9, 0], ["teu", 4, 0.84, 3], ["bra", 3, 0.78, 5]], [["kne", 8, 0.85, 0], ["teu", 5, 0.8, 3], ["bra", 4, 0.75, 5]], [["kne", 9, 0.8, 0], ["teu", 6, 0.76, 3], ["bra", 4, 0.72, 5]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"ors", name:"Orsza", year:1514, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+ { id:"ors", name:"Orsza", year:1514, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:1.1364,
    flags:'pl', river:true, camp:'v2', deco:'v2',
    path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
    gold:240, hk:1.04, boss:null, roster:["str", "boj"], music:"ch", sky:"#e8dcc0",
@@ -218,7 +221,7 @@ const MAPS = [
    waves:[[["str", 4, 1.1, 0]], [["str", 4, 1.05, 0], ["boj", 2, 0.96, 3]], [["str", 5, 1.0, 0], ["boj", 3, 0.92, 3]], [["str", 6, 0.95, 0], ["boj", 4, 0.88, 3]], [["str", 7, 0.9, 0], ["boj", 4, 0.84, 3]], [["str", 8, 0.85, 0], ["boj", 5, 0.8, 3]], [["str", 9, 0.8, 0], ["boj", 6, 0.76, 3]], [["str", 10, 0.75, 0], ["boj", 6, 0.72, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"obe", name:"Obertyn", year:1531, big:false, fac:"mol", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+ { id:"obe", name:"Obertyn", year:1531, big:false, fac:"mol", grass:"grass", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
    gold:240, hk:1.05, boss:null, roster:["mol", "aza"], music:"ch", sky:"#e6d8b8",
@@ -228,7 +231,7 @@ const MAPS = [
    waves:[[["mol", 4, 1.1, 0]], [["mol", 4, 1.05, 0], ["aza", 2, 0.96, 3]], [["mol", 5, 1.0, 0], ["aza", 3, 0.92, 3]], [["mol", 6, 0.95, 0], ["aza", 4, 0.88, 3]], [["mol", 7, 0.9, 0], ["aza", 4, 0.84, 3]], [["mol", 8, 0.85, 0], ["aza", 5, 0.8, 3]], [["mol", 9, 0.8, 0], ["aza", 6, 0.76, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"byc", name:"Byczyna", year:1588, big:false, fac:"max", grass:"grass", fort:"fort", fortW:160, fortAR:367/440,
+ { id:"byc", name:"Byczyna", year:1588, big:false, fac:"max", grass:"grass", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[180, -25], [180, 80], [60, 120], [60, 220], [300, 260], [300, 360], [100, 400], [180, 478]], spots:[[130, 33], [219, 59], [134, 75], [100, 90], [111, 145], [128, 209], [199, 225], [259, 235], [248, 315]], roads:[[180, 80], [60, 120], [60, 220]],
    gold:250, hk:1.06, boss:null, roster:["max", "gkn"], music:"jg", sky:"#e0e4f0",
@@ -238,7 +241,7 @@ const MAPS = [
    waves:[[["max", 4, 1.1, 0]], [["max", 4, 1.05, 0], ["gkn", 2, 0.96, 3]], [["max", 5, 1.0, 0], ["gkn", 3, 0.92, 3]], [["max", 6, 0.95, 0], ["gkn", 4, 0.88, 3]], [["max", 7, 0.9, 0], ["gkn", 4, 0.84, 3]], [["max", 8, 0.85, 0], ["gkn", 5, 0.8, 3]], [["max", 9, 0.8, 0], ["gkn", 6, 0.76, 3]], [["max", 10, 0.75, 0], ["gkn", 6, 0.72, 3]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"kir", name:"Kircholm", year:1605, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+ { id:"kir", name:"Kircholm", year:1605, big:true, fac:"swe", grass:"grass", fort:"fort_tabor", fortW:170, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[30, -25], [30, 140], [150, 140], [150, 40], [300, 40], [300, 250], [60, 250], [60, 340], [250, 340], [250, 405], [180, 420], [180, 478]], spots:[[75, 107], [60, 160], [96, 154], [126, 153], [200, 85], [106, 60], [270, 31], [258, 92], [258, 156], [252, 208], [168, 270]], roads:[[30, 140], [150, 140], [300, 250], [60, 250]],
    gold:280, hk:1.08, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
@@ -248,7 +251,7 @@ const MAPS = [
    waves:[[["pie", 4, 1.1, 0]], [["pie", 5, 1.05, 0], ["raj", 3, 0.96, 3]], [["pie", 6, 1.0, 0], ["raj", 4, 0.92, 3]], [["pie", 7, 0.95, 0], ["raj", 5, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 8, 0.9, 0], ["raj", 5, 0.84, 3], ["pan", 4, 0.78, 5]], [["pie", 9, 0.85, 0], ["raj", 6, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 10, 0.8, 0], ["raj", 7, 0.76, 3], ["pan", 5, 0.72, 5]], [["pie", 11, 0.75, 0], ["raj", 7, 0.72, 3], ["pan", 5, 0.69, 5]], [["pie", 12, 0.7, 0], ["raj", 8, 0.68, 3], ["pan", 6, 0.66, 5]], [["pie", 13, 0.65, 0], ["raj", 9, 0.64, 3], ["pan", 6, 0.63, 5]], [["pie", 14, 0.6, 0], ["raj", 9, 0.6, 3], ["pan", 7, 0.6, 5]], [["pie", 15, 0.55, 0], ["raj", 10, 0.56, 3], ["pan", 7, 0.57, 5], ["gen", 1, 1, 8], ["pie", 6, 0.7, 12]]],
    bossL:{"spawn": "Szwedzki młot uderza!", "half": "Nie…!", "low": "Odwrót!", "die": "Szuchy…"},
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"klu", name:"Kłuszyn", year:1610, big:false, fac:"mos", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+ { id:"klu", name:"Kłuszyn", year:1610, big:false, fac:"mos", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[40, -25], [40, 100], [320, 100], [320, 200], [80, 200], [80, 320], [280, 320], [280, 420], [180, 450], [180, 478]], spots:[[85, 44], [110, 120], [194, 81], [264, 82], [266, 155], [260, 210], [188, 211], [128, 188], [120, 230]], roads:[[40, 100], [320, 100], [320, 200]],
    gold:260, hk:1.1, boss:null, roster:["str", "boj", "pan"], music:"ch", sky:"#e8d8b0",
@@ -258,7 +261,7 @@ const MAPS = [
    waves:[[["str", 4, 1.1, 0]], [["str", 4, 1.05, 0], ["boj", 2, 0.96, 3]], [["str", 5, 1.0, 0], ["boj", 3, 0.92, 3]], [["str", 6, 0.95, 0], ["boj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["str", 7, 0.9, 0], ["boj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["str", 8, 0.85, 0], ["boj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["str", 9, 0.8, 0], ["boj", 6, 0.76, 3], ["pan", 4, 0.72, 5]], [["str", 10, 0.75, 0], ["boj", 6, 0.72, 3], ["pan", 5, 0.69, 5]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"cec", name:"Cecora", year:1620, big:false, fac:"ott", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+ { id:"cec", name:"Cecora", year:1620, big:false, fac:"ott", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:true, camp:'v2', deco:'v2',
    path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229]], roads:[[300, 45], [90, 95], [60, 180]],
    gold:250, hk:1.08, boss:null, roster:["aza", "jan", "sip", "tat"], music:"ch", sky:"#e8e0c8",
@@ -268,7 +271,7 @@ const MAPS = [
    waves:[[["aza", 4, 1.1, 0]], [["aza", 4, 1.05, 0], ["jan", 2, 0.96, 3]], [["aza", 5, 1.0, 0], ["jan", 3, 0.92, 3]], [["aza", 6, 0.95, 0], ["jan", 4, 0.88, 3], ["sip", 3, 0.81, 5]], [["aza", 7, 0.9, 0], ["jan", 4, 0.84, 3], ["sip", 3, 0.78, 5], ["tat", 2, 0.85, 6]], [["aza", 8, 0.85, 0], ["jan", 5, 0.8, 3], ["sip", 4, 0.75, 5], ["tat", 3, 0.85, 6]], [["aza", 9, 0.8, 0], ["jan", 6, 0.76, 3], ["sip", 4, 0.72, 5], ["tat", 3, 0.85, 6]], [["aza", 10, 0.75, 0], ["jan", 6, 0.72, 3], ["sip", 5, 0.69, 5], ["tat", 4, 0.85, 6]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"cho", name:"Chocim", year:1621, big:true, fac:"ott", grass:"grass_ch", fort:"fort_ch", fortW:180, fortAR:367/440,
+ { id:"cho", name:"Chocim", year:1621, big:true, fac:"ott", grass:"grass_ch", fort:"fort_ch", fortW:180, fortAR:1.0250,
    flags:'pl', river:true, camp:'v2', deco:'v2',
    path:[[300, -25], [300, 45], [90, 95], [60, 180], [250, 215], [290, 290], [100, 330], [80, 400], [180, 425], [180, 478]], spots:[[254, 31], [259, 69], [172, 62], [144, 96], [43, 113], [124, 147], [173, 183], [221, 188], [307, 229], [237, 261], [253, 320]], roads:[[300, 45], [90, 95], [60, 180], [250, 215]],
    gold:300, hk:1.1, boss:"pas", roster:["aza", "jan", "sip"], music:"ch", sky:"#e8e0c8",
@@ -278,7 +281,7 @@ const MAPS = [
    waves:[[["aza", 4, 1.1, 0]], [["aza", 5, 1.05, 0], ["jan", 3, 0.96, 3]], [["aza", 6, 1.0, 0], ["jan", 4, 0.92, 3]], [["aza", 7, 0.95, 0], ["jan", 5, 0.88, 3], ["sip", 3, 0.81, 5]], [["aza", 8, 0.9, 0], ["jan", 5, 0.84, 3], ["sip", 4, 0.78, 5]], [["aza", 9, 0.85, 0], ["jan", 6, 0.8, 3], ["sip", 4, 0.75, 5]], [["aza", 10, 0.8, 0], ["jan", 7, 0.76, 3], ["sip", 5, 0.72, 5]], [["aza", 11, 0.75, 0], ["jan", 7, 0.72, 3], ["sip", 5, 0.69, 5]], [["aza", 12, 0.7, 0], ["jan", 8, 0.68, 3], ["sip", 6, 0.66, 5]], [["aza", 13, 0.65, 0], ["jan", 9, 0.64, 3], ["sip", 6, 0.63, 5]], [["aza", 14, 0.6, 0], ["jan", 9, 0.6, 3], ["sip", 7, 0.6, 5]], [["aza", 15, 0.55, 0], ["jan", 10, 0.56, 3], ["sip", 7, 0.57, 5], ["pas", 1, 1, 8], ["aza", 6, 0.7, 12]]],
    bossL:{"spawn": "Chocim będzie mój! Evet!", "half": "Aman!", "low": "Gdzie wielbłąd?!", "die": "Pokój!"},
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"gni", name:"Gniew", year:1626, big:false, fac:"swe", grass:"grass_ch", fort:"fort_ch", fortW:160, fortAR:367/440,
+ { id:"gni", name:"Gniew", year:1626, big:false, fac:"swe", grass:"grass_ch", fort:"fort_gr", fortW:160, fortAR:0.8136,
    flags:'pl', river:true, camp:'v2', deco:'v2',
    path:[[100, -25], [100, 60], [280, 90], [280, 180], [60, 210], [60, 310], [300, 340], [300, 420], [180, 450], [180, 478]], spots:[[50, 43], [152, 47], [191, 93], [237, 101], [322, 140], [232, 162], [152, 180], [97, 185], [98, 235]], roads:[[100, 60], [280, 90], [280, 180]],
    gold:270, hk:1.12, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d0e0f0",
@@ -288,7 +291,7 @@ const MAPS = [
    waves:[[["pie", 4, 1.1, 0]], [["pie", 4, 1.05, 0], ["raj", 2, 0.96, 3]], [["pie", 5, 1.0, 0], ["raj", 3, 0.92, 3]], [["pie", 6, 0.95, 0], ["raj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 7, 0.9, 0], ["raj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["pie", 8, 0.85, 0], ["raj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 9, 0.8, 0], ["raj", 6, 0.76, 3], ["pan", 4, 0.72, 5]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"trz", name:"Trzciana", year:1629, big:false, fac:"swe", grass:"grass_gr", fort:"fort_gr", fortW:160, fortAR:367/440,
+ { id:"trz", name:"Trzciana", year:1629, big:false, fac:"swe", grass:"grass_gr", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[200, -25], [200, 70], [80, 110], [80, 200], [260, 240], [260, 330], [100, 370], [180, 430], [180, 478]], spots:[[254, 51], [155, 67], [121, 80], [91, 87], [128, 132], [128, 182], [115, 219], [170, 238], [212, 247]], roads:[[200, 70], [80, 110], [80, 200]],
    gold:280, hk:1.14, boss:null, roster:["pie", "raj", "pan"], music:"jg", sky:"#d8ecd0",
@@ -298,7 +301,7 @@ const MAPS = [
    waves:[[["pie", 4, 1.1, 0]], [["pie", 4, 1.05, 0], ["raj", 2, 0.96, 3]], [["pie", 5, 1.0, 0], ["raj", 3, 0.92, 3]], [["pie", 6, 0.95, 0], ["raj", 4, 0.88, 3], ["pan", 3, 0.81, 5]], [["pie", 7, 0.9, 0], ["raj", 4, 0.84, 3], ["pan", 3, 0.78, 5]], [["pie", 8, 0.85, 0], ["raj", 5, 0.8, 3], ["pan", 4, 0.75, 5]], [["pie", 9, 0.8, 0], ["raj", 6, 0.76, 3], ["pan", 4, 0.72, 5]], [["pie", 10, 0.75, 0], ["raj", 6, 0.72, 3], ["pan", 5, 0.69, 5]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"och", name:"Ochmatów", year:1644, big:false, fac:"tat", grass:"grass_wi", fort:"fort_wi", fortW:160, fortAR:367/440,
+ { id:"och", name:"Ochmatów", year:1644, big:false, fac:"tat", grass:"grass_wi", fort:"fort_tabor", fortW:150, fortAR:0.7161,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[50, -25], [50, 90], [180, 130], [300, 90], [300, 200], [180, 240], [60, 280], [60, 380], [180, 420], [180, 478]], spots:[[102, 38], [97, 81], [137, 94], [168, 110], [226, 140], [230, 92], [262, 80], [253, 118], [286, 227]], roads:[[50, 90], [180, 130], [300, 90]],
    gold:290, hk:1.15, boss:null, roster:["tat", "aza", "sip"], music:"ch", sky:"#ead8a8",
@@ -308,7 +311,7 @@ const MAPS = [
    waves:[[["tat", 4, 1.1, 0]], [["tat", 4, 1.05, 0], ["aza", 2, 0.96, 3]], [["tat", 5, 1.0, 0], ["aza", 3, 0.92, 3]], [["tat", 6, 0.95, 0], ["aza", 4, 0.88, 3], ["sip", 3, 0.81, 5]], [["tat", 7, 0.9, 0], ["aza", 4, 0.84, 3], ["sip", 3, 0.78, 5]], [["tat", 8, 0.85, 0], ["aza", 5, 0.8, 3], ["sip", 4, 0.75, 5]], [["tat", 9, 0.8, 0], ["aza", 6, 0.76, 3], ["sip", 4, 0.72, 5]], [["tat", 10, 0.75, 0], ["aza", 6, 0.72, 3], ["sip", 5, 0.69, 5]]],
    bossL:null,
    pl:["Za Polskę!", "Nie damy się!", "Do broni!", "Ojczyzna woła!", "Bij, zabij!", "Chwała bohaterom!", "Jeszcze Polska!"] },
- { id:"jg", name:"Jasna Góra", year:1655, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:367/440,
+ { id:"jg", name:"Jasna Góra", year:1655, big:true, fac:"swe", grass:"grass", fort:"fort", fortW:180, fortAR:0.8341,
    flags:'pl', river:false, camp:'v2', deco:'v2',
    path:[[70, -25], [70, 95], [290, 95], [290, 200], [70, 200], [70, 305], [290, 305], [290, 405], [180, 405], [180, 478]], spots:[[121, 41], [120, 71], [191, 79], [246, 77], [237, 121], [248, 153], [235, 186], [169, 180], [114, 179], [111, 258], [125, 316]], roads:[[70, 95], [290, 95], [290, 200], [70, 200]],
    gold:300, hk:1.12, boss:"gen", roster:["pie", "raj", "pan"], music:"jg", sky:"#cfe3f0",
@@ -1190,7 +1193,7 @@ const IMG = {};
 const IMG_LIST = [].concat(
   ...TKEYS.map(k => [0,1,2].map(l => 't_'+k+l)),
   ...HKEYS.map(k => [0,1,2,3].map(l => 'h_'+k+l)),
-  Object.values(ET).map(t => t.img), ['e_hus','e_tat','fort','fort_gr','fort_ch','fort_wi','grass','grass_gr','grass_ch','grass_wi','dirt'],
+  Object.values(ET).map(t => t.img), ['e_hus','e_tat','fort','fort_gr','fort_ch','fort_wi','fort_grod','fort_tabor','grass','grass_gr','grass_ch','grass_wi','dirt'],
   ['oak','pine','apple','birch','bush','rock','rocks','cart','tent','tentb','tento','tentw','barrels','barrels2','fence','fence2','hay','hay2','mill','ocan','pond','reed','vine'].map(n => 'd_'+n));
 const DW = {d_oak:36,d_pine:28,d_apple:32,d_birch:30,d_bush:22,d_rock:20,d_rocks:18,d_hay:22,d_hay2:24,d_fence:24,d_fence2:26,d_barrels:16,d_barrels2:20,d_reed:20,d_pond:44,d_vine:26,d_mill:46,d_tentw:40,d_tentb:38,d_tento:42,d_ocan:30,d_cart:34,d_tent:40};
 function loadImages(cb) {
@@ -1524,11 +1527,20 @@ function drawFortress(c, t) {
 }
 function enemyFlag(c, t) {
   const x = 330, y = Math.min(10, -OFF + 16);
-  if (M.fac === 'swe') flag(c, x, y, 16, 10, t, ['#2a5bc9'], true, '#ffd23a');
-  else if (M.fac === 'teu') flag(c, x, y, 16, 10, t, ['#f4f1e8'], true, '#151515');
-  else { flag(c, x, y, 16, 10, t, ['#c81e1e'], true);
+  const f = M.fac;
+  if (f === 'swe') flag(c, x, y, 16, 10, t, ['#2a5bc9'], true, '#ffd23a');
+  else if (f === 'teu') flag(c, x, y, 16, 10, t, ['#f4f1e8'], true, '#151515');
+  else if (f === 'ger') flag(c, x, y, 16, 10, t, ['#000000', '#ffd23a', '#000000']); // Rzesza / Henryk V
+  else if (f === 'mon') flag(c, x, y, 16, 10, t, ['#1a4a8a', '#c9a24a']); // Mongołowie
+  else if (f === 'mos') flag(c, x, y, 16, 10, t, ['#ffffff', '#2a62c9', '#c81e1e']); // Moskwa
+  else if (f === 'mol') flag(c, x, y, 16, 10, t, ['#2a62c9', '#ffd23a', '#c81e1e']); // Mołdawia
+  else if (f === 'max') flag(c, x, y, 16, 10, t, ['#ffd23a', '#151515']); // Habsburgowie
+  else if (f === 'tat') flag(c, x, y, 16, 10, t, ['#1a7a3a', '#c9a24a']); // Tatarzy
+  else if (f === 'ott') { // Turcja – półksiężyc
+    flag(c, x, y, 16, 10, t, ['#c81e1e'], true);
     const wy = Math.sin(t*6 - .5*4)*.5*10*.22; c.fillStyle = '#fff'; c.beginPath(); c.arc(x + 7.5, y + 5 + wy, 3, 0, 7); c.fill();
-    c.fillStyle = '#c81e1e'; c.beginPath(); c.arc(x + 8.7, y + 4.7 + wy, 2.5, 0, 7); c.fill(); }
+    c.fillStyle = '#c81e1e'; c.beginPath(); c.arc(x + 8.7, y + 4.7 + wy, 2.5, 0, 7); c.fill();
+  } else flag(c, x, y, 16, 10, t, ['#c81e1e'], true);
 }
 function drawHero(c, h, t) {
   if (h.dead) return;
@@ -1821,41 +1833,57 @@ function renderBestLine() {
 }
 
 // ---- mapa kampanii ----
-function windPath(pts) {
-  // winding old-map road between nodes (quadratic bends)
-  if (!pts.length) return '';
-  let d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
-  for (let i = 1; i < pts.length; i++) {
-    const a = pts[i-1], b = pts[i];
-    const mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
-    const dx = b[0]-a[0], dy = b[1]-a[1];
-    const side = (i%2 ? 1 : -1);
-    const cx = mx - dy*0.18*side, cy = my + dx*0.18*side;
-    d += ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1);
+function roadD(pts) {
+  if (!pts || pts.length < 2) return '';
+  let d = 'M' + pts[0][0] + ' ' + pts[0][1];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const xc = (pts[i][0] + pts[i+1][0]) / 2, yc = (pts[i][1] + pts[i+1][1]) / 2;
+    d += ' Q' + pts[i][0] + ' ' + pts[i][1] + ' ' + xc + ' ' + yc;
   }
+  const last = pts[pts.length - 1];
+  d += ' T' + last[0] + ' ' + last[1];
   return d;
 }
 function renderCamp() {
   $('campStars').textContent = '★ ' + totalStars() + '/' + TOTAL_STARS;
-  const unlocked = [];
-  for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) unlocked.push(NODE_POS[MAPS[i].id]);
-  // draw road only through opened chain
-  const roadPts = [];
-  for (let i = 0; i < MAPS.length; i++) {
-    if (!mapOpen(i) && !won(MAPS[i].id) && i > 0) break;
-    roadPts.push(NODE_POS[MAPS[i].id]);
-    if (!won(MAPS[i].id) && i > 0) break; // stop after first open-but-not-won
-  }
-  if (roadPts.length < 2) roadPts.push(...MAPS.slice(0,2).map(m => NODE_POS[m.id]));
-  $('routePath').setAttribute('d', windPath(roadPts));
-  $('routePath').classList.add('draw');
+  const cmap = $('cmap');
+  if (cmap) cmap.style.aspectRatio = String(CAMP_ASPECT);
+  // winding roads for unlocked segments
+  const svg = $('routeSvg');
+  let lastOpen = 0;
+  for (let i = 0; i < MAPS.length; i++) if (mapOpen(i) || won(MAPS[i].id)) lastOpen = i;
+  let shadows = '', roads = '';
+  CAMP_ROADS.forEach((rd, idx) => {
+    if (idx >= lastOpen) return;
+    const fresh = idx === lastOpen - 1;
+    const d = roadD(rd.pts);
+    shadows += `<path class="roadsh" d="${d}" />`;
+    roads += `<path class="road${fresh ? ' draw' : ''}" d="${d}" />`;
+  });
+  if (svg) svg.innerHTML = shadows + roads;
+
   $('nodes').innerHTML = MAPS.map((m, i) => {
     const op = mapOpen(i), r = mapRec(m.id), w = r.stars > 0, [x, y] = NODE_POS[m.id];
+    const [ldx, ldy] = NODE_LBL[m.id] || [0, 0];
     const end = (r.endless|0) > 0 ? `<div class="endb">Bastion ${r.endless}</div>` : '';
-    return `<button class="node ${m.big?'big':''} ${w ? 'won' : op ? 'open' : 'lock'}" data-i="${i}" style="left:${x}%;top:${y}%"><div class="ring">${op ? m.year : '🔒'}</div><div class="nm">${op ? m.name : '???'}</div><div class="st">${op ? starsHtml(r.stars) : ''}</div>${end}</button>`;
+    const ring = op ? String(m.year).slice(2) : '🔒';
+    const nm = op ? `<div class="nm" style="--ldx:${ldx}px;--ldy:${ldy}px"><b>${m.name}</b><small>${m.year}</small></div>`
+                  : `<div class="nm faint" style="--ldx:${ldx}px;--ldy:${ldy}px"><small>${m.year}</small></div>`;
+    const lead = (ldx || ldy) ? `<i class="lead" style="--ldx:${ldx}px;--ldy:${ldy}px"></i>` : '';
+    return `<button class="node ${m.big?'big':''} ${w?'won':op?'open':'lock'}" data-i="${i}" style="left:${x}%;top:${y}%">${lead}<div class="ring">${ring}</div>${nm}<div class="st">${op?starsHtml(r.stars):''}</div>${end}</button>`;
   }).join('');
   $('nodes').querySelectorAll('.node').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); audioInit(); const i = +b.dataset.i;
     if (mapOpen(i)) openPrep(i); else { sfx('click'); b.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-50%,-50%) rotate(-8deg)'},{transform:'translate(-50%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}], {duration:300}); } }));
+  // auto-scroll to current (first open not-won, else last won)
+  requestAnimationFrame(() => {
+    const wrap = $('cmapwrap'); if (!wrap) return;
+    let focus = 0;
+    for (let i = 0; i < MAPS.length; i++) { if (mapOpen(i) && !won(MAPS[i].id)) { focus = i; break; } if (won(MAPS[i].id)) focus = i; }
+    const [x, y] = NODE_POS[MAPS[focus].id];
+    const tw = wrap.clientWidth, th = wrap.clientHeight;
+    const cw = cmap.clientWidth, ch = cmap.clientHeight;
+    wrap.scrollTo({ left: Math.max(0, (x/100)*cw - tw/2), top: Math.max(0, (y/100)*ch - th/2), behavior: 'smooth' });
+  });
 }
 let prepI = 0, prepEndless = false;
 function openPrep(i, endless) {
