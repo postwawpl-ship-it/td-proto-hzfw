@@ -1475,12 +1475,17 @@ const himg = (id, tier) => iimg('h_' + id + tier);
 const heroTier = id => tierOf(heroLvl(id));
 function toCss(x, y) { return [cv.offsetLeft + x*SCALE, cv.offsetTop + (y+OFF)*SCALE]; }
 function placeMenu(x, y, above) {
-  const [cx, cy] = toCss(x, y), st = $('stage');
+  const [cx, cy] = toCss(x, y);
   menu.classList.remove('hidden');
-  const mw = menu.offsetWidth, mh = menu.offsetHeight;
-  const left = Math.max(4, Math.min(st.clientWidth - mw - 4, cx - mw/2));
-  let top = cy - mh - (above||26)*SCALE; if (top < 4) top = cy + 24*SCALE;
-  if (top + mh > st.clientHeight - 4) top = st.clientHeight - mh - 4;
+  const mw = menu.offsetWidth, mh = menu.offsetHeight, m = 8;
+  // Clamp inside the canvas (map) frame, not the full stage — keeps the popup
+  // clear of the decorative brown/gold border around the map.
+  const L = cv.offsetLeft + m, R = cv.offsetLeft + cv.offsetWidth - m;
+  const T = cv.offsetTop + m, B = cv.offsetTop + cv.offsetHeight - m;
+  const left = Math.max(L, Math.min(R - mw, cx - mw / 2));
+  let top = cy - mh - (above || 26) * SCALE;
+  if (top < T) top = cy + 24 * SCALE;
+  if (top + mh > B) top = Math.max(T, B - mh);
   menu.style.left = left + 'px'; menu.style.top = top + 'px';
 }
 function closeMenu() { if (menu) menu.classList.add('hidden'); if (S) S.selected = null; }
@@ -1488,8 +1493,11 @@ function openBuild(i) {
   S.selected = {spot: i};
   menu.className = 'build';
   const keys = TKEYS.filter(towerOpen);
-  menu.style.width = Math.min(352, 12 + keys.length*50) + 'px';
-  menu.innerHTML = '<div class="opts">' + keys.map(k => `<button class="opt" data-k="${k}"><img src="${timg(k,0)}" alt=""><span class="n">${TT[k].name}</span><span class="c">${TT[k].cost[0]} zł</span></button>`).join('') + '</div><div class="hint" id="optHint">Wybierz wieżę</div>';
+  // Fit inside the map frame: wrapping grid, max width = canvas - margins.
+  const maxW = Math.max(200, cv.offsetWidth - 16), n = keys.length;
+  const cols = n <= 2 ? n : n === 4 ? 2 : 3; // 1–2 row, 4 → 2×2, 3/5/6 → 3-col wrap
+  menu.style.width = Math.min(maxW, 14 + cols * 102) + 'px';
+  menu.innerHTML = '<div class="opts" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))">' + keys.map(k => `<button class="opt" data-k="${k}"><img src="${timg(k,0)}" alt=""><span class="n">${TT[k].name}</span><span class="c">${TT[k].cost[0]} zł</span></button>`).join('') + '</div><div class="hint" id="optHint">Wybierz wieżę</div>';
   menu.querySelectorAll('.opt').forEach(b => {
     b.addEventListener('pointerenter', () => { $('optHint').textContent = TT[b.dataset.k].desc; });
     b.addEventListener('click', ev => { ev.stopPropagation(); audioInit();
@@ -1502,7 +1510,7 @@ function openTower(tw) {
   const T = TT[tw.type], max = tw.lvl >= 2, uc = max ? 0 : T.cost[tw.lvl+1], ref = Math.floor(tw.spent*.7);
   const dmgTxt = tw.type === 'smo' ? `Spowolnienie ${Math.round(towerStat(tw,'slow')*100)}%` : `Obrażenia ${towerStat(tw,'dmg')}`;
   const nextTxt = max ? '' : (tw.type === 'smo' ? ` → ${Math.round(T.slow[tw.lvl+1]*100)}%` : ` → ${T.dmg[tw.lvl+1]}`);
-  menu.className = 'tower'; menu.style.width = '';
+  menu.className = 'tower'; menu.style.width = Math.min(250, Math.max(200, cv.offsetWidth - 16)) + 'px';
   menu.innerHTML = `<div class="th"><img src="${timg(tw.type, tw.lvl)}" alt=""><div><h3>${T.name}</h3><div class="lv">${'★'.repeat(tw.lvl+1)}${'☆'.repeat(2-tw.lvl)} poziom ${tw.lvl+1}/3</div></div></div>
     <div class="desc">${T.desc}<br><b>${dmgTxt}${nextTxt}</b> · zasięg ${towerStat(tw,'range')}${max ? '' : ' → ' + T.range[tw.lvl+1]}</div>
     <div class="row"><button class="act up" data-c="${uc}">${max ? 'MAKS. ★' : 'Ulepsz · ' + uc + ' zł'}</button><button class="act sell">Sprzedaj +${ref}</button></div>`;
